@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User, Municipality, AdministrativePost, Suco, Aldeia,
     Child, AppUsageLog, PreschoolEnrollmentOptIn,
-    ApkVersion, WhatsAppMessage
+    ApkVersion, WhatsAppMessage, ActivityResult
 )
 
 # ------------------------------
@@ -98,3 +98,17 @@ class WhatsAppMessageAdmin(admin.ModelAdmin):
     list_display = ("id", "to_number", "template_type", "status", "sent_at")
     list_filter = ("template_type", "status", "sent_at")
     search_fields = ("to_number", "template_type")
+
+
+@admin.register(ActivityResult)
+class ActivityResultAdmin(admin.ModelAdmin):
+    list_display = ("id", "parent", "student", "activity_name", "activity_result", "created_at")
+    list_filter = ("activity_name", "created_at", "parent", "student")
+    search_fields = ("activity_name", "parent__first_name", "parent__last_name", "student__first_name")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (None, {"fields": ("parent", "student")}),
+        ("Categories", {"fields": ("category1", "category2", "category3")}),
+        ("Activity", {"fields": ("activity_name", "activity_result")}),
+        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+    )

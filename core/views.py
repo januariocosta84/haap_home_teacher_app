@@ -1,7 +1,8 @@
 # core/views.py
 
 from re import escape
-from django.db.models import Count
+from django.db.models import Count, Q
+from django.db import connection
 from django.http.response import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
@@ -14,7 +15,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib import colors
 from datetime import datetime
 
-from core.models import AdministrativePost, Aldeia, ApkVersion, AppUsageLog, Child, Municipality, Suco, User
+from core.models import AdministrativePost, Aldeia, ApkVersion, AppUsageLog, Child, Municipality, Suco, User,ActivityResult
 from .forms import ApkVersionForm, ChildRegistrationForm, LoginForm, ParentRegisterForm, ParentRegistrationForm, ProfileImageForm, UserRegistrationForm
 from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login, logout
@@ -352,6 +353,11 @@ def parent_dashboard(request):
 
 class UserManagementView(View):
     def get(self, request):
+        # Only MoE admins can access user management
+        if not request.user.is_authenticated or request.user.role != "moe_admin":
+            messages.error(request, "Aksesu negadu.")
+            return redirect("core:home")
+        
         # Query users by role
         parents = User.objects.filter(role="parent")
         teachers = User.objects.filter(role="teacher")
@@ -387,44 +393,79 @@ def parent_list(request):
         "municipalities": municipalities
     })
 
+def is_valid_uuid(value):
+    try:
+        uuid.UUID(str(value))
+        return True
+    except ValueError:
+        return False
+
 class AppUsageLogListView(ListView):
-    model = AppUsageLog
+    model = ActivityResult
     template_name = "dashboards/logs.html"
     context_object_name = "logs"
     paginate_by = 10
 
     def get_queryset(self):
         user = self.request.user
-        queryset = super().get_queryset().select_related("child").order_by("-date_accessed")
 
-        # Optional filter by ?activity=
+        queryset = ActivityResult.objects.select_related(
+            "parent",
+            "student",
+            "student__parent"
+        ).order_by("-created_at")
+
+        # ------------------------
+        # 1. Text search filter
+        # ------------------------
         activity = self.request.GET.get("activity")
         if activity:
-            queryset = queryset.filter(activity_type=activity)
+            queryset = queryset.filter(activity_name__icontains=activity)
 
-        # Role-based filtering
+        # ------------------------
+        # 2. Role-based filters
+        # ------------------------
         if user.role == "parent":
-            queryset = queryset.filter(child__parent=user)
+            queryset = queryset.filter(parent=user)
 
         elif user.role == "municipality_analyst":
-            queryset = queryset.filter(child__parent__municipality=user.municipality)
+            if user.municipality:
+                queryset = queryset.filter(
+                    Q(parent__municipality=user.municipality) |
+                    Q(student__parent__municipality=user.municipality)
+                )
+            else:
+                return ActivityResult.objects.none()
 
         elif user.role == "teacher":
-            # Assuming teacher also has municipality relation like user.municipality
-            queryset = queryset.filter(child__parent__municipality=user.municipality)
+            queryset = queryset.filter(
+                student__parent__municipality=user.municipality
+            )
 
         elif user.role == "moe_admin":
-            # Admin sees everything → no filter
-            pass
+            pass  # no restrictions
 
         else:
-            # Other roles (if any) → return nothing or restrict
-            queryset = queryset.none()
+            return ActivityResult.objects.none()
+
+        # ------------------------
+        # 3. Parent filter (dropdown or querystring)
+        # ------------------------
+        parent_id = self.request.GET.get("parent")
+
+        if parent_id and is_valid_uuid(parent_id):
+            queryset = queryset.filter(parent__id=parent_id)
+
+        # ------------------------
+        # 4. Student filter (children of the selected parent)
+        # ------------------------
+        student_id = self.request.GET.get("student")
+
+        if student_id and is_valid_uuid(student_id):
+            queryset = queryset.filter(student__id=student_id)
 
         return queryset
 
-
-## Children Report
 
 class ChildrenReportView(ListView):
     model = Child
@@ -587,6 +628,57 @@ def register_user(request):
 
     return render(request, "users/register_user.html", {"form": form})
 
+
+@login_required
+def view_user(request, user_id):
+    """Simple view for a single user (MoE admin only)."""
+    if request.user.role != "moe_admin":
+        messages.error(request, "Aksesu negadu.")
+        return redirect("core:user_management")
+
+    user = get_object_or_404(User, id=user_id)
+    return render(request, "users/view_user.html", {"obj": user})
+
+
+@login_required
+def edit_user(request, user_id):
+    """Edit an existing user (MoE admin only)."""
+    if request.user.role != "moe_admin":
+        messages.error(request, "Aksesu negadu.")
+        return redirect("core:user_management")
+
+    user_obj = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        form = UserRegistrationForm(request.POST, instance=user_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "User updated successfully.")
+            return redirect("core:user_management")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = UserRegistrationForm(instance=user_obj)
+
+    return render(request, "users/edit_user.html", {"form": form, "user_obj": user_obj})
+
+
+@login_required
+def delete_user(request, user_id):
+    """Delete a user (MoE admin only). Shows confirmation form on GET, deletes on POST."""
+    if request.user.role != "moe_admin":
+        messages.error(request, "Aksesu negadu.")
+        return redirect("core:user_management")
+
+    user_obj = get_object_or_404(User, id=user_id)
+    if request.method == "POST":
+        name = f"{user_obj.first_name} {user_obj.last_name}"
+        user_obj.delete()
+        messages.warning(request, f"User '{name}' has been deleted.")
+        return redirect("core:user_management")
+
+    return render(request, "users/confirm_delete_user.html", {"user_obj": user_obj})
+
 class LatestApkView(ListView):
     model = ApkVersion
     template_name = "apk/latest_version.html"
@@ -644,6 +736,9 @@ def export_parents_pdf(request):
     story.append(metadata)
     story.append(Spacer(1, 0.3*inch))
     
+    # Total count
+    total_parents = parents.count()
+
     # Prepare table data
     table_data = [['Naran', 'WhatsApp', 'Email', 'Munisipiu']]
     
@@ -655,6 +750,15 @@ def export_parents_pdf(request):
             str(parent.municipality) if parent.municipality else "-"
         ])
     
+    # Add total summary above table
+    summary_style = ParagraphStyle(
+        'Summary',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=8,
+    )
+    story.append(Paragraph(f"Total Parentes: <b>{total_parents}</b>", summary_style))
+
     if len(table_data) == 1:  # Only header
         story.append(Paragraph("Walha dados no filtru ne'e.", styles['Normal']))
     else:

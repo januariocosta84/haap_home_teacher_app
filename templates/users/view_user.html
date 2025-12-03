@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5>Ver Utilizador</h5>
+    </div>
+    <div class="card-body">
+      <dl class="row">
+        <dt class="col-sm-3">Naran</dt>
+        <dd class="col-sm-9">{{ obj.first_name }} {{ obj.last_name }}</dd>
+
+        <dt class="col-sm-3">WhatsApp</dt>
+        <dd class="col-sm-9">{{ obj.whatsapp_number }}</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">{{ obj.email }}</dd>
+
+        <dt class="col-sm-3">Role</dt>
+        <dd class="col-sm-9">{{ obj.get_role_display }}</dd>
+
+  <dt class="col-sm-3">Munisipiu</dt>
+  <dd class="col-sm-9">{% if obj.municipality %}{{ obj.municipality.name }}{% else %}-{% endif %}</dd>
+      </dl>
+
+      <a href="{% url 'core:edit_user' obj.id %}" class="btn btn-sm btn-warning">Editar</a>
+      <a href="{% url 'core:user_management' %}" class="btn btn-secondary btn-sm">Fila</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

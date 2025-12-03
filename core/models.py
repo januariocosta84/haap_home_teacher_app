@@ -311,3 +311,50 @@ class WhatsAppMessage(models.Model):
 
     def __str__(self):
         return f" WhatsApp → {self.to_number} [{self.template_type}] "
+
+
+class ActivityResult(models.Model):
+    """Stores activity results linked to a parent (pid) and a student/child (sid).
+
+    The database column names remain `pid` and `sid` for compatibility, but
+    at the ORM level they are proper ForeignKey relations to `User` and `Child`.
+    """
+    id = models.AutoField(primary_key=True)
+
+    parent = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='activity_results',
+        db_column='pid'
+    )
+
+    student = models.ForeignKey(
+        Child,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='activity_results',
+        db_column='sid'
+    )
+
+    category1 = models.TextField(null=True, blank=True)
+    category2 = models.TextField(null=True, blank=True)
+    category3 = models.TextField(null=True, blank=True)
+
+    activity_name = models.TextField(null=True, blank=True)
+    activity_result = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'activity_result'
+        indexes = [
+            models.Index(fields=['parent']),
+            models.Index(fields=['student']),
+        ]
+
+    def __str__(self):
+        return f"ActivityResult {self.id} ({self.activity_name}) -> {self.activity_result}"

@@ -1,114 +1,243 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>👥 Jestaun Utilizador</h2>
-    <a href="{% url 'core:register_user' %}" class="btn btn-primary">
-      ➕ Kria Utilizador Foun
-    </a>
-  </div>
-
-  <!-- Parents -->
-  <div class="card my-3">
-    <div class="card-header bg-primary text-white">Parentes</div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th><th>Naran</th><th>Telefone</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for parent in parents %}
-          <tr>
-            <td>{{ parent.id }}</td>
-            <td>{{ parent.first_name }} {{ parent.last_name }}</td>
-            <td>{{ parent.whatsapp_number }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3">No parents found</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<div class="container-fluid mt-5">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center py-3 px-4">
+      <h3 class="mb-0 fw-bold text-primary"> Jestaun Utilizador</h3>
+      <a href="{% url 'core:register_user' %}" class="btn btn-success btn-sm">
+        <i class="bi bi-plus-circle"></i> Kria Utilizador Foun
+      </a>
     </div>
   </div>
 
-  <!-- Teachers -->
-  <div class="card my-3">
-    <div class="card-header bg-success text-white">Formadores</div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th><th>Naran</th><th>Telefone</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for teacher in teachers %}
-          <tr>
-            <td>{{ teacher.id }}</td>
-            <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
-            <td>{{ teacher.whatsapp_number }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3">No teachers found</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <!-- Tabs for roles -->
+  <ul class="nav nav-tabs" id="userTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab">Parentes ({{ parents|length }})</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab">Formadores ({{ teachers|length }})</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="analysts-tab" data-bs-toggle="tab" data-bs-target="#analysts" type="button" role="tab">Analistas ({{ analysts|length }})</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab">Admins ({{ admins|length }})</button>
+    </li>
+  </ul>
 
-  <!-- Analysts -->
-  <div class="card my-3">
-    <div class="card-header bg-warning">Analistas Munisipal</div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th><th>Naran</th><th>Telefone</th><th>Munisipal</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for analyst in analysts %}
-          <tr>
-            <td>{{ analyst.id }}</td>
-            <td>{{ analyst.first_name }} {{ analyst.last_name }}</td>
-            <td>{{ analyst.whatsapp_number }}</td>
-            <td>{{ analyst.municipality.name }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3">No analysts found</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <div class="tab-content mt-3" id="userTabsContent">
+    {% comment %} Parents Tab {% endcomment %}
+    <div class="tab-pane fade show active" id="parents" role="tabpanel">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="input-group w-50">
+              <span class="input-group-text">🔎</span>
+              <input class="form-control" id="searchParents" placeholder="Filtra naran/telefone..." />
+            </div>
+            <small class="text-muted align-self-center">Total: {{ parents|length }}</small>
+          </div>
 
-  <!-- Admins -->
-  <div class="card my-3">
-    <div class="card-header bg-danger text-white">Admins</div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>ID</th><th>Naran</th><th>Funsaun</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for admin in admins %}
-          <tr>
-            <td>{{ admin.id }}</td>
-            <td>{{ admin.first_name }} {{ admin.last_name }}</td>
-            <td>{{ admin.get_role_display }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3">No admins found</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Naran</th>
+                  <th>WhatsApp</th>
+                  <th>Email</th>
+                  <th class="text-end">Aksaun</th>
+                </tr>
+              </thead>
+              <tbody id="parentsTable">
+                {% for parent in parents %}
+                <tr>
+                  <td>{{ parent.id }}</td>
+                  <td>{{ parent.first_name }} {{ parent.last_name }}</td>
+                  <td>{{ parent.whatsapp_number }}</td>
+                  <td>{{ parent.email }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'core:view_user' parent.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    <a href="{% url 'core:edit_user' parent.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'core:delete_user' parent.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">No parents found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
+
+    {% comment %} Teachers Tab {% endcomment %}
+    <div class="tab-pane fade" id="teachers" role="tabpanel">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="input-group w-50">
+              <span class="input-group-text">🔎</span>
+              <input class="form-control" id="searchTeachers" placeholder="Filtra naran/telefone..." />
+            </div>
+            <small class="text-muted align-self-center">Total: {{ teachers|length }}</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Naran</th>
+                  <th>WhatsApp</th>
+                  <th class="text-end">Aksaun</th>
+                </tr>
+              </thead>
+              <tbody id="teachersTable">
+                {% for teacher in teachers %}
+                <tr>
+                  <td>{{ teacher.id }}</td>
+                  <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
+                  <td>{{ teacher.whatsapp_number }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'core:view_user' teacher.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    <a href="{% url 'core:edit_user' teacher.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'core:delete_user' teacher.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No teachers found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Analysts Tab {% endcomment %}
+    <div class="tab-pane fade" id="analysts" role="tabpanel">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="input-group w-50">
+              <span class="input-group-text">🔎</span>
+              <input class="form-control" id="searchAnalysts" placeholder="Filtra naran/telefone/munisipiu..." />
+            </div>
+            <small class="text-muted align-self-center">Total: {{ analysts|length }}</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Naran</th>
+                  <th>WhatsApp</th>
+                  <th>Munisipiu</th>
+                  <th class="text-end">Aksaun</th>
+                </tr>
+              </thead>
+              <tbody id="analystsTable">
+                {% for analyst in analysts %}
+                <tr>
+                  <td>{{ analyst.id }}</td>
+                  <td>{{ analyst.first_name }} {{ analyst.last_name }}</td>
+                  <td>{{ analyst.whatsapp_number }}</td>
+                  <td>{{ analyst.municipality.name }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'core:view_user' analyst.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    <a href="{% url 'core:edit_user' analyst.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'core:delete_user' analyst.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5">No analysts found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Admins Tab {% endcomment %}
+    <div class="tab-pane fade" id="admins" role="tabpanel">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="input-group w-50">
+              <span class="input-group-text">🔎</span>
+              <input class="form-control" id="searchAdmins" placeholder="Filtra naran..." />
+            </div>
+            <small class="text-muted align-self-center">Total: {{ admins|length }}</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Naran</th>
+                  <th>Funsaun</th>
+                  <th class="text-end">Aksaun</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTable">
+                {% for admin in admins %}
+                <tr>
+                  <td>{{ admin.id }}</td>
+                  <td>{{ admin.first_name }} {{ admin.last_name }}</td>
+                  <td>{{ admin.get_role_display }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'core:view_user' admin.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No admins found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Generic table filter helper
+  function setupTableFilter(inputId, tableBodyId) {
+    const input = document.getElementById(inputId);
+    const tbody = document.getElementById(tableBodyId);
+    if (!input || !tbody) return;
+
+    input.addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach(row => {
+        // skip empty placeholder rows
+        if (row.querySelectorAll('td').length === 0) return;
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.indexOf(q) !== -1 ? '' : 'none';
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    setupTableFilter('searchParents', 'parentsTable');
+    setupTableFilter('searchTeachers', 'teachersTable');
+    setupTableFilter('searchAnalysts', 'analystsTable');
+    // admins do not have a search input but we keep function available
+    setupTableFilter('searchAdmins', 'adminsTable');
+  });
+</script>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card border-danger">
+    <div class="card-header bg-danger text-white">
+      <h5>Confirmasaun Delete</h5>
+    </div>
+    <div class="card-body">
+      <p>Kestu kona ba elimina utilizador:</p>
+      <p class="fw-bold">{{ user_obj.first_name }} {{ user_obj.last_name }} ({{ user_obj.whatsapp_number }})</p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar Permanente</button>
+        <a href="{% url 'core:user_management' %}" class="btn btn-secondary">Kansela</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

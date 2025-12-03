@@ -21,17 +21,23 @@
           <a href="{% url 'core:parent_list' %}" class="btn btn-outline-secondary btn-sm me-2">Limpa</a>
         {% endif %}
 
-        {# Export button always visible; include municipality param only when selected #}
-        <a href="{% url 'core:export_parents_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
-           class="btn btn-danger btn-sm d-flex align-items-center">
-          <i class="bi bi-file-earmark-pdf-fill me-1"></i>
-          <span class="d-none d-sm-inline">Export PDF</span>
-        </a>
+        {# Export button inline with Limpa; show only to MoE admins #}
+        {% if request.user.is_authenticated and request.user.role == 'moe_admin' %}
+          <button type="button"
+                  class="btn btn-danger btn-sm d-flex align-items-center"
+                  id="exportPdfBtn"
+                  data-export-url="{% url 'core:export_parents_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exportConfirmModal">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i>
+            Descarrega PDF
+          </button>
+        {% endif %}
       </div>
     </form>
   </div>
 </div>
-
+{# Floating export button aligned to the right of the table for emphasis #}
 <a href="#"  class="btn btn-primary">+ Register Parent</a>
 <table class="table mt-3">
     <thead>
@@ -101,4 +107,41 @@
     {% endif %}
   </ul>
 </nav>
+
+{# Export confirmation modal (re-uses page_obj.paginator.count for total) #}
+<div class="modal fade" id="exportConfirmModal" tabindex="-1" aria-labelledby="exportConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exportConfirmModalLabel">Konfirma Export</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Deskarrega PDF hosi lista atual?</p>
+        <p><strong>Total Parentes:</strong> {{ page_obj.paginator.count }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kansela</button>
+        <a id="confirmExportLink" class="btn btn-danger btn-sm" href="#">Descarrega PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // Wire the export modal confirm link to the button's data-export-url
+  document.addEventListener('DOMContentLoaded', function () {
+    var exportBtn = document.getElementById('exportPdfBtn');
+    var confirmLink = document.getElementById('confirmExportLink');
+    if (exportBtn && confirmLink) {
+      exportBtn.addEventListener('click', function () {
+        var url = exportBtn.getAttribute('data-export-url');
+        confirmLink.setAttribute('href', url);
+      });
+    }
+  });
+</script>
+{% endblock %}
+{# extra_js not needed for inline buttons #}
 {% endblock %}
