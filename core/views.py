@@ -32,6 +32,7 @@ from django.utils.encoding import force_bytes
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import get_user_model
+import uuid
 
 
 @login_required
@@ -400,12 +401,88 @@ def is_valid_uuid(value):
     except ValueError:
         return False
 
+# class AppUsageLogListView(ListView):
+#     model = ActivityResult
+#     template_name = "dashboards/logs.html"
+#     context_object_name = "logs"
+#     paginate_by = 10
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         queryset = ActivityResult.objects.select_related(
+#             "parent",
+#             "student",
+#             "student__parent"
+#         ).order_by("-created_at")
+
+#         # ------------------------
+#         # 1. Text search filter
+#         # ------------------------
+#         activity = self.request.GET.get("activity")
+#         if activity:
+#             queryset = queryset.filter(activity_name__icontains=activity)
+
+#         # ------------------------
+#         # 2. Role-based filters
+#         # ------------------------
+#         if user.role == "parent":
+#             queryset = queryset.filter(parent=user)
+
+#         elif user.role == "municipality_analyst":
+#             if user.municipality:
+#                 queryset = queryset.filter(
+#                     Q(parent__municipality=user.municipality) |
+#                     Q(student__parent__municipality=user.municipality)
+#                 )
+#             else:
+#                 return ActivityResult.objects.none()
+
+#         elif user.role == "teacher":
+#             queryset = queryset.filter(
+#                 student__parent__municipality=user.municipality
+#             )
+
+#         elif user.role == "moe_admin":
+#             pass  # no restrictions
+
+#         else:
+#             return ActivityResult.objects.none()
+
+#         # ------------------------
+#         # 3. Parent filter (dropdown or querystring)
+#         # ------------------------
+#         parent_id = self.request.GET.get("parent")
+
+#         if parent_id and is_valid_uuid(parent_id):
+#             queryset = queryset.filter(parent__id=parent_id)
+
+#         # ------------------------
+#         # 4. Student filter (children of the selected parent)
+#         # ------------------------
+#         student_id = self.request.GET.get("student")
+
+#         if student_id and is_valid_uuid(student_id):
+#             queryset = queryset.filter(student__id=student_id)
+
+#         return queryset
 class AppUsageLogListView(ListView):
     model = ActivityResult
     template_name = "dashboards/logs.html"
     context_object_name = "logs"
     paginate_by = 10
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+
+        # build GET params without "page"
+        query = self.request.GET.copy()
+        if "page" in query:
+            query.pop("page")
+
+        ctx["querystring"] = query.urlencode()
+
+        return ctx
     def get_queryset(self):
         user = self.request.user
 
@@ -415,16 +492,12 @@ class AppUsageLogListView(ListView):
             "student__parent"
         ).order_by("-created_at")
 
-        # ------------------------
-        # 1. Text search filter
-        # ------------------------
+        # 1. Text search
         activity = self.request.GET.get("activity")
         if activity:
             queryset = queryset.filter(activity_name__icontains=activity)
 
-        # ------------------------
-        # 2. Role-based filters
-        # ------------------------
+        # 2. Role-based filter
         if user.role == "parent":
             queryset = queryset.filter(parent=user)
 
@@ -443,28 +516,60 @@ class AppUsageLogListView(ListView):
             )
 
         elif user.role == "moe_admin":
-            pass  # no restrictions
+            pass  # list ALL
 
         else:
             return ActivityResult.objects.none()
 
-        # ------------------------
-        # 3. Parent filter (dropdown or querystring)
-        # ------------------------
+        # 3. Parent filter
         parent_id = self.request.GET.get("parent")
-
         if parent_id and is_valid_uuid(parent_id):
             queryset = queryset.filter(parent__id=parent_id)
 
-        # ------------------------
-        # 4. Student filter (children of the selected parent)
-        # ------------------------
+        # 4. Student filter
         student_id = self.request.GET.get("student")
-
         if student_id and is_valid_uuid(student_id):
             queryset = queryset.filter(student__id=student_id)
 
         return queryset
+
+    # ----------------------------------------------------------
+    # NEW SECTION — ensure moe_admin sees ALL parents & students
+    # ----------------------------------------------------------
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        parent_id = self.request.GET.get("parent")
+        student_id = self.request.GET.get("student")
+
+        # SELECT PARENTS BASED ON ROLE
+        if user.role == "moe_admin":
+            ctx["filter_parents"] = User.objects.all()
+        elif user.role in ["teacher", "municipality_analyst"]:
+            ctx["filter_parents"] = User.objects.filter(
+                municipality=user.municipality
+            )
+        else:
+            ctx["filter_parents"] = User.objects.filter(id=user.id)
+
+        # SELECT STUDENTS (depends on parent filter)
+        if parent_id and is_valid_uuid(parent_id):
+            ctx["filter_students"] = Child.objects.filter(parent_id=parent_id)
+        else:
+            if user.role == "moe_admin":
+                ctx["filter_students"] = Child.objects.all()
+            else:
+                ctx["filter_students"] = Child.objects.filter(
+                    parent__municipality=user.municipality
+                )
+
+        # Keep selected filters
+        ctx["selected_activity"] = self.request.GET.get("activity", "")
+        ctx["selected_parent"] = parent_id
+        ctx["selected_student"] = student_id
+
+        return ctx
 
 
 class ChildrenReportView(ListView):
