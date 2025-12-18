@@ -42,8 +42,8 @@
       <tr>
         <th>Estudante</th>
         <th>Parente</th>
-        <th>Atividade</th>
         <th>Categorias</th>
+         <th>Atividade</th>
         <th>Resultado</th>
         <th>Data</th>
       </tr>
@@ -65,15 +65,15 @@
 
     <td>
       {% if log.category1 %}{{ log.category1 }}{% endif %}
-      {% if log.category2 %} • {{ log.category2 }}{% endif %}
       {% if log.category3 %} • {{ log.category3 }}{% endif %}
+      {% if log.category2 %} • {{ log.category2 }}{% endif %}
     </td>
 
     <td>
       {% if log.activity_result == 1 %}
-        Completed
+        Kompletadu
       {% else %}
-        {{ log.activity_result }}
+        Incompletu
       {% endif %}
     </td>
 

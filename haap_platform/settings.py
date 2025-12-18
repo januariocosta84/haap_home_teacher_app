@@ -11,21 +11,21 @@ import os
 
 load_dotenv()
 
-SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+#SECRET_KEY = os.getenv('SECRET_KEY')
+#DEBUG = os.getenv('DEBUG') == 'True'
+#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
-
+#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%'
+SECRET_KEY = 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+DEBUG = True
 
-#ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43']
+ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43']
 
 
 # Application definition
@@ -83,16 +83,19 @@ WSGI_APPLICATION = 'haap_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv("DB_NAME"),
-        'USER': os.getenv("DB_USER"),
-        'PASSWORD': os.getenv("DB_PASSWORD"),
-        'HOST': os.getenv("DB_HOST"),
-        'PORT': os.getenv("DB_PORT"),
+        'NAME': ("haap"),  # os.getenv("DB_NAME"),
+        'USER': ("root"),  # os.getenv("DB_USER"),
+        'PASSWORD': ("Paddington2025yoyo"),  # os.getenv("DB_PASSWORD"),
+        'HOST': ("localhost"),  # os.getenv("DB_HOST"),
+        'PORT': ("3306"),  # os.getenv("DB_PORT"),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
+print("Database Password:", os.getenv("DB_PASSWORD"))  # Debug line
+print("Database Settings:", DATABASES)  # Debug line    
+print("DB Connection Test:", DATABASES['default']['NAME'])  # Debug line    
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -169,6 +172,6 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # Example SMTP config
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = "your_email@gmail.com"
-EMAIL_HOST_PASSWORD = "your_password_or_app_password"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")      
 EMAIL_USE_TLS = True
