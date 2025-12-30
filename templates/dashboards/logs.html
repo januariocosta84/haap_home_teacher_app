@@ -61,12 +61,14 @@
       {% endif %}
     </td>
 
-    <td>{{ log.activity_name }}</td>
+    <td>{{ log.category1 }}</td>
 
     <td>
       {% if log.category1 %}{{ log.category1 }}{% endif %}
-      {% if log.category3 %} • {{ log.category3 }}{% endif %}
       {% if log.category2 %} • {{ log.category2 }}{% endif %}
+      {% if log.category3 %} • {{ log.category3 }}{% endif %}
+    
+      
     </td>
 
     <td>

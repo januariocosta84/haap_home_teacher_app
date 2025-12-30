@@ -1,19 +1,19 @@
 {% extends "core/base.html" %}
  <title>HAAP | {% block title %}Lista ba APK Versão Foun{% endblock %}</title>
 {% block content %}
-<div class="container mt-4">
-    <h2>📱 Latest APK Version</h2>
+<div class="container-fluid mt-4">
+    <h2>📱 APK versaun Ikus</h2>
     <div class="list-group mt-3">
         {% if versions %}
             {% for apk in versions %}
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
-                        <strong>Version {{ apk.version_name }}</strong><br>
-                        <small>Released at: {{ apk.released_at|date:"Y-m-d H:i" }}</small>
+                        <strong>Versaun {{ apk.version_name }}</strong><br>
+                        <small>Lansa iha: {{ apk.released_at|date:"Y-m-d H:i" }}</small>
                     </div>
                     <div>
                         {% if apk.is_latest %}
-                            <span class="badge bg-success">Latest</span>
+                            <span class="badge bg-success">Ikus</span>
                         {% endif %}
                         <a href="{{ apk.download_url }}" class="btn btn-primary btn-sm ms-2">Download</a>
                     </div>
