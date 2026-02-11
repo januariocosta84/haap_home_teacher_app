@@ -23,7 +23,7 @@
       <tbody>
         {% for child in children %}
           <tr>
-            <td>{{ child.first_name }}</td>
+            <td><a href="{% url 'core:child-activity' child.id %}">{{ child.first_name }}</a></td>
             <td>{{ child.year_of_birth }}</td>
             <td>{{ child.get_age_group_display }}</td>
             <td>{{ child.user_id }}</td>

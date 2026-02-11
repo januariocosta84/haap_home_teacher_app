@@ -24,6 +24,31 @@
         <h1>Bemvindo Mai hahu App!</h1>
     </div>
     <div class="login-container mt-2">
+      <!-- Error Messages -->
+      {% if messages %}
+        <div class="alert-container mb-3">
+          {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border: 1px solid #f5c6cb; padding: 12px 16px;">
+              <i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i> 
+              <strong>Error:</strong> {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Form validation errors -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border: 1px solid #f5c6cb; padding: 12px 16px;">
+          <i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>
+          <strong>Error:</strong>
+          {% for error in form.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endif %}
+
       <form action="{% url 'core:login' %}" method="POST">
         {% csrf_token %}
         <div class="form-group">

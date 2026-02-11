@@ -20,10 +20,10 @@
       <div class="small-box text-bg-primary">
         <div class="inner">
           <h3>{{ all_users }}</h3>
-          <p>Utilizadores sira</p>
+          <p>Administrator</p>
         </div>
         <i class="bi bi-people-fill small-box-icon"></i>
-        <a href="{% url 'core:user_management' %}" class="small-box-footer link-light link-underline-opacity-0">
+        <a href="{% url 'core:user_management' %}?tab=admins" class="small-box-footer link-light link-underline-opacity-0">
           Mais informasaun <i class="bi bi-link-45deg"></i>
         </a>
       </div>
@@ -37,7 +37,7 @@
           <p>Parentes</p>
         </div>
         <i class="bi bi-person-hearts small-box-icon"></i>
-        <a href="{% url 'core:parent_list' %}" class="small-box-footer link-light link-underline-opacity-0">
+        <a href="{% url 'core:user_management' %}?tab=parents" class="small-box-footer link-light link-underline-opacity-0">
           Mais informasaun <i class="bi bi-link-45deg"></i>
         </a>
       </div>
@@ -51,7 +51,7 @@
           <p>Analistas Munisípiu</p>
         </div>
         <i class="bi bi-bar-chart-line-fill small-box-icon"></i>
-        <a href="#" class="small-box-footer link-dark link-underline-opacity-0">
+        <a href="{% url 'core:user_management' %}?tab=analysts" class="small-box-footer link-light link-underline-opacity-0">
           Mais informasaun <i class="bi bi-link-45deg"></i>
         </a>
       </div>
@@ -65,7 +65,7 @@
           <p>Oan sira</p>
         </div>
         <i class="bi bi-emoji-smile-fill small-box-icon"></i>
-        <a href="#" class="small-box-footer link-light link-underline-opacity-0">
+        <a href="{% url 'core:user_management' %}?tab=children" class="small-box-footer link-light link-underline-opacity-0">
           Mais informasaun <i class="bi bi-link-45deg"></i>
         </a>
       </div>

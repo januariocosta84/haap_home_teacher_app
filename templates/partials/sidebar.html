@@ -3,7 +3,17 @@
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
   <!-- Sidebar Brand -->
   <div class="sidebar-brand">
+    {%if user.role == "moe_admin" %}
+    <a href="{% url 'core:moe_admin_dashboard' %}" class="brand-link">
+    {% elif user.role == "parent" %}
+    <a href="{% url 'core:children_list' %}" class="brand-link">
+    {% elif user.role == "municipality_analyst" %}
+    <a href="{% url 'core:municipality_dashboard' %}" class="brand-link">
+    {% elif user.role == "teacher" %}
+    <a href="{% url 'core:teacher_dashboard' %}" class="brand-link">
+    {% else %}
     <a href="#" class="brand-link">
+    {% endif %}
       <img
         src="{% static 'img/logo-ori.png' %}"
         alt="HAAP Logo"
@@ -74,19 +84,19 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'core:user_management' %}?tab=parents" class="nav-link">
                   <i class="nav-icon bi-house-door"></i>
                   <p>Inan aman</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'core:user_management' %}?tab=teachers" class="nav-link">
                   <i class="nav-icon bi bi-person-raised-hand"></i>
-                  <p>Professor</p>
+                  <p>Formadores</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{% url 'core:user_management' %}?tab=analysts" class="nav-link">
                  <i class="nav-icon bi bi-person-arms-up"></i>
                   <p>Analista munisipal</p>
                 </a>
@@ -110,6 +120,13 @@
               <p>Settings</p>
             </a>
           </li>
+                  <!-- Logs (all roles can see) -->
+        <li class="nav-item">
+          <a href="{% url 'core:logs' %}" class="nav-link">
+            <i class="nav-icon bi bi-activity"></i>
+            <p>Atividades</p>
+          </a>
+        </li>
         {% elif user.role == "parent" %}
           <!-- Children for Parents -->
           <li class="nav-item">
@@ -147,15 +164,16 @@
               <p>Dashboard ba Professor</p>
             </a>
           </li>
-        {% endif %}
-
-        <!-- Logs (all roles can see) -->
+                  <!-- Logs (all roles can see) -->
         <li class="nav-item">
-          <a href="{% url 'core:app_usage_logs' %}" class="nav-link">
+          <a href="{% url 'core:logs' %}" class="nav-link">
             <i class="nav-icon bi bi-activity"></i>
             <p>Atividades</p>
           </a>
         </li>
+        {% endif %}
+
+
 
         <!-- Logout -->
         <li class="nav-item">

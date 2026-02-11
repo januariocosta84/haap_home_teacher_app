@@ -2,7 +2,9 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <h3>Versaun APK</h3>
-  <a href="{% url 'core:upload_apk' %}" class="btn btn-success mb-3">+ Upload APK Foun</a>
+  {% if user.is_superuser %}
+    <a href="{% url 'core:upload_apk' %}" class="btn btn-success mb-3">Add New APK</a>
+  {% endif %}
 
   {% if apks %}
     <table class="table table-striped">

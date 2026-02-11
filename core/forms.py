@@ -203,6 +203,32 @@ class ProfileImageForm(forms.ModelForm):
             'image': forms.FileInput(attrs={'class': 'form-control-file'})  # no clear checkbox
         }
 
+
+# Profile edit form used by `profile_view`
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'address', 'municipality', 'administrative_post', 'suco', 'aldeia']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Preload municipalities
+        self.fields['municipality'].queryset = Municipality.objects.all()
+        self.fields['municipality'].empty_label = "Selesiona Munisípiu"
+
+        # Default empty for dependent fields
+        self.fields['administrative_post'].queryset = AdministrativePost.objects.none()
+        self.fields['suco'].queryset = Suco.objects.none()
+        self.fields['aldeia'].queryset = Aldeia.objects.none()
+
+        # If instance provided, pre-populate dependent dropdowns
+        if self.instance and getattr(self.instance, 'municipality', None):
+            self.fields['administrative_post'].queryset = AdministrativePost.objects.filter(municipality=self.instance.municipality)
+        if self.instance and getattr(self.instance, 'administrative_post', None):
+            self.fields['suco'].queryset = Suco.objects.filter(administrative_post=self.instance.administrative_post)
+        if self.instance and getattr(self.instance, 'suco', None):
+            self.fields['aldeia'].queryset = Aldeia.objects.filter(suco=self.instance.suco)
+
 # class ParentRegisterForm(forms.ModelForm):
 #     password = forms.CharField(
 #         widget=forms.PasswordInput(attrs={"class": "form-control"})
@@ -304,7 +330,55 @@ class ParentRegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-    
+
+
+# Admin-facing minimal parent form (used for CRUD in `views/parents.py`)
+class ParentForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'first_name', 'last_name', 'whatsapp_number', 'email', 'address',
+            'municipality', 'administrative_post', 'suco', 'aldeia'
+        ]
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'whatsapp_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'municipality': forms.Select(attrs={'class': 'custom-select'}),
+            'administrative_post': forms.Select(attrs={'class': 'custom-select'}),
+            'suco': forms.Select(attrs={'class': 'custom-select'}),
+            'aldeia': forms.Select(attrs={'class': 'custom-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['municipality'].queryset = Municipality.objects.all()
+        self.fields['administrative_post'].queryset = AdministrativePost.objects.none()
+        self.fields['suco'].queryset = Suco.objects.none()
+        self.fields['aldeia'].queryset = Aldeia.objects.none()
+
+        if 'municipality' in self.data:
+            try:
+                municipality_id = int(self.data.get('municipality'))
+                self.fields['administrative_post'].queryset = AdministrativePost.objects.filter(municipality_id=municipality_id)
+            except (ValueError, TypeError):
+                pass
+
+        if 'administrative_post' in self.data:
+            try:
+                post_id = int(self.data.get('administrative_post'))
+                self.fields['suco'].queryset = Suco.objects.filter(administrative_post_id=post_id)
+            except (ValueError, TypeError):
+                pass
+
+        if 'suco' in self.data:
+            try:
+                suco_id = int(self.data.get('suco'))
+                self.fields['aldeia'].queryset = Aldeia.objects.filter(suco_id=suco_id)
+            except (ValueError, TypeError):
+                pass    
 # Staff registration form (for municipality analysts and teachers)
 class StaffRegisterForm(forms.ModelForm):
     class Meta:
@@ -348,42 +422,119 @@ class StaffRegisterForm(forms.ModelForm):
 
 class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
-        widget=forms.PasswordInput(),
-        required=False
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Password (optional)"
+        })
     )
+
     role = forms.ChoiceField(
         choices=[
             ("municipality_analyst", "Municipality Analyst"),
             ("teacher", "Teacher"),
             ("parent", "Parent"),
-        ]
+        ],
+        widget=forms.Select(attrs={"class": "form-select"})
     )
 
     class Meta:
         model = User
         fields = [
             "first_name", "last_name", "whatsapp_number", "email", "address",
-            "municipality", "administrative_post", "suco", "aldeia", "role", "password"
+            "municipality", "administrative_post", "suco", "aldeia",
+            "role", "password"
+        ]
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "whatsapp_number": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+67077123456"
+            }),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "address": forms.TextInput(attrs={"class": "form-control"}),
+
+            # Bootstrap select fields
+            "municipality": forms.Select(attrs={"class": "form-select"}),
+            "administrative_post": forms.Select(attrs={"class": "form-select"}),
+            "suco": forms.Select(attrs={"class": "form-select"}),
+            "aldeia": forms.Select(attrs={"class": "form-select"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Municipality dropdown
+        self.fields["municipality"].queryset = Municipality.objects.all()
+        self.fields["municipality"].empty_label = "Select Municipality"
+
+        # Empty dependent dropdowns by default
+        self.fields["administrative_post"].queryset = AdministrativePost.objects.none()
+        self.fields["suco"].queryset = Suco.objects.none()
+        self.fields["aldeia"].queryset = Aldeia.objects.none()
+
+        # Handle cascading selects (POST / bound form)
+        if self.is_bound:
+            try:
+                municipality_id = int(self.data.get("municipality", 0))
+                self.fields["administrative_post"].queryset = (
+                    AdministrativePost.objects.filter(municipality_id=municipality_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+            try:
+                post_id = int(self.data.get("administrative_post", 0))
+                self.fields["suco"].queryset = (
+                    Suco.objects.filter(administrative_post_id=post_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+            try:
+                suco_id = int(self.data.get("suco", 0))
+                self.fields["aldeia"].queryset = (
+                    Aldeia.objects.filter(suco_id=suco_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data["whatsapp_number"]
+
+        if self.cleaned_data.get("password"):
+            user.set_password(self.cleaned_data["password"])
+        else:
+            user.set_unusable_password()
+
+        if commit:
+            user.save()
+        return user
+
+
+# Simple admin user form used by `user_management` views
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'first_name', 'last_name', 'whatsapp_number', 'email', 'address', 'municipality', 'administrative_post', 'suco', 'aldeia', 'role'
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Preload municipalities
         self.fields['municipality'].queryset = Municipality.objects.all()
-        self.fields['municipality'].empty_label = "Selesiona Munisípiu"
-
-        # Default empty for dependent fields
         self.fields['administrative_post'].queryset = AdministrativePost.objects.none()
         self.fields['suco'].queryset = Suco.objects.none()
         self.fields['aldeia'].queryset = Aldeia.objects.none()
 
-        # If POST data exists, filter dependent fields so selected value works
         if 'municipality' in self.data:
             try:
                 municipality_id = int(self.data.get('municipality'))
                 self.fields['administrative_post'].queryset = AdministrativePost.objects.filter(municipality_id=municipality_id)
             except (ValueError, TypeError):
-                pass  # invalid input; ignore
+                pass
 
         if 'administrative_post' in self.data:
             try:

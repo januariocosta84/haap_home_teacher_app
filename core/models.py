@@ -319,8 +319,13 @@ class ActivityResult(models.Model):
     The database column names remain `pid` and `sid` for compatibility, but
     at the ORM level they are proper ForeignKey relations to `User` and `Child`.
     """
+    STATUS_CHOICES = (
+        ("access", "Access"),
+        ("completed", "Completed"),
+        ("incompleted", "Incompleted"),
+    )
     id = models.AutoField(primary_key=True)
-
+    
     parent = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -329,7 +334,12 @@ class ActivityResult(models.Model):
         related_name='activity_results',
         db_column='pid'
     )
-
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="access"
+    )
     student = models.ForeignKey(
         Child,
         on_delete=models.SET_NULL,
@@ -338,13 +348,13 @@ class ActivityResult(models.Model):
         related_name='activity_results',
         db_column='sid'
     )
-
+   
     category1 = models.TextField(null=True, blank=True)
     category2 = models.TextField(null=True, blank=True)
     category3 = models.TextField(null=True, blank=True)
 
     activity_name = models.TextField(null=True, blank=True)
-    activity_result = models.IntegerField(default=0)
+    activity_result = models.CharField(max_length=100, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -358,3 +368,5 @@ class ActivityResult(models.Model):
 
     def __str__(self):
         return f"ActivityResult {self.id} ({self.activity_name}) -> {self.activity_result}"
+
+

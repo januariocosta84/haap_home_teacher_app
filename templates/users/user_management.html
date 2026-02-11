@@ -17,6 +17,9 @@
       <button class="nav-link active" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab">Parentes ({{ parents|length }})</button>
     </li>
     <li class="nav-item" role="presentation">
+      <button class="nav-link" id="children-tab" data-bs-toggle="tab" data-bs-target="#children" type="button" role="tab">Oan sira ({{ children|length }})</button>
+    </li>
+    <li class="nav-item" role="presentation">
       <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab">Formadores ({{ teachers|length }})</button>
     </li>
     <li class="nav-item" role="presentation">
@@ -66,6 +69,53 @@
                 </tr>
                 {% empty %}
                 <tr><td colspan="5">No parents found</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Children Tab {% endcomment %}
+    <div class="tab-pane fade" id="children" role="tabpanel">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="input-group w-50">
+              <span class="input-group-text">🔎</span>
+              <input class="form-control" id="searchChildren" placeholder="Filtra naran/parent/..." />
+            </div>
+            <small class="text-muted align-self-center">Total: {{ children|length }}</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Naran</th>
+                  <th>Parent</th>
+                  <th>Year</th>
+                  <th>Age group</th>
+                  <th class="text-end">Aksaun</th>
+                </tr>
+              </thead>
+              <tbody id="childrenTable">
+                {% for child in children %}
+                <tr>
+                  <td>{{ child.id }}</td>
+                  <td>{{ child.first_name }}</td>
+                  <td>{{ child.parent.first_name }} {{ child.parent.last_name }}</td>
+                  <td>{{ child.year_of_birth }}</td>
+                  <td>{{ child.get_age_group_display }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-warning">Editar</a>
+                    <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">No children found</td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -238,6 +288,26 @@
     setupTableFilter('searchAnalysts', 'analystsTable');
     // admins do not have a search input but we keep function available
     setupTableFilter('searchAdmins', 'adminsTable');
+    setupTableFilter('searchChildren', 'childrenTable');
+
+      // Activate a specific tab if `?tab=` is present in the URL
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get('tab');
+      const allowed = ['parents', 'children', 'teachers', 'analysts', 'admins'];
+      if (requested && allowed.includes(requested)) {
+        const trigger = document.querySelector(`#${requested}-tab`);
+        if (trigger) {
+          // Bootstrap 5 Tab show
+          const tab = new bootstrap.Tab(trigger);
+          tab.show();
+          // Scroll into view a bit for better UX
+          setTimeout(() => { document.getElementById(requested).scrollIntoView({behavior: 'smooth', block: 'start'}); }, 100);
+        }
+      }
+    } catch (e) {
+      // ignore if URLSearchParams or bootstrap not available
+    }
   });
 </script>
 {% endblock %}

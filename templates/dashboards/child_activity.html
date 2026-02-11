@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+<title>HAAP | {% block title %}Atividade Labarik{% endblock %}</title>
+
+{% block content %}
+
+<h4> <b>{{ child.first_name }} {{ child.last_name }} </b>nia Atividade sira</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Atividade</th>
+            <th>Kategoria 1</th>
+            <th>Kategoria 2</th>
+            <th>Kategoria 3</th>
+            <th>Estadu</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for act in activities %}
+        <tr>
+            <td>{{ act.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ act.activity_name|default:"-" }}</td>
+            <td>{{ act.category1|default:"-" }}</td>
+            <td>{{ act.category2|default:"-" }}</td>
+            <td>{{ act.category3|default:"-" }}</td>
+            <td>{{ act.get_status_display }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">
+                Laiha atividade ne’ebé rejista
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- 🔁 Pagination -->
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                ⬅ Anterior
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">⬅ Anterior</span>
+        </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <span class="page-link">
+                Pajina {{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
+            </span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                Próximu ➡
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Próximu ➡</span>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
