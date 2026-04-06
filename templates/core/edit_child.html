@@ -1,12 +1,12 @@
 {% extends "core/base.html" %}
 {% block content %}
 <div class="container-fluid mt-4">
-  <h3>Edit Child: {{ child.first_name }}</h3>
+  <h3>Editar: {{ child.first_name }}</h3>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-    <a href="{% url 'core:children_list' %}" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Rai</button>
+    <a href="{% url 'core:children_list' %}" class="btn btn-secondary">Cancela</a>
   </form>
 </div>
 {% endblock %}

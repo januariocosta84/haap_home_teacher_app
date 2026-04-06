@@ -5,7 +5,7 @@ from django.views import View
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 
-from core.forms import UserForm, UserRegistrationForm
+from core.forms import UserForm, UserRegistrationForm, UserEditForm
 from core.models import Child
 
 User = get_user_model()
@@ -16,7 +16,7 @@ class UserManagementView(View):
         # Only MoE admins can access user management
         if not request.user.is_authenticated or request.user.role != "moe_admin":
             messages.error(request, "Aksesu negadu.")
-            return redirect("core:home")
+            return redirect("core:children_list")
 
         # Query users by role
         parents = User.objects.filter(role="parent")
@@ -61,23 +61,29 @@ def view_user(request, user_id):
 
 @login_required
 def edit_user(request, user_id):
-    """Edit an existing user (MoE admin only)."""
-    if request.user.role != "moe_admin":
+    """Edit an existing user. MoE admins can edit anyone, other users can edit themselves."""
+    user_obj = get_object_or_404(User, id=user_id)
+    
+    # Permission check: only moe_admin can edit other users, each user can edit themselves
+    if request.user.role != "moe_admin" and request.user.id != user_obj.id:
         messages.error(request, "Aksesu negadu.")
         return redirect("core:user_management")
 
-    user_obj = get_object_or_404(User, id=user_id)
-
     if request.method == "POST":
-        form = UserRegistrationForm(request.POST, instance=user_obj)
+        form = UserEditForm(request.POST, instance=user_obj, current_user=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, "User updated successfully.")
-            return redirect("core:user_management")
+            messages.success(request, "Utilizador atualizado ho sucesso.")
+            # Redirect based on user role
+            if request.user.role == "moe_admin":
+                return redirect("core:user_management")
+            else:
+                # Regular users redirect to their profile page
+                return redirect("core:profile")
         else:
-            messages.error(request, "Please correct the errors below.")
+            messages.error(request, "Favor corrija erros sira tuir mai.")
     else:
-        form = UserRegistrationForm(instance=user_obj)
+        form = UserEditForm(instance=user_obj, current_user=request.user)
 
     return render(request, "users/edit_user.html", {"form": form, "user_obj": user_obj})
 

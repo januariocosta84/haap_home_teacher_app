@@ -96,9 +96,9 @@
                   <th>ID</th>
                   <th>Naran</th>
                   <th>Parent</th>
-                  <th>Year</th>
-                  <th>Age group</th>
-                  <th class="text-end">Aksaun</th>
+                  <th>Tinan</th>
+                  <th>Group Idade</th>
+                  <!-- <th class="text-end">Aksaun</th> -->
                 </tr>
               </thead>
               <tbody id="childrenTable">
@@ -109,10 +109,10 @@
                   <td>{{ child.parent.first_name }} {{ child.parent.last_name }}</td>
                   <td>{{ child.year_of_birth }}</td>
                   <td>{{ child.get_age_group_display }}</td>
-                  <td class="text-end">
+                  <!-- <td class="text-end">
                     <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-warning">Editar</a>
                     <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Eliminar</a>
-                  </td>
+                  </td> -->
                 </tr>
                 {% empty %}
                 <tr><td colspan="6">No children found</td></tr>

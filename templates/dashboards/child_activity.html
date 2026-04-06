@@ -5,27 +5,43 @@
 
 <h4> <b>{{ child.first_name }} {{ child.last_name }} </b>nia Atividade sira</h4>
 
-<table class="table table-bordered">
-    <thead>
+<table class="table table-bordered align-middle text-center">
+    <thead class="table-light small text-muted">
         <tr>
             <th>Data</th>
             <th>Atividade</th>
-            <th>Kategoria 1</th>
-            <th>Kategoria 2</th>
-            <th>Kategoria 3</th>
-            <th>Estadu</th>
+            <th>Tema</th>
+            <th>Tipu</th>
+            <!-- <th>Kategoria 2</th>
+            <th>Kategoria 3</th> -->
+            <th class="text-center">Rezultadu aprendizajen</th> 
         </tr>
     </thead>
     <tbody>
         {% for act in activities %}
         <tr>
-            <td>{{ act.created_at|date:"Y-m-d H:i" }}</td>
-            <td>{{ act.activity_name|default:"-" }}</td>
-            <td>{{ act.category1|default:"-" }}</td>
-            <td>{{ act.category2|default:"-" }}</td>
-            <td>{{ act.category3|default:"-" }}</td>
-            <td>{{ act.get_status_display }}</td>
+            <!-- Date (smaller) -->
+            <td class="small ">
+                {{ act.created_at|date:"Y-m-d H:i" }}
+            </td>
+
+            <!-- Activity Name (smaller) -->
+            <td class="small">
+                {{ act.activity_name|default:"-" }}
+            </td>
+
+            <!-- Category 1 (smaller & muted) -->
+            <td class="small text">
+                {{ act.cat1_left|default:"-" }}
+            </td>
+            <td>{{ act.cat1_right|default:"-" }}</td>
+
+            <!-- Activity Result (bigger & emphasized) -->
+            <td class="text-center fw-bold fs-5">
+                {{ act.activity_result }}
+            </td>
         </tr>
+
         {% empty %}
         <tr>
             <td colspan="6" class="text-center">

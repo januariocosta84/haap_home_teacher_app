@@ -13,131 +13,565 @@
         </div>
     </div>
 
-    <!-- LOG TABLE -->
-    <div class="card">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
-                <thead class="thead-light">
-                <tr>
-                    <th>#</th>
-
-                    {% if user.role == "moe_admin" %}
-                        <th>Naran Aman-Inan</th>
-                    {% endif %}
-
-                    <th>Naran Estudante</th>
-                    <th>Atividade</th>
-                    <th>Kategoria 1</th>
-                    <th>Kategoria 2</th>
-                    <th>Kategoria 3</th>
-                    <th>Estadu</th>
-                    <th>Data</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td>{{ log.id }}</td>
-
-                    <!-- Parent Name (MOE Admin ONLY) -->
-                    {% if user.role == "moe_admin" %}
-                        <td>
-                            {{ log.parent.get_full_name|default:log.parent.username|default:"-" }}
-                        </td>
-                    {% endif %}
-
-                    <!-- Student Name -->
-                    <td>
-                        {% if log.student %}
-                            {{ log.student.first_name }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-
-                    <!-- Activity -->
-                    <td>
-                        {{ log.activity_name|default:"-" }}
-                    </td>
-
-                    <!-- Categories -->
-                    <td>{{ log.category1|default:"-" }}</td>
-                    <td>{{ log.category2|default:"-" }}</td>
-                    <td>{{ log.category3|default:"-" }}</td>
-
-                    <!-- Status -->
-                    <td>
-                        {% if log.status == "completed" %}
-                            <span class="badge badge-success">
-                                Kompletu
-                            </span>
-                        {% elif log.status == "incompleted" %}
-                            <span class="badge badge-danger">
-                                La Kompletu
-                            </span>
-                        {% else %}
-                            <span class="badge badge-secondary">
-                                Aksesu
-                            </span>
-                        {% endif %}
-                    </td>
-
-                    <!-- Date -->
-                    <td>{{ log.created_at|date:"d M Y H:i" }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="{% if user.role == 'moe_admin' %}9{% else %}8{% endif %}"
-                        class="text-center text-muted">
-                        Laiha rejistu atividade
-                    </td>
-                </tr>
-                {% endfor %}
-
-
-                </tbody>
-            </table>
+    <!-- SUMMARY STATISTICS - HORIZONTAL TOP -->
+    <div class="row mb-3 text-center">
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="min-height: 140px;">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="card-title text-muted mb-2" style="font-size: 0.85rem;">Total Estudante</h6>
+                    <h2 id="statTotalChildren" class="mb-0">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="min-height: 140px;">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="card-title text-muted mb-2" style="font-size: 0.85rem;">Total Atividade</h6>
+                    <h2 id="statTotalActivities" class="mb-0">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="min-height: 140px;">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="card-title text-muted mb-2" style="font-size: 0.85rem;">Atinji Rezultadu</h6>
+                    <h2 id="statAchieved" class="mb-0">-</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="min-height: 140px;">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h6 class="card-title text-muted mb-2" style="font-size: 0.85rem;">Taxa Atinji (%)</h6>
+                    <h2 id="statRate" class="mb-0">-</h2>
+                    <small id="statTrend" class="text-success d-block mt-2">↑ +10%</small>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- PAGINATION -->
-    {% if is_paginated %}
-    <nav class="mt-3">
-        <ul class="pagination justify-content-center">
+    <!-- TREND BUTTON -->
+    <div class="row mb-3">
+    <div class="col-12">
+        <button id="toggleChart" class="btn btn-info shadow-sm " title="Hare'e grafiku trend Atinji">
+            <i class="bi bi-activity"></i> Hare'e Trend
+        </button>
+    </div>
+    </div>
 
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                        Antes
-                    </a>
-                </li>
-            {% endif %}
+    <!-- MAIN CONTENT AREA: TABLE FULL WIDTH -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Dadus Detalhes</h5>
+                </div>
+                <div class="card-body" style="max-height: 700px; overflow-y: auto;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0" id="myTable">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>#</th>
+                                {% if user.role == "moe_admin" %}
+                                    <th id="parentHeader" style="cursor:pointer;">Naran Aman-Inan <i class="fas fa-filter text-muted ml-1"></i></th>
+                                {% endif %}
 
-            {% for num in paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">
-                            {{ num }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
+                                <th>Naran Estudante</th>
+                                <th style="display:none;">Student ID</th> <!-- Hidden column for unique count -->
+                                <th id="munisipiuHeader" style="cursor:pointer;">Munisipiu <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th id="postoHeader" style="cursor:pointer;">Posto <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th id="sucoHeader" style="cursor:pointer;">Suco <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th id="aldeiaHeader" style="cursor:pointer;">Aldeia <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th id="temaHeader" style="cursor:pointer;">Tema <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th>Tipu</th>
+                                <th id="actividadeHeader" style="cursor:pointer;">Actividade <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th id="resultadoHeader" style="cursor:pointer;">Rezultadu aprendizajen <i class="fas fa-filter text-muted ml-1"></i></th>
+                                <th >Data <i class="fas fa-filter text-muted ml-1"></i></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
 
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                        Tuir Mai
-                    </a>
-                </li>
-            {% endif %}
+                                    <!-- Parent Name (MOE Admin ONLY) -->
+                                    {% if user.role == "moe_admin" %}
+                                        <td>
+                                            {{ log.parent.get_full_name|default:log.parent.username|default:"-" }}
+                                        </td>
+                                    {% endif %}
 
-        </ul>
-    </nav>
-    {% endif %}
+                                    <!-- Student Name -->
+                                    <td>
+                                        {% if log.student %}
+                                            {{ log.student.first_name }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
 
+                                    <!-- Hidden Student ID for unique count -->
+                                    <td style="display:none;">
+                                        {% if log.student %}
+                                            {{ log.student.id }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <!-- Activity -->
+                                     <td>{{log.parent.municipality}}</td>
+                                     <td>{{log.parent.administrative_post}}</td>
+                                     <td>{{log.parent.suco}}</td>
+                                     <td>{{log.parent.aldeia}}</td>
+                                     <td>{{ log.tema|default:"-" }}</td>
+                                     <td>{{ log.tipu|default:"-" }}</td>
+                                     <td>{{ log.activity_name|default:"-" }}</td>
+                                    <td>
+                                     {{ log.activity_result|default:"-" }}
+                                    </td>
+
+                                    <!-- Date -->
+                                    <td>{{ log.created_at|date:"d M Y H:i" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="{% if user.role == 'moe_admin' %}13{% else %}12{% endif %}"
+                                        class="text-center text-muted">
+                                        Laiha rejistu atividade
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="columnFilterModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-bs-title" id="filterTitle">Filtra</h5>
+        <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="filterContent">
+            <select id="columnPopupFilter" class="form-control">
+                <option value="">Hotu</option>
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+       <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">cancela</button>
+        <button id="applyColumnFilter" class="btn btn-primary btn-sm">Aplika</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Trend Chart Modal -->
+<div class="modal fade" id="trendChartModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content shadow">
+      <div class="modal-header">
+        <h5 class="modal-title">Trend Atinji</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="trendGroupBy" class="form-label">Filtra Periodu</label>
+            <select id="trendGroupBy" class="form-control">
+              <option value="daily">Loron</option>
+              <option value="monthly" selected>Fulan</option>
+              <option value="yearly">Tinan</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="trendYearSelect" class="form-label">Tinan</label>
+            <select id="trendYearSelect" class="form-control">
+              <option value="">Hotu</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="trendMonthSelect" class="form-label">Fulan</label>
+            <select id="trendMonthSelect" class="form-control">
+              <option value="">Hotu</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto </option>
+              <option value="09">Septembro</option>
+              <option value="10">Outobru</option>
+              <option value="11">Novembru</option>
+              <option value="12">Decembru</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="trendChart" height="200"></canvas>
+      </div>
+      <div class="modal-footer">
+        <button id="exportChart" class="btn btn-sm btn-secondary">Download</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Taka</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+// Global references for the trend chart and current filter state.
+let trendChart = null;
+let currentFilterValues = {};
+let dateFilterActive = false;
+
+const monthNameToIndex = {
+    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+};
+const monthIndexToName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function parseTableDate(dateTime) {
+    const [dayStr, monthName, year] = dateTime.split(' ');
+    const day = parseInt(dayStr, 10);
+    const monthIndex = monthNameToIndex[monthName] ?? 0;
+    return {
+        dateObj: new Date(parseInt(year, 10), monthIndex, day),
+        year: year,
+        month: String(monthIndex + 1).padStart(2, '0'),
+        monthName: monthName,
+        day: String(day).padStart(2, '0')
+    };
+}
+
+function formatTrendKey(parsed, groupBy) {
+    const date = parsed.dateObj;
+    if (groupBy === 'yearly') {
+        return String(date.getFullYear());
+    }
+    if (groupBy === 'monthly') {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    }
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function formatTrendLabel(parsed, groupBy) {
+    const date = parsed.dateObj;
+    if (groupBy === 'yearly') {
+        return String(date.getFullYear());
+    }
+    if (groupBy === 'monthly') {
+        return `${monthIndexToName[date.getMonth()]} ${date.getFullYear()}`;
+    }
+    return `${String(date.getDate()).padStart(2, '0')} ${monthIndexToName[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function getTrendFilterValues() {
+    return {
+        groupBy: $('#trendGroupBy').val(),
+        year: $('#trendYearSelect').val(),
+        month: $('#trendMonthSelect').val()
+    };
+}
+
+function populateTrendSelectors(filteredData) {
+    const uniqueYears = new Set();
+    filteredData.toArray().forEach(row => {
+        const parsed = parseTableDate(row[row.length - 1]);
+        uniqueYears.add(parsed.year);
+    });
+
+    const yearSelect = $('#trendYearSelect');
+    const selectedYear = yearSelect.val();
+    yearSelect.empty().append('<option value="">Hotu</option>');
+    Array.from(uniqueYears).sort().forEach(year => {
+        yearSelect.append(`<option value="${year}">${year}</option>`);
+    });
+    if (selectedYear) {
+        yearSelect.val(selectedYear);
+    }
+}
+
+function updateTrendControls() {
+    const groupBy = $('#trendGroupBy').val();
+    if (groupBy === 'daily') {
+        $('#trendMonthSelect').prop('disabled', false);
+        $('#trendYearSelect').prop('disabled', false);
+    } else if (groupBy === 'monthly') {
+        $('#trendMonthSelect').prop('disabled', true);
+        $('#trendYearSelect').prop('disabled', false);
+    } else {
+        $('#trendMonthSelect').prop('disabled', true);
+        $('#trendYearSelect').prop('disabled', false);
+    }
+}
+
+// Recalculate the dashboard summary stats when the table filter changes.
+function updateStatistics() {
+    try {
+        const table = $('#myTable').DataTable();
+        const filteredData = table.rows({ search: 'applied' }).data();
+        
+        const totalActivities = filteredData.length;
+        
+        // Hidden student ID column index is dynamic based on user role.
+        const studentIdColIdx = {% if user.role == "moe_admin" %}3{% else %}2{% endif %};
+        const totalChildren = new Set(
+            filteredData.toArray().map(row => row[studentIdColIdx])
+        ).size;
+        
+        // Count how many rows contain a successful result.
+        const achieved = filteredData.toArray().filter(row => {
+            const resultColumn = row[row.length - 3]; // Result column position
+            return resultColumn && resultColumn.trim() !== '' && resultColumn.trim() !== 'Tentadu';
+        }).length;
+        
+        const rate = totalActivities > 0 ? ((achieved / totalActivities) * 100).toFixed(1) : 0;
+        
+        document.getElementById('statTotalChildren').textContent = totalChildren;
+        document.getElementById('statTotalActivities').textContent = totalActivities;
+        document.getElementById('statAchieved').textContent = achieved;
+        document.getElementById('statRate').textContent = rate + '%';
+        
+        // Refresh chart after updating numbers.
+        updateTrendChart();
+    } catch (error) {
+        console.error('Error updating statistics:', error);
+    }
+}
+
+// Build or update the trend chart using the currently filtered table data.
+function updateTrendChart() {
+    try {
+        const table = $('#myTable').DataTable();
+        const filteredData = table.rows({ search: 'applied' }).data();
+        
+        populateTrendSelectors(filteredData);
+        updateTrendControls();
+
+        const { groupBy, year, month } = getTrendFilterValues();
+        const dateMap = new Map();
+
+        filteredData.toArray().forEach(row => {
+            const parsed = parseTableDate(row[row.length - 1]);
+            const result = row[row.length - 4];
+
+            if (year && parsed.year !== year) {
+                return;
+            }
+            if (month && parsed.month !== month) {
+                return;
+            }
+
+            const key = formatTrendKey(parsed, groupBy);
+            if (!dateMap.has(key)) {
+                dateMap.set(key, { parsed, total: 0, success: 0 });
+            }
+            const item = dateMap.get(key);
+            item.total += 1;
+            if (result && result.trim() !== '' && result.trim() !== 'Tentadu') {
+                item.success += 1;
+            }
+        });
+        
+        const sortedEntries = Array.from(dateMap.entries()).sort((a, b) => a[1].parsed.dateObj - b[1].parsed.dateObj);
+        const labels = sortedEntries.map(([, item]) => formatTrendLabel(item.parsed, groupBy));
+        const successData = sortedEntries.map(([, item]) => item.success);
+        const totalData = sortedEntries.map(([, item]) => item.total);
+        
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        
+        if (trendChart) trendChart.destroy();
+        
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Atinji Rezultadu',
+                        data: successData,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: 'Total Atividade',
+                        data: totalData,
+                        borderColor: '#007bff',
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error updating chart:', error);
+    }
+}
+
+// Open the trend modal when the button is clicked.
+document.getElementById('toggleChart').addEventListener('click', function() {
+    $('#trendChartModal').modal('show');
+});
+
+// Export the chart as an image file.
+document.getElementById('exportChart').addEventListener('click', function() {
+    const link = document.createElement('a');
+    link.href = document.getElementById('trendChart').toDataURL();
+    link.download = 'trend_chart.png';
+    link.click();
+});
+
+$(document).ready(function () {
+
+    // Prevent DataTable initialization if it already exists.
+    if (!$.fn.DataTable.isDataTable('#myTable')) {
+        let table = $('#myTable').DataTable({
+            language: {
+                search: "Pesquisa:",
+                lengthMenu: "Haree _MENU_ rejistu",
+                info: "Hatudu _START_ to _END_ husi _TOTAL_ rejistu",
+                infoEmpty: "Laiha rejistu",
+                infoFiltered: "(filtra husi _MAX_ total rejistu)",
+                zeroRecords: "La hetan dadus",
+                paginate: {
+                    first: "Uluk",
+                    last: "Ikus",
+                    next: "Tuir Mai",
+                    previous: "Antes"
+                }
+            },
+            columnDefs: [
+                {
+                    targets: {% if user.role == "moe_admin" %}3{% else %}2{% endif %}, // Hide the internal Student ID column.
+                    visible: false
+                }
+            ]
+        });
+
+        // Dynamic column indexes based on whether the parent column exists.
+        let idx = {
+            parent: {% if user.role == "moe_admin" %}1{% else %}-1{% endif %},
+            munisipiu: {% if user.role == "moe_admin" %}4{% else %}3{% endif %},
+            posto: {% if user.role == "moe_admin" %}5{% else %}4{% endif %},
+            resultado: {% if user.role == "moe_admin" %}10{% else %}9{% endif %},
+            tema: {% if user.role == "moe_admin" %}8{% else %}7{% endif %},
+            actividade: {% if user.role == "moe_admin" %}9{% else %}8{% endif %},
+            data: {% if user.role == "moe_admin" %}11{% else %}10{% endif %}
+        };
+
+        let currentColumn = null;
+
+        // Show a modal filter for a selected table column.
+        function openFilter(column, title) {
+            currentColumn = column;
+
+            $('#filterTitle').text(title);
+            let filterHTML = '<select id="columnPopupFilter" class="form-control"><option value="">Hotu</option>';
+            
+            // If filtering by date, display date range controls instead of a list.
+            if (column === 'data') {
+                filterHTML = '<div class="form-group">' +
+                    '<label for="dateFrom">Husi Data</label>' +
+                    '<input type="date" id="dateFrom" class="form-control mb-2">' +
+                    '<label for="dateTo">To Data</label>' +
+                    '<input type="date" id="dateTo" class="form-control">' +
+                    '</div>';
+            } else {
+                table.column(idx[column]).data().unique().sort().each(function (d) {
+                    let displayValue = d || '-';
+                    if (d) {
+                        filterHTML += '<option value="'+d+'">'+displayValue+'</option>';
+                    }
+                });
+                filterHTML += '</select>';
+            }
+
+            $('#filterContent').html(filterHTML);
+            $('#columnFilterModal').modal('show');
+        }
+
+        // Attach click listeners to table header filters.
+        $('#munisipiuHeader').click(()=>openFilter('munisipiu','Filtra Munisipiu'));
+        $('#postoHeader').click(()=>openFilter('posto','Filtra Posto'));
+        $('#resultadoHeader').click(()=>openFilter('resultado','Filtra Rezultadu'));
+        $('#temaHeader').click(()=>openFilter('tema','Filtra Tema'));
+        $('#actividadeHeader').click(()=>openFilter('actividade','Filtra Actividade'));
+        $('#dataHeader').click(()=>openFilter('data','Filtra Data'));
+        {% if user.role == "moe_admin" %}
+        $('#parentHeader').click(()=>openFilter('parent','Filtra Parent'));
+        {% endif %}
+
+        // Apply the selected filter and refresh the dashboard stats.
+        $('#applyColumnFilter').click(function () {
+            if (currentColumn === 'data') {
+                // Remove any previous custom date filters.
+                $.fn.dataTable.ext.search.pop();
+                
+                const dateFrom = $('#dateFrom').val();
+                const dateTo = $('#dateTo').val();
+                
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    const dateStr = data[idx['data']];
+                    const date = dateStr.split(' ')[0];
+                    
+                    if (!dateFrom && !dateTo) return true;
+                    if (dateFrom && date < dateFrom) return false;
+                    if (dateTo && date > dateTo) return false;
+                    return true;
+                });
+                
+                table.draw();
+                dateFilterActive = true;
+            } else {
+                // Exact match filter for non-date columns.
+                let val = $('#columnPopupFilter').val();
+                table.column(idx[currentColumn])
+                    .search(val ? '^'+val+'$' : '', true, false)
+                    .draw();
+            }
+
+            updateStatistics();
+            $('#columnFilterModal').modal('hide');
+        });
+
+        // Refresh trend chart when chart controls change.
+        $('#trendGroupBy, #trendYearSelect, #trendMonthSelect').change(function () {
+            updateTrendChart();
+        });
+
+        // Initial stats calculation after DataTable is initialized.
+        updateStatistics();
+    }
+});
+</script>
 {% endblock %}

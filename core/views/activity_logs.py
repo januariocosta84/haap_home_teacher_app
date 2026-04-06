@@ -14,21 +14,18 @@ def is_valid_uuid(value):
     try:
         uuid.UUID(str(value))
         return True
-    except Exception:
+    except (ValueError, TypeError):
         return False
-
 
 
 @login_required
 def AppUsageLogListView(request):
     user = request.user
-
     queryset = (
         ActivityResult.objects
         .select_related("student", "student__parent")
         .order_by("-created_at")
     )
-
     # 🔍 Activity search
     activity = request.GET.get("activity")
     if activity:
@@ -36,7 +33,6 @@ def AppUsageLogListView(request):
 
     # 🔐 ROLE-BASED ACCESS CONTROL
     if user.role == "parent":
-        # Parent sees ONLY their own children
         queryset = queryset.filter(student__parent=user)
 
     elif user.role in ["municipality_analyst", "teacher"]:
@@ -45,11 +41,16 @@ def AppUsageLogListView(request):
         )
 
     elif user.role == "moe_admin":
-        # Full access
         pass
-
     else:
         queryset = ActivityResult.objects.none()
+
+    # ✅ SKIP EMPTY SID + PID
+    queryset = queryset.filter(
+        student__isnull=False,
+        student__parent__isnull=False
+    )
+    
 
     # 🎯 Parent filter
     parent_id = request.GET.get("parent")
@@ -58,25 +59,34 @@ def AppUsageLogListView(request):
 
     # 🎯 Student filter
     student_id = request.GET.get("student")
-    print("Student",student_id)
     if student_id and is_valid_uuid(student_id):
         queryset = queryset.filter(student__id=student_id)
 
     # 📄 Pagination
-    paginator = Paginator(queryset, 10)  # same as paginate_by = 10
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
+            # paginator = Paginator(queryset, 10)
+            # page_number = request.GET.get("page")
+            # page_obj = paginator.get_page(page_number)
+    
+    # Split category1 into tema and tipu
+    logs_with_split = []
+    for log in queryset:
+        if log.category1 and '-' in log.category1:
+            parts = log.category1.split('-', 1)  # Split only on first dash
+            log.tema = parts[0].strip()
+            log.tipu = parts[1].strip() if len(parts) > 1 else ''
+        else:
+            log.tema = log.category1 or ''
+            log.tipu = ''
+        logs_with_split.append(log)
+    
     context = {
-        "logs": page_obj,        # matches context_object_name
-        "page_obj": page_obj,
-        "paginator": paginator,
-        "is_paginated": page_obj.has_other_pages(),
+        "logs": logs_with_split,
+        "page_obj": None,
+        "paginator": None,
+        "is_paginated": False,
     }
 
     return render(request, "dashboards/logs.html", context)
-
-
 class ChildActivityView(LoginRequiredMixin, ListView):
     model = ActivityResult
     template_name = "dashboards/child_activity.html"
@@ -98,10 +108,31 @@ class ChildActivityView(LoginRequiredMixin, ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ActivityResult.objects.filter(
+        queryset = ActivityResult.objects.filter(
             student=self.child,
             parent=self.request.user
         ).order_by("-created_at")
+
+        # Split category1 into two attributes
+        for obj in queryset:
+            if obj.category1:
+                if '-' in obj.category1:
+                    parts = obj.category1.split('-')
+                    obj.cat1_left = parts[0].strip()
+                    obj.cat1_right = parts[1].strip() if len(parts) > 1 else ''
+                else:
+                    # Only one value, put it in left column
+                    obj.cat1_left = obj.category1.strip()
+                    obj.cat1_right = ''
+            else:
+                obj.cat1_left = ''
+                obj.cat1_right = ''
+
+            # Optional: split category2 and category3 similarly if needed
+            obj.cat2_left = obj.category2 or ''
+            obj.cat3_left = obj.category3 or ''
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

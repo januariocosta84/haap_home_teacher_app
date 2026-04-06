@@ -2,7 +2,7 @@ from django.urls import path
 from core.api_view import ActivityResultCreateAPIView, LoginAPIView, LogoutAPIView
 from core.views import *
 from core.views.activity_logs import ChildActivityView
-                       
+from core.views.analytics_api import trend_data_api, summary_stats_api, get_municipalities_api
 
 app_name = "core"
 
@@ -29,9 +29,9 @@ urlpatterns = [
 
     # Public parent registration
     path("register/parent/", ParentRegisterView.as_view(), name="parent_register"),
-    path("profile/", profile_view, name="profile"),
-    path("profile/update-image/", update_profile_image, name="update_profile_image"),
-    
+    path("dashboard/profile/", profile_view, name="profile"),
+    path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
+    path("dashboard/profile/change-password/", change_password, name="change_password"),
 
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),
     path('dashboard/teacher/', teacher_dashboard, name='teacher_dashboard'),
@@ -62,5 +62,7 @@ urlpatterns = [
     #child details activity
     path("activity/<uuid:child_id>/", ChildActivityView.as_view(), name="child-activity"),
 
-
+    path('api/trends/', trend_data_api, name='api_trends'),
+    path('api/summary/', summary_stats_api, name='api_summary'),
+    path('api/municipalities/', get_municipalities_api, name='api_municipalities'),
 ]

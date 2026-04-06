@@ -2,17 +2,18 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <h3>Upload APK Foun</h3>
-  <form method="post">
+
+  <form id="apkUploadForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="mb-3">
-      <label class="form-label">Versaun APK (Hanoin: 1.0.3)</label>
+      <label class="form-label">Versaun APK</label>
       {{ form.version_name }}
     </div>
 
     <div class="mb-3">
-      <label class="form-label">Download URL (Lian: https://example.com/app.apk)</label>
-      {{ form.download_url }}
+      <label class="form-label">Upload APK File</label>
+      {{ form.apk_file }}
     </div>
 
     <div class="form-check mb-3">
@@ -20,8 +21,46 @@
       <label class="form-check-label ms-1">Ne'e mak versaun foun-liu?</label>
     </div>
 
+    <!-- ⭐ Progress bar -->
+    <div class="progress mb-3" style="height:25px;">
+      <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated"
+           role="progressbar" style="width:0%">0%</div>
+    </div>
+
     <button type="submit" class="btn btn-success">Hatudu / Upload</button>
     <a href="{% url 'core:apk_list' %}" class="btn btn-secondary">Kansela</a>
   </form>
 </div>
-{% endblock %}
+<script>
+document.getElementById('apkUploadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('POST', '', true);
+
+    // Progress bar
+    xhr.upload.addEventListener('progress', function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            const progressBar = document.getElementById('uploadProgress');
+            progressBar.style.width = percentComplete + '%';
+            progressBar.textContent = percentComplete + '%';
+        }
+    });
+
+    // ⭐ AFTER UPLOAD FINISHED
+    xhr.onload = function() {
+        if (xhr.status === 200 || xhr.status === 302) {
+            alert("APK version uploaded successfully.");
+            window.location.href = "{% url 'core:apk_list' %}";
+        } else {
+            alert("Upload failed.");
+        }
+    };
+
+    xhr.send(formData);
+});
+</script>
+  {% endblock %}

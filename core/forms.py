@@ -32,24 +32,24 @@ class ParentRegistrationForm(forms.ModelForm):
     # Location fields (cascading dropdowns)
     municipality = forms.ModelChoiceField(
         queryset=Municipality.objects.all(),
-        empty_label="Select Municipality",
+        empty_label="Hili munisípiu",
         label="Municipality"
     )
     administrative_post = forms.ModelChoiceField(
         queryset=AdministrativePost.objects.none(),
-        empty_label="Select Administrative Post",
+        empty_label="Hili Postu Administrativu",
         required=True,
         label="Administrative Post"
     )
     suco = forms.ModelChoiceField(
         queryset=Suco.objects.none(),
-        empty_label="Select Suco",
+        empty_label="Hili Suco",
         required=True,
         label="Suco"
     )
     aldeia = forms.ModelChoiceField(
         queryset=Aldeia.objects.none(),
-        empty_label="Select Aldeia",
+        empty_label="Hili Aldeia",
         required=True,
         label="Aldeia"
     )
@@ -188,12 +188,19 @@ class ChildRegistrationForm(forms.ModelForm):
 class ApkVersionForm(forms.ModelForm):
     class Meta:
         model = ApkVersion
-        fields = ['version_name', 'download_url', 'is_latest']
+        fields = ['version_name', 'apk_file', 'is_latest']
         widgets = {
-            'version_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. 1.0.3'}),
-            'download_url': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://example.com/app.apk'}),
-            'is_latest': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'version_name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'e.g. 1.0.3'}
+            ),
+            'apk_file': forms.ClearableFileInput(
+                attrs={'class': 'form-control'}
+            ),
+            'is_latest': forms.CheckboxInput(
+                attrs={'class': 'form-check-input'}
+            ),
         }
+
 # User profile image update form
 class ProfileImageForm(forms.ModelForm):
     class Meta:
@@ -434,6 +441,7 @@ class UserRegistrationForm(forms.ModelForm):
             ("municipality_analyst", "Municipality Analyst"),
             ("teacher", "Teacher"),
             ("parent", "Parent"),
+            ("moe_admin", "MoE Admin"),
         ],
         widget=forms.Select(attrs={"class": "form-select"})
     )
@@ -499,6 +507,21 @@ class UserRegistrationForm(forms.ModelForm):
                 )
             except (ValueError, TypeError):
                 pass
+        
+        # Handle editing existing instance (unbound form with instance data)
+        elif self.instance.pk:
+            if self.instance.municipality:
+                self.fields["administrative_post"].queryset = (
+                    AdministrativePost.objects.filter(municipality=self.instance.municipality)
+                )
+            if self.instance.administrative_post:
+                self.fields["suco"].queryset = (
+                    Suco.objects.filter(administrative_post=self.instance.administrative_post)
+                )
+            if self.instance.suco:
+                self.fields["aldeia"].queryset = (
+                    Aldeia.objects.filter(suco=self.instance.suco)
+                )
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -569,4 +592,143 @@ class UserForm(forms.ModelForm):
             user.set_unusable_password()  # must use reset link
         if commit:
             user.save()
+        return user
+
+
+class ChangePasswordForm(forms.Form):
+    """Form for users to change their password"""
+    current_password = forms.CharField(
+        label="Current Password",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your current password"
+        })
+    )
+    new_password = forms.CharField(
+        label="New Password",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your new password"
+        })
+    )
+    confirm_password = forms.CharField(
+        label="Confirm New Password",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirm your new password"
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if new_password and confirm_password:
+            if new_password != confirm_password:
+                raise forms.ValidationError("New password and confirm password do not match.")
+        
+        return cleaned_data
+
+
+class UserEditForm(forms.ModelForm):
+    """Form for editing users without password field"""
+    class Meta:
+        model = User
+        fields = [
+            "first_name", "last_name", "whatsapp_number", "email", "address",
+            "municipality", "administrative_post", "suco", "aldeia", "role"
+        ]
+        labels = {
+            "first_name": "Naran Dahuluk",
+            "last_name": "Naran Familia",
+            "whatsapp_number": "Númeru WhatsApp",
+            "email": "Korreiu Eletróniku",
+            "address": "Enderesu",
+            "municipality": "Munisípiu",
+            "administrative_post": "Postu Administrativu",
+            "suco": "Suku",
+            "aldeia": "Aldeia",
+            "role": "Funsaun",
+        }
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "whatsapp_number": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "+67077123456"
+            }),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+            "address": forms.TextInput(attrs={"class": "form-control"}),
+
+            # Bootstrap select fields
+            "municipality": forms.Select(attrs={"class": "form-select"}),
+            "administrative_post": forms.Select(attrs={"class": "form-select"}),
+            "suco": forms.Select(attrs={"class": "form-select"}),
+            "aldeia": forms.Select(attrs={"class": "form-select"}),
+            "role": forms.Select(attrs={"class": "form-select"}),
+        }
+
+    def __init__(self, *args, current_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Municipality dropdown
+        self.fields["municipality"].queryset = Municipality.objects.all()
+        self.fields["municipality"].empty_label = "Hili Munisípiu"
+
+        # Empty dependent dropdowns by default
+        self.fields["administrative_post"].queryset = AdministrativePost.objects.none()
+        self.fields["administrative_post"].empty_label = "Hili Postu Administrativu"
+        self.fields["suco"].queryset = Suco.objects.none()
+        self.fields["suco"].empty_label = "Hili Suku"
+        self.fields["aldeia"].queryset = Aldeia.objects.none()
+        self.fields["aldeia"].empty_label = "Hili Aldeia"
+
+        # Remove role field if current user is not moe_admin
+        if current_user and current_user.role != "moe_admin":
+            del self.fields["role"]
+
+        # Handle cascading selects (POST / bound form)
+        if self.is_bound:
+            try:
+                municipality_id = int(self.data.get("municipality", 0))
+                self.fields["administrative_post"].queryset = (
+                    AdministrativePost.objects.filter(municipality_id=municipality_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+            try:
+                post_id = int(self.data.get("administrative_post", 0))
+                self.fields["suco"].queryset = (
+                    Suco.objects.filter(administrative_post_id=post_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+            try:
+                suco_id = int(self.data.get("suco", 0))
+                self.fields["aldeia"].queryset = (
+                    Aldeia.objects.filter(suco_id=suco_id)
+                )
+            except (ValueError, TypeError):
+                pass
+
+        # Handle editing existing instance (unbound form with instance data)
+        elif self.instance.pk:
+            if self.instance.municipality:
+                self.fields["administrative_post"].queryset = (
+                    AdministrativePost.objects.filter(municipality=self.instance.municipality)
+                )
+            if self.instance.administrative_post:
+                self.fields["suco"].queryset = (
+                    Suco.objects.filter(administrative_post=self.instance.administrative_post)
+                )
+            if self.instance.suco:
+                self.fields["aldeia"].queryset = (
+                    Aldeia.objects.filter(suco=self.instance.suco)
+                )
+
+    def save(self, commit=True):
+        user = super().save(commit=True)
         return user

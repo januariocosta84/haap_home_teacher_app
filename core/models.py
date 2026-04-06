@@ -34,7 +34,7 @@ class AdministrativePost(models.Model):
         ordering = ['municipality__name', 'name']
 
     def __str__(self):
-        return f"{self.name}, {self.municipality.name}"
+        return f"{self.name}"
 
 
 # ---------------------------------
@@ -51,7 +51,7 @@ class Suco(models.Model):
         ordering = ['administrative_post__name', 'name']
 
     def __str__(self):
-        return f"{self.name}, {self.administrative_post.name}"
+        return f"{self.name}"
 
 
 # ---------------------------------
@@ -68,7 +68,7 @@ class Aldeia(models.Model):
         ordering = ['suco__name', 'name']
 
     def __str__(self):
-        return f"{self.name}, {self.suco.name}"
+        return f"{self.name}"
 
 # user profile image upload path
 def user_image_upload_path(instance, filename):
@@ -161,8 +161,8 @@ class Location(models.Model):
 # ---------------------------------
 class Child(models.Model):
     AGE_GROUP_CHOICES = [
-        ('A', 'Group A: 3-4 years'),
-        ('B', 'Group B: 5-6 years'),
+        ('A', 'Grupo A: Tinan 3-4 '),
+        ('B', 'Grupo B: Tinan 5-6 '),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -257,29 +257,42 @@ class PreschoolEnrollmentOptIn(models.Model):
 # ---------------------------------
 # 6. APK Version Management
 # ---------------------------------
+def apk_upload_path(instance, filename):
+    # optional: keep same filename to replace
+    return f"apk/{filename}"
+
+
 class ApkVersion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     version_name = models.CharField(max_length=20)
-    download_url = models.URLField()
+
+    # change from URLField → FileField
+    apk_file = models.FileField(upload_to=apk_upload_path)
+
     is_latest = models.BooleanField(default=False)
     released_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        if self.is_latest:
-            # Ensure only one latest version
-            ApkVersion.objects.filter(is_latest=True).update(is_latest=False)
+
+        # 🔥 delete old file when replacing
+        if self.pk:
+            try:
+                old = ApkVersion.objects.get(pk=self.pk)
+                if old.apk_file and old.apk_file.name != self.apk_file.name:
+                    if os.path.exists(old.apk_file.path):
+                        os.remove(old.apk_file.path)
+            except ApkVersion.DoesNotExist:
+                pass
+
         super().save(*args, **kwargs)
 
     class Meta:
-        db_table = 'apk_versions'
-        indexes = [
-            models.Index(fields=['is_latest']),
-        ]
+        db_table = "apk_versions"
 
     def __str__(self):
-        return f"APK v{self.version_name} ({'latest' if self.is_latest else 'archived'})"
+        return f"APK v{self.version_name}"
 
-
+    
 # ---------------------------------
 # 7. WhatsApp Message Log
 # ---------------------------------

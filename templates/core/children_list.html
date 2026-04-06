@@ -30,7 +30,7 @@
             <td>{{ child.created_at|date:"Y-m-d H:i" }}</td>
             <td>
               <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-primary">Editar</a>
-              <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Hamos</a>
+              <!-- <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Hamos</a> -->
             </td>
           </tr>
         {% endfor %}

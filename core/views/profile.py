@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
 from django.contrib import messages
-from core.forms import ProfileForm, ProfileImageForm
+from core.forms import ProfileForm, ProfileImageForm, ChangePasswordForm
 
 @login_required
 def profile_view(request):
@@ -28,3 +29,30 @@ def update_profile_image(request):
     else:
         form = ProfileImageForm(instance=request.user)
     return render(request, "users/update_profile_image.html", {"form": form})
+
+
+@login_required
+def change_password(request):
+    """Allow user to change their password"""
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            current_password = form.cleaned_data.get('current_password')
+            new_password = form.cleaned_data.get('new_password')
+            
+            # Verify current password
+            if not user.check_password(current_password):
+                messages.error(request, "Current password is incorrect.")
+                return redirect('core:change_password')
+            
+            # Set new password
+            user.set_password(new_password)
+            user.save()
+            
+            messages.success(request, "Password changed successfully. Please login again.")
+            return redirect('core:login')
+    else:
+        form = ChangePasswordForm()
+    
+    return render(request, 'users/change_password.html', {'form': form})

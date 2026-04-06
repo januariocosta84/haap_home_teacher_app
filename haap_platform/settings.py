@@ -148,10 +148,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py
 AUTH_USER_MODEL = 'core.User'
-LOGIN_URL = '/login/'          # matches your defined URL
-#
-LOGOUT_REDIRECT_URL = '/login/'  # after logout, go back to login
-
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'logout'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 

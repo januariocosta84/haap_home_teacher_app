@@ -7,7 +7,7 @@
     <div class="col">
       <div class="card card-primary card-outline shadow-sm mt-4">
         <div class="card-header bg-white">
-          <h3 class="mb-0">User Profile</h3>
+          <h3 class="mb-0">Perfil utilizador</h3>
         </div>
 
         <div class="card-body">
@@ -31,17 +31,17 @@
                 {% csrf_token %}
                 {{ form.profile_picture }}
                 <button type="submit" class="btn btn-primary btn-sm mt-2">
-                  <i class="fas fa-upload"></i> Update Picture
+                  <i class="fas fa-upload"></i> Atualizar Foto
                 </button>
               </form>
             </div>
 
             <!-- Profile Information (Right) -->
             <div class="col-12 col-md-8">
-              <h4 class="mb-4">Profile Information</h4>
+              <h4 class="mb-4">Perfil</h4>
 
               <div class="row mb-2">
-                <div class="col-5"><strong>Full Name:</strong></div>
+                <div class="col-5"><strong>Naran Kompletu:</strong></div>
                 <div class="col-7">{{ user.get_full_name|default:"Not set" }}</div>
               </div>
               <div class="row mb-2">
@@ -54,7 +54,7 @@
                 <div class="col-7">{{ user.whatsapp_number|default:"Not provided" }}</div>
               </div>
               <div class="row mb-2">
-                <div class="col-5"><strong>Role:</strong></div>
+                <div class="col-5"><strong>Papel:</strong></div>
                 <div class="col-7">
                   {% if user.is_superuser %}
                     Administrator
@@ -66,20 +66,20 @@
                 </div>
               </div>
               <div class="row mb-2">
-                <div class="col-5"><strong>Date Joined:</strong></div>
+                <div class="col-5"><strong>Loron tama:</strong></div>
                 <div class="col-7">{{ user.date_joined|date:"M d, Y"|default:"Unknown" }}</div>
               </div>
               <div class="row mb-2">
-                <div class="col-5"><strong>Last Login:</strong></div>
+                <div class="col-5"><strong>Login Ikus:</strong></div>
                 <div class="col-7">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</div>
               </div>
 
               <div class="mt-4 d-flex gap-2">
-                <a href="#" class="btn btn-warning">
-                  <i class="fas fa-edit"></i> Edit Profile
+                <a href="{% url 'core:edit_user' user.id %}" class="btn btn-warning">
+                  <i class="fas fa-edit"></i> Editar profile
                 </a>
-                <a href="#" class="btn btn-secondary">
-                  <i class="fas fa-key"></i> Change Password
+                <a href="{% url 'core:change_password' %}" class="btn btn-secondary">
+                  <i class="fas fa-key"></i> Troka Password
                 </a>
               </div>
             </div>

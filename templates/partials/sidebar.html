@@ -114,12 +114,12 @@
 
           <!-- System Settings -->
           <li class="nav-header">SISTEMA</li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nav-icon bi bi-gear-fill"></i>
               <p>Settings</p>
             </a>
-          </li>
+          </li> -->
                   <!-- Logs (all roles can see) -->
         <li class="nav-item">
           <a href="{% url 'core:logs' %}" class="nav-link">
@@ -140,7 +140,7 @@
               <a href="{% url 'core:latest_apk' %}" class="nav-link">
                   <i class="nav-icon bi bi-phone"></i>
                   <p>
-                      Download APK
+                      Download HAAP
                       {% if versions %}
                           <span class="badge bg-danger ms-1">Foun</span>
                       {% endif %}
@@ -156,6 +156,12 @@
               <p>Dashboard</p>
             </a>
           </li>
+          <li class="nav-item">
+          <a href="{% url 'core:logs' %}" class="nav-link">
+            <i class="nav-icon bi bi-activity"></i>
+            <p>Atividades</p>
+          </a>
+        </li>
         {% elif user.role == "teacher" %}
           <!-- Teacher Dashboard -->
           <li class="nav-item">

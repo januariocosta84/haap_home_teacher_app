@@ -1,9 +1,9 @@
 {% extends "core/base.html" %}
 {% block content %}
 <div class="container-fluid mt-4">
-  <h3>Versaun APK</h3>
-  {% if user.is_superuser %}
-    <a href="{% url 'core:upload_apk' %}" class="btn btn-success mb-3">Add New APK</a>
+  <h3>Versaun HAAP</h3>
+  {% if user.role == 'moe_admin' %}
+    <a href="{% url 'core:upload_apk' %}" class="btn btn-success mb-3">Adisiona HAAP Foun</a>
   {% endif %}
 
   {% if apks %}
@@ -21,24 +21,35 @@
         {% for apk in apks %}
           <tr>
             <td>{{ apk.version_name }}</td>
-            <td><a href="{{ apk.download_url }}" target="_blank">Download</a></td>
             <td>
+              <a href="{{ apk.apk_file.url }}"
+              class="btn btn-sm btn-success {% if user.role == 'moe_admin' %}disabled{% endif %}"
+              download>
+              Download
+            </a>
+            </td>
+                    <td>
               {% if apk.is_latest %}
-                <span class="badge bg-success">Latest</span>
+                <span class="badge bg-success">Ikus</span>
               {% else %}
-                <span class="badge bg-secondary">Archived</span>
+                <span class="badge bg-secondary">Arkivadu</span>
               {% endif %}
             </td>
             <td>{{ apk.released_at|date:"Y-m-d H:i" }}</td>
             <td>
-              <a href="{% url 'core:edit_apk' apk.id %}" class="btn btn-sm btn-primary">Edit</a>
-            </td>
+                {% if user.role == 'moe_admin' %}
+                  <a href="{% url 'core:edit_apk' apk.id %}" class="btn btn-sm btn-primary">Editar</a>
+                
+                {%else %}
+                  <span class="text-muted fst-italic">N/A</span>
+                {% endif %}
+          </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% else %}
-    <div class="alert alert-info">No APK versions uploaded yet.</div>
+    <div class="alert alert-info">Sedauk iha versaun HAAP Foun.</div>
   {% endif %}
 </div>
 {% endblock %}

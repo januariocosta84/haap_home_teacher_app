@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -19,14 +19,15 @@ def download_apk(request, apk_id):
 
 @login_required
 def upload_apk(request):
+    apk = ApkVersion.objects.first()  # 🔥 only one record
     if request.method == 'POST':
-        form = ApkVersionForm(request.POST)
+        form = ApkVersionForm(request.POST, request.FILES, instance=apk)
         if form.is_valid():
             form.save()
-            messages.success(request, "APK version uploaded successfully.")
-            return redirect('apk_list')
-    else:
-        form = ApkVersionForm()
+            return JsonResponse({"success": True})
+        return JsonResponse({"success": False, "errors": form.errors})
+
+    form = ApkVersionForm()
     return render(request, 'apk/upload_apk.html', {'form': form})
 
 
@@ -34,7 +35,7 @@ def upload_apk(request):
 def edit_apk(request, apk_id):
     apk = get_object_or_404(ApkVersion, id=apk_id)
     if request.method == 'POST':
-        form = ApkVersionForm(request.POST, instance=apk)
+        form = ApkVersionForm(request.POST, request.FILES, instance=apk)
         if form.is_valid():
             form.save()
             messages.success(request, "APK version updated successfully.")
@@ -47,7 +48,7 @@ def edit_apk(request, apk_id):
 @login_required
 def apk_list(request):
     user = request.user
-    print(f"User {user.username} accessed the APK list." f"Is staff: {user.is_staff}, Is superuser: {user.is_superuser}")
+    print(f"User {user.username} accessed the APK list." f"Is staff: {user.is_staff}, Is superuser: {user.is_superuser}","Role: {user.role}",user.role)
     apks = ApkVersion.objects.order_by('-released_at')
     return render(request, 'apk/apk_list.html', {'apks': apks, 'user': user})
 

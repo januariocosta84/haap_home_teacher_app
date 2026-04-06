@@ -1,5 +1,6 @@
 <!-- base.html -->
 {% load static %}
+
 <!doctype html>
 <html lang="en">
   <!--begin::Head-->
@@ -74,6 +75,7 @@
       integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
       crossorigin="anonymous"
     />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.css" />
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -106,7 +108,7 @@
           <div class="container-fluid">
             <!--begin::Row-->
             <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h3></div>
+              <div class="col-sm-6"><h3 class="mb-0"></h3></div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                   {% block breadcrumbs %}
@@ -220,6 +222,9 @@
       integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
       crossorigin="anonymous"
     ></script>
+
+  
+<script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
     <script>
   // Wait for the page to fully load
   document.addEventListener("DOMContentLoaded", function() {
@@ -235,6 +240,8 @@
       }, 10000); // 10 seconds = 10000 milliseconds
     });
   });
+
+
 </script>
     <!-- jsvectormap -->
     <script>
