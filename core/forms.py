@@ -201,16 +201,16 @@ class ApkVersionForm(forms.ModelForm):
             ),
         }
 
-# User profile image update form
 class ProfileImageForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['image']   # only handle image field
-        widgets = {
-            'image': forms.FileInput(attrs={'class': 'form-control-file'})  # no clear checkbox
+        fields = ['image']
+        labels = {
+            'image': 'Foto'
         }
-
-
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'form-control-file'})
+        }
 # Profile edit form used by `profile_view`
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -598,24 +598,24 @@ class UserForm(forms.ModelForm):
 class ChangePasswordForm(forms.Form):
     """Form for users to change their password"""
     current_password = forms.CharField(
-        label="Current Password",
+        label="Password atual",
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
-            "placeholder": "Enter your current password"
+            "placeholder": "Hakerek ita nia password atual"
         })
     )
     new_password = forms.CharField(
-        label="New Password",
+        label="Password Foun",
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
-            "placeholder": "Enter your new password"
+            "placeholder": "Hakerek password foun"
         })
     )
     confirm_password = forms.CharField(
-        label="Confirm New Password",
+        label="Konfirma Password",
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
-            "placeholder": "Confirm your new password"
+            "placeholder": "Hakerek konfirma password foun"
         })
     )
 
@@ -626,7 +626,7 @@ class ChangePasswordForm(forms.Form):
 
         if new_password and confirm_password:
             if new_password != confirm_password:
-                raise forms.ValidationError("New password and confirm password do not match.")
+                raise forms.ValidationError("Password foun no password konfirmadu la hanensan.")
         
         return cleaned_data
 
@@ -732,3 +732,42 @@ class UserEditForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=True)
         return user
+    
+#Forgot and reset password
+
+class ForgotPasswordForm(forms.Form):
+    whatsapp_number = forms.CharField(
+        max_length=15,
+        label="Númeru WhatsApp",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '+67077123456'
+        })
+    )
+
+    def clean_whatsapp_number(self):
+        number = self.cleaned_data['whatsapp_number']
+        if not User.objects.filter(whatsapp_number=number).exists():
+            raise forms.ValidationError("Númeru WhatsApp ne'e la iha sistema.")
+        return number
+
+
+class ResetPasswordForm(forms.Form):
+    new_password = forms.CharField(
+        label="Password Foun",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        min_length=8
+    )
+    confirm_password = forms.CharField(
+        label="Konfirma Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        min_length=8
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get('new_password')
+        p2 = cleaned_data.get('confirm_password')
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError("Password sira ne'e la hanesan.")
+        return cleaned_data

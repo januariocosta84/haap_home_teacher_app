@@ -1,3 +1,6 @@
+from functools import cache
+import random
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -5,7 +8,9 @@ from django.views import View
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 
-from core.forms import UserForm, UserRegistrationForm, UserEditForm
+from core.forms import ForgotPasswordForm, ResetPasswordForm, UserForm, UserRegistrationForm, UserEditForm
+# Make sure this is at the top of your views file
+from django.core.cache import cache as django_cache
 from core.models import Child
 
 User = get_user_model()
@@ -116,3 +121,78 @@ def user_list(request):
 def add_user(request):
     # Use same behavior as `register_user` to avoid duplication
     return register_user(request)
+
+
+
+def forgot_password(request):
+    form = ForgotPasswordForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        whatsapp_number = form.cleaned_data['whatsapp_number']
+
+        # Generate 6-digit OTP
+        otp = str(random.randint(100000, 999999))
+
+        # Store OTP in cache for 10 minutes
+        cache_key = f"reset_otp_{whatsapp_number}"
+        django_cache.set(cache_key, otp, timeout=600)  # ← changed
+
+        request.session['reset_whatsapp'] = whatsapp_number
+
+        print(f"OTP for {whatsapp_number}: {otp}")
+
+        messages.success(request, f"OTP haruka ona ba {whatsapp_number}. Validu minutu 10.")
+        return redirect('core:verify_otp')
+
+    return render(request, 'registration/forgot_password.html', {'form': form})
+
+
+def verify_otp(request):
+    whatsapp_number = request.session.get('reset_whatsapp')
+
+    if not whatsapp_number:
+        messages.error(request, "Sesaun expirou. Tenta fali.")
+        return redirect('forgot_password')
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp', '').strip()
+        cache_key = f"reset_otp_{whatsapp_number}"
+        saved_otp = django_cache.get(cache_key)  # ← changed
+
+        if not saved_otp:
+            messages.error(request, "OTP expirou. Husu fali.")
+            return redirect('core:forgot_password')
+
+        if entered_otp != saved_otp:
+            messages.error(request, "OTP sala. Tenta fali.")
+            return render(request, 'registration/verify_otp.html')
+
+        django_cache.delete(cache_key)  # ← changed
+        request.session['otp_verified'] = True
+        return redirect('core:reset_password')
+
+    return render(request, 'registration/verify_otp.html')
+
+def reset_password(request):
+    whatsapp_number = request.session.get('reset_whatsapp')
+    otp_verified = request.session.get('otp_verified')
+
+    if not whatsapp_number or not otp_verified:
+        messages.error(request, "Sesaun expirou. Tenta fali.")
+        return redirect('core:forgot_password')
+
+    form = ResetPasswordForm(request.POST or None)
+
+    if request.method == 'POST' and form.is_valid():
+        user = User.objects.get(whatsapp_number=whatsapp_number)
+        user.set_password(form.cleaned_data['new_password'])
+        user.save()
+
+        # Clear session
+        del request.session['reset_whatsapp']
+        del request.session['otp_verified']
+
+        messages.success(request, "Password muda ona! Favor login fali.")
+        return redirect('core:login')
+
+    return render(request, 'registration/reset_password.html', {'form': form})

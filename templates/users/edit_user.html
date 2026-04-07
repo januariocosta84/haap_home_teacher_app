@@ -1,43 +1,135 @@
 {% extends "core/base.html" %}
-
 {% block content %}
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header">
-      <h5>Editar Utilizador</h5>
+<div class="container-fluid mt-4">
+
+  <!-- Back link -->
+  <a href="{% url 'core:profile' %}" 
+     class="text-muted text-decoration-none d-inline-flex align-items-center gap-1 mb-3" 
+     style="font-size:13px;">
+    <i class="fas fa-arrow-left" style="font-size:11px;"></i> Fila ba perfil
+  </a>
+
+  <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
+
+    <!-- Header -->
+    <div class="card-header bg-white border-bottom d-flex align-items-center gap-3 py-3">
+      <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+           style="width:40px; height:40px; background:#E6F1FB; font-size:14px; font-weight:500; color:#185FA5;">
+        {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+      </div>
+      <div>
+        <div style="font-size:15px; font-weight:500;">Editar utilizador</div>
+        <div class="text-muted" style="font-size:12px;">{{ user.get_full_name }}</div>
+      </div>
     </div>
-    <div class="card-body">
-      <form method="post">
+
+    <div class="card-body px-4 py-4">
+      <form method="post" id="editForm">
         {% csrf_token %}
-        {% for field in form.visible_fields %}
-          <div class="mb-3">
-            <label class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-              <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% for error in field.errors %}
-              <div class="text-danger small">{{ error }}</div>
-            {% endfor %}
+
+        <!-- Section: Informasaun Pessoal -->
+        <div class="text-uppercase text-muted mb-3 mt-0" 
+             style="font-size:11px; font-weight:500; letter-spacing:0.06em; border-bottom: 1px solid #f0f0f0; padding-bottom:6px;">
+          Informasaun pessoal
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
           </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{% url 'core:user_management' %}" class="btn btn-secondary">Cancelar</a>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.whatsapp_number.label }}</label>
+            {{ form.whatsapp_number }}
+            <div id="phone-error" class="text-danger small d-none"></div>
+            {% for error in form.whatsapp_number.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12">
+            <label class="form-label small text-muted">{{ form.address.label }}</label>
+            {{ form.address }}
+            {% for error in form.address.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <!-- Section: Konta -->
+        <div class="text-uppercase text-muted mb-3" 
+             style="font-size:11px; font-weight:500; letter-spacing:0.06em; border-bottom: 1px solid #f0f0f0; padding-bottom:6px;">
+          Konta
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.username.label }}</label>
+            {{ form.username }}
+            {% for error in form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.role.label }}</label>
+            {{ form.role }}
+            {% for error in form.role.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+
+        <!-- Section: Lokalizasaun -->
+        <div class="text-uppercase text-muted mb-3" 
+             style="font-size:11px; font-weight:500; letter-spacing:0.06em; border-bottom: 1px solid #f0f0f0; padding-bottom:6px;">
+          Lokalizasaun
+        </div>
+        <div class="row g-3 mb-2">
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.municipality.label }}</label>
+            {{ form.municipality }}
+            {% for error in form.municipality.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.administrative_post.label }}</label>
+            {{ form.administrative_post }}
+            {% for error in form.administrative_post.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.suco.label }}</label>
+            {{ form.suco }}
+            {% for error in form.suco.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label small text-muted">{{ form.aldeia.label }}</label>
+            {{ form.aldeia }}
+            {% for error in form.aldeia.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+
       </form>
     </div>
+
+    <!-- Footer: action buttons -->
+    <div class="card-footer bg-light border-top d-flex gap-2 px-4 py-3">
+      <button type="submit" form="editForm" id="submit-button" class="btn btn-primary px-4">
+        <i class="fas fa-save me-1"></i> Guardar
+      </button>
+      <a href="{% url 'core:profile' %}" class="btn btn-outline-secondary px-4">
+        Kansela
+      </a>
+    </div>
+
   </div>
 </div>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Phone validation script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-  // Function to trigger cascading dropdowns
+
   function triggerCascade() {
     var municipalityId = $("#id_municipality").val();
     if (municipalityId) {
-      // Trigger administrative post change
       $.ajax({
         url: "{% url 'core:ajax_load_admin_posts' %}",
         data: { municipality_id: municipalityId },
@@ -47,7 +139,6 @@ $(document).ready(function () {
           data.forEach(p => $("#id_administrative_post").append(new Option(p.name, p.id)));
           if (currentValue) {
             $("#id_administrative_post").val(currentValue);
-            // Trigger suco cascade
             $.ajax({
               url: "{% url 'core:ajax_load_sucos' %}",
               data: { administrative_post_id: currentValue },
@@ -57,7 +148,6 @@ $(document).ready(function () {
                 data.forEach(s => $("#id_suco").append(new Option(s.name, s.id)));
                 if (sucoValue) {
                   $("#id_suco").val(sucoValue);
-                  // Trigger aldeia cascade
                   $.ajax({
                     url: "{% url 'core:ajax_load_aldeias' %}",
                     data: { suco_id: sucoValue },
@@ -65,9 +155,7 @@ $(document).ready(function () {
                       var aldeiaValue = $("#id_aldeia").val();
                       $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
                       data.forEach(a => $("#id_aldeia").append(new Option(a.name, a.id)));
-                      if (aldeiaValue) {
-                        $("#id_aldeia").val(aldeiaValue);
-                      }
+                      if (aldeiaValue) $("#id_aldeia").val(aldeiaValue);
                     }
                   });
                 }
@@ -79,16 +167,13 @@ $(document).ready(function () {
     }
   }
 
-  // Trigger cascade on page load if municipality is set
   triggerCascade();
 
-  // Load Administrative Posts when municipality changes
   $("#id_municipality").change(function () {
     var municipalityId = $(this).val();
     $("#id_administrative_post").html('<option value="">Hili Postu Administrativu</option>');
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
     if (municipalityId) {
       $.ajax({
         url: "{% url 'core:ajax_load_admin_posts' %}",
@@ -100,12 +185,10 @@ $(document).ready(function () {
     }
   });
 
-  // Load Sucos when administrative post changes
   $("#id_administrative_post").change(function () {
     var postId = $(this).val();
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
     if (postId) {
       $.ajax({
         url: "{% url 'core:ajax_load_sucos' %}",
@@ -117,11 +200,9 @@ $(document).ready(function () {
     }
   });
 
-  // Load Aldeias when suco changes
   $("#id_suco").change(function () {
     var sucoId = $(this).val();
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
     if (sucoId) {
       $.ajax({
         url: "{% url 'core:ajax_load_aldeias' %}",
@@ -151,7 +232,6 @@ $(document).ready(function () {
     if (phone && !timorPhoneRegex.test(phone)) {
       errorDisplay.textContent = "Numeru WhatsApp tenke komesa ho +6707...";
       errorDisplay.classList.remove("d-none");
-      //alert("Numeru WhatsApp la loos! Tenke komesa ho +6707..."); // ✅ ALERT ADDED
       submitButton.disabled = true;
       return;
     }
@@ -161,15 +241,14 @@ $(document).ready(function () {
         .then(res => res.json())
         .then(data => {
           if (data.exists) {
-            errorDisplay.textContent = "Numeru WhatsApp ida ne’e rejistadu ona.";
+            errorDisplay.textContent = "Numeru WhatsApp ida ne'e rejistadu ona.";
             errorDisplay.classList.remove("d-none");
-            alert("Numeru WhatsApp ida ne’e rejistadu ona!"); // ✅ ALERT ADDED
             submitButton.disabled = true;
           }
         }).catch(err => console.error("Error checking WhatsApp:", err));
     }
   });
-});
 
+});
 </script>
 {% endblock %}

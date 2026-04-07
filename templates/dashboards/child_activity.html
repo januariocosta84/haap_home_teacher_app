@@ -8,22 +8,24 @@
 <table class="table table-bordered align-middle text-center">
     <thead class="table-light small text-muted">
         <tr>
-            <th>Data</th>
+            <th class="text-center">Rezultadu aprendizajen</th> 
             <th>Atividade</th>
             <th>Tema</th>
             <th>Tipu</th>
             <!-- <th>Kategoria 2</th>
             <th>Kategoria 3</th> -->
-            <th class="text-center">Rezultadu aprendizajen</th> 
+           
+            <th>Data</th>
         </tr>
     </thead>
     <tbody>
         {% for act in activities %}
         <tr>
-            <!-- Date (smaller) -->
-            <td class="small ">
-                {{ act.created_at|date:"Y-m-d H:i" }}
+            <!-- Activity Result (bigger & emphasized) -->
+            <td class="small">
+                {{ act.activity_result }}
             </td>
+          
 
             <!-- Activity Name (smaller) -->
             <td class="small">
@@ -35,11 +37,11 @@
                 {{ act.cat1_left|default:"-" }}
             </td>
             <td>{{ act.cat1_right|default:"-" }}</td>
-
-            <!-- Activity Result (bigger & emphasized) -->
-            <td class="text-center fw-bold fs-5">
-                {{ act.activity_result }}
+              <!-- Date (smaller) -->
+            <td class="small ">
+                {{ act.created_at|date:"Y-m-d H:i" }}
             </td>
+            
         </tr>
 
         {% empty %}

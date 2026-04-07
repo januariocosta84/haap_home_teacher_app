@@ -3,6 +3,7 @@ from core.api_view import ActivityResultCreateAPIView, LoginAPIView, LogoutAPIVi
 from core.views import *
 from core.views.activity_logs import ChildActivityView
 from core.views.analytics_api import trend_data_api, summary_stats_api, get_municipalities_api
+from core.views.user_management import forgot_password, reset_password, verify_otp
 
 app_name = "core"
 
@@ -65,4 +66,9 @@ urlpatterns = [
     path('api/trends/', trend_data_api, name='api_trends'),
     path('api/summary/', summary_stats_api, name='api_summary'),
     path('api/municipalities/', get_municipalities_api, name='api_municipalities'),
+
+    #reset password
+    path('forgot-password/', forgot_password, name='forgot_password'),
+    path('verify-otp/', verify_otp, name='verify_otp'),
+    path('reset-password/', reset_password, name='reset_password'),
 ]

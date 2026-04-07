@@ -11,7 +11,7 @@ def profile_view(request):
         form = ProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            messages.success(request, "Profile successfully updated.")
+            messages.success(request, "Perfil atualiza ho susesu.")
             return redirect('core:profile')
     else:
         form = ProfileForm(instance=user)
@@ -24,7 +24,7 @@ def update_profile_image(request):
         form = ProfileImageForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, "Profile image updated.")
+            messages.success(request, "Perfil foto atualiza ho susesu.")
             return redirect('core:profile')
     else:
         form = ProfileImageForm(instance=request.user)
@@ -43,7 +43,7 @@ def change_password(request):
             
             # Verify current password
             if not user.check_password(current_password):
-                messages.error(request, "Current password is incorrect.")
+                messages.error(request, "Password atual la loos.")
                 return redirect('core:change_password')
             
             # Set new password

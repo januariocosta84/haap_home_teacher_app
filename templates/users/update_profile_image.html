@@ -2,24 +2,55 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-  <h2>Update Profile Image</h2>
+  <h2>Atualiza foto perfil</h2>
 
   <div class="card card-primary card-outline shadow-sm mb-4">
     <div class="card-body">
-      <p>Your Current Image:</p>
-        <img src="{{ user.image.url }}" 
+      <p>Ita nia foto atual:</p>
+      <img src="{{ user.image.url }}" 
         alt="Profile image"
         class="rounded-circle" 
         width="150" height="150">
     </div>
     <div class="card-footer bg-white">
-      <form method="post" enctype="multipart/form-data">
+      <form method="post" enctype="multipart/form-data" id="photoForm">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Upload</button>
+
+        <input type="file" 
+               id="id_image" 
+               name="image" 
+               accept="image/*" 
+               style="display: none;"
+               onchange="autoSubmit(this)">
+
+        <div class="mb-3 d-flex align-items-center gap-2">
+          <button type="button" 
+                  class="btn btn-outline-secondary" 
+                  onclick="document.getElementById('id_image').click()">
+            Hili foto
+          </button>
+          <span id="fileNameDisplay" style="font-size: 14px; color: #888;">
+            Foto seidauk hili
+          </span>
+        </div>
+
       </form>
     </div>
   </div>
 
 </div>
+
+<script>
+  function autoSubmit(input) {
+    if (input.files && input.files.length > 0) {
+      // Show filename briefly before submitting
+      document.getElementById('fileNameDisplay').textContent = input.files[0].name;
+      document.getElementById('fileNameDisplay').style.color = '#333';
+
+      // Auto submit the form
+      document.getElementById('photoForm').submit();
+    }
+  }
+</script>
+
 {% endblock %}

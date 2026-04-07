@@ -1,0 +1,38 @@
+{% extends "./layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Verifica OTP</h5>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for msg in messages %}
+              <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <p class="text-muted" style="font-size:14px;">
+            Hakerek OTP ne'ebé haruka ba ita nia WhatsApp.
+          </p>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">OTP</label>
+              <input type="text" name="otp" class="form-control"
+                     placeholder="123456" maxlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Verifica</button>
+          </form>
+        </div>
+        <div class="card-footer text-center">
+          <a href="{% url 'core:forgot_password' %}" style="font-size:13px;">Husu OTP fali</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
