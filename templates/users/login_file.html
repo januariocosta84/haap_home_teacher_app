@@ -58,7 +58,17 @@
             {{ form.username }}
             <div class="input-group-append">
               <span class="input-group-text">
-                <i class="mdi mdi-check-circle-outline"></i>
+              <i class="fas fa-solid fa-phone"></i>
+                {% comment %} <i class="fas fa-sharp fa-solid fa-user"></i> {% endcomment %}
+
+                <!--
+                In the example above, you add...
+                1. `fa-solid` class for Solid style
+                2. `user` icon with the `fa-` prefix
+                3. `fa-sharp` class for Sharp family
+                ... and you'll see the Sharp Solid User icon
+                -->
+
               </span>
             </div>
           </div>
@@ -69,7 +79,7 @@
             {{ form.password }}
             <div class="input-group-append">
               <span class="input-group-text">
-                <i class="mdi mdi-check-circle-outline"></i>
+                  <i class="fas fa-lock"></i>
               </span>
             </div>
           </div>
