@@ -3,94 +3,141 @@
 
 {% block content %}
 
-<h4> <b>{{ child.first_name }} {{ child.last_name }} </b>nia Atividade sira</h4>
+<div class="container-fluid mt-4">
 
-<table class="table table-bordered align-middle text-center">
-    <thead class="table-light small text-muted">
-        <tr>
-            <th class="text-center">Rezultadu aprendizajen</th> 
-            <th>Atividade</th>
-            <th>Tema</th>
-            <th>Tipu</th>
-            <!-- <th>Kategoria 2</th>
-            <th>Kategoria 3</th> -->
-           
-            <th>Data</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for act in activities %}
-        <tr>
-            <!-- Activity Result (bigger & emphasized) -->
-            <td class="small">
-                {{ act.activity_result }}
-            </td>
-          
+  <!-- Title -->
+  <h4 class="mb-3">
+    Rezultadu aprendizajen sira.<b>{{ child.first_name }} {{ child.last_name }} ...</b> 
+  </h4>
 
-            <!-- Activity Name (smaller) -->
-            <td class="small">
+  <!-- Card -->
+  <div class="card shadow-sm border-0">
+
+    <!-- Card Body -->
+    <div class="card-body p-0">
+
+      <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
+        <table id="example1"
+               class="table table-hover mb-0"
+               style="font-size:14px;">
+
+          <!-- THEAD -->
+          <thead style="position:sticky; top:0; z-index:1;">
+            <tr style="background:#f8f9fa;">
+
+              <th class="px-3 py-2"
+                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
+                Rezultadu  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
+                Atividade  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
+                Tema  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
+                Tipu  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
+                Data  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+              </th>
+
+            </tr>
+          </thead>
+
+          <!-- TBODY -->
+          <tbody>
+            {% for act in activities %}
+            <tr>
+
+              <!-- Result Badge -->
+              <td class="px-3">
+                {% if act.activity_result and act.activity_result != 'Tentadu' %}
+                  <span class="badge rounded-pill"
+                        style="background:#E1F5EE; color:#0F6E56; font-size:14px; font-weight:500;">
+                    {{ act.activity_result }}
+                  </span>
+                {% elif act.activity_result == 'Tentadu' %}
+                  <span class="badge rounded-pill"
+                        style="background:#FAECE7; color:#993C1D; font-size:14px; font-weight:500;">
+                    {{ act.activity_result }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+
+              <!-- Activity -->
+              <td class="px-3" style="font-weight:500;">
                 {{ act.activity_name|default:"-" }}
-            </td>
+              </td>
 
-            <!-- Category 1 (smaller & muted) -->
-            <td class="small text">
+              <!-- Tema -->
+              <td class="px-3 text-muted" style="font-size:12px;">
                 {{ act.cat1_left|default:"-" }}
-            </td>
-            <td>{{ act.cat1_right|default:"-" }}</td>
-              <!-- Date (smaller) -->
-            <td class="small ">
-                {{ act.created_at|date:"Y-m-d H:i" }}
-            </td>
-            
-        </tr>
+              </td>
 
-        {% empty %}
-        <tr>
-            <td colspan="6" class="text-center">
+              <!-- Tipu -->
+              <td class="px-3 text-muted" style="font-size:12px;">
+                {{ act.cat1_right|default:"-" }}
+              </td>
+
+              <!-- Date -->
+              <td class="px-3 text-muted"
+                  style="font-size:12px; white-space:nowrap;">
+                {{ act.created_at|date:"d M Y H:i" }}
+              </td>
+
+            </tr>
+
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-5">
+                <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
                 Laiha atividade ne’ebé rejista
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
 
-<!-- 🔁 Pagination -->
-{% if is_paginated %}
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
+        </table>
+      </div>
 
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                ⬅ Anterior
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">⬅ Anterior</span>
-        </li>
-        {% endif %}
+    </div>
 
-        <li class="page-item disabled">
-            <span class="page-link">
-                Pajina {{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
-            </span>
-        </li>
+  </div>
 
-        {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                Próximu ➡
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link">Próximu ➡</span>
-        </li>
-        {% endif %}
+</div>
 
-    </ul>
-</nav>
-{% endif %}
+<script>
+  $(function () {
+    $("#example1").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      searching: false,
+      pageLength: 10,
 
+      language: {
+        info: "Hare'e _START_ to’o _END_ husi _TOTAL_ dadus",
+        infoEmpty: "Laiha dadus disponivel",
+        paginate: {
+          previous: "⬅ Anterior",
+          next: "Próximu ➡"
+        }
+      },
+
+      buttons: ["copy", "csv", "excel", "pdf", "print"]
+
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  });
+</script>
 {% endblock %}

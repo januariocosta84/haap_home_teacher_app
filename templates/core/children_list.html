@@ -1,45 +1,203 @@
 {% extends "core/base.html" %}
- <title>HAAP | {% block title %}Lista ba labarik sira{% endblock %}</title>
-{% block content %}
-<div class="container-fluid mt-4">
-  <h3>Hau nia oan sira</h3>
 
-  <a href="{% url 'core:register_child' %}" class="btn btn-success mb-3">
-    + Rejista oan
-  </a>
+<title>HAAP | {% block title %}Lista ba labarik sira{% endblock %}</title>
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Hau nia oan sira</h3>
+
+    <a href="{% url 'core:register_child' %}" class="btn btn-success shadow-sm">
+      <i class="fas fa-plus"></i> Rejista oan
+    </a>
+  </div>
+
+  <!-- Card -->
+  <div class="card shadow-sm border-0">
+    
+    <!-- Card Header -->
+  <div class="card-header bg-light text-dark border-bottom">
+  <h5 class="mb-0">Lista Oan</h5>
+  </div>
+    <!-- Card Body -->
+  <div class="card-body p-0">
 
   {% if children %}
-    <table class="table table-bordered table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>Naran kompletu</th>
-          <th>Tinan moris</th>
-          <th>Grupu Idade</th>
-          <th>Login ID</th>
-          <th>Registu iha</th>
-          <th>Aksaun</th>
+
+  <div class="table-responsive text-center" style="max-height:600px; overflow-y:auto;">
+    <table id="example2"
+           class="table table-hover mb-0"
+           style="font-size:13px;">
+
+      <!-- THEAD -->
+      <thead style="position:sticky; top:0; z-index:1;">
+        <tr style="background:#f8f9fa;">
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Naran  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Tinan <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Grupu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Login <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Status <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+            Data <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+          </th>
+
+          <th class="px-3 py-2"
+              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
+                Posto  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+           
+          </th>
+
         </tr>
       </thead>
+
+      <!-- TBODY -->
       <tbody>
         {% for child in children %}
-          <tr>
-            <td><a href="{% url 'core:child-activity' child.id %}">{{ child.first_name }}</a></td>
-            <td>{{ child.year_of_birth }}</td>
-            <td>{{ child.get_age_group_display }}</td>
-            <td>{{ child.user_id }}</td>
-            <td>{{ child.created_at|date:"Y-m-d H:i" }}</td>
-            <td>
-              <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-primary">Editar</a>
-              <!-- <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Hamos</a> -->
-            </td>
-          </tr>
+        <tr>
+
+          <!-- Name + Avatar -->
+          <td class="px-3">
+            <div class="d-flex align-items-center">
+              <img src="https://ui-avatars.com/api/?name={{ child.first_name }}&background=0D8ABC&color=fff"
+                   class="rounded-circle me-2"
+                   width="36" height="36">
+
+              <a href="{% url 'core:child-activity' child.id %}"
+                 class="text-decoration-none"
+                 style="font-weight:500;">
+                {{ child.first_name }}
+              </a>
+            </div>
+          </td>
+
+          <td class="px-3 text-muted" style="font-size:12px;">
+            {{ child.year_of_birth }}
+          </td>
+
+          <td class="px-3">
+            {{ child.get_age_group_display }}
+          </td>
+
+          <td class="px-3 text-muted" style="font-size:12px;">
+            {{ child.user_id }}
+          </td>
+
+          <!-- Status Badge (same style as your logs) -->
+          <td class="px-3">
+            <span class="badge rounded-pill"
+                  style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
+              Active
+            </span>
+          </td>
+
+          <td class="px-3 text-muted"
+              style="font-size:12px; white-space:nowrap;">
+            {{ child.created_at|date:"d M Y" }}
+          </td>
+
+          <!-- Actions -->
+          <td class="px-3">
+            <a href="{% url 'core:edit_child' child.id %}"
+               class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-edit"></i>
+            </a>
+
+            <button class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal{{ child.id }}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+
+        </tr>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ child.id }}" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Konfirma Hamos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <div class="modal-body">
+                Ita hakarak hamos <strong>{{ child.first_name }}</strong>?
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                  Kansela
+                </button>
+
+                <a href="{% url 'core:delete_child' child.id %}"
+                   class="btn btn-danger">
+                  Hamos
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         {% endfor %}
       </tbody>
+
     </table>
+  </div>
+
   {% else %}
-    <div class="alert alert-info">
-      Ita la iha oan sira nebee rejista tan.
-    </div>
+
+  <!-- Empty State (same style) -->
+  <div class="text-center text-muted py-5">
+    <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
+    Laiha dadus oan
+  </div>
+
   {% endif %}
+
 </div>
+
+  </div>
+
+</div>
+
+<script>
+  $(function () {
+    $("#example2").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      searching: false,   // ✅ REMOVE SEARCH BAR
+      pageLength: 10,
+      buttons: ["copy", "csv", "excel", "pdf", "print"]
+    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+  });
+</script>
+
 {% endblock %}

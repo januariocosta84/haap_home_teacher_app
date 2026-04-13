@@ -119,7 +119,7 @@
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="logs-body">
             {% for log in logs %}
             <tr>
               <td class="px-3 text-muted" style="font-size:12px;">{{ log.id }}</td>
@@ -260,43 +260,117 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
-<!-- ✅ All original JavaScript preserved exactly below -->
 <script>
-let trendChart = null;
-let currentFilterValues = {};
-let dateFilterActive = false;
+function refreshTable() {
+    fetch(window.location.href, {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        // 🔥 Destroy DataTable first
+        if ($.fn.DataTable.isDataTable('#myTable')) {
+            $('#myTable').DataTable().destroy();
+        }
+
+        // ✅ Replace tbody only
+        document.getElementById("logs-body").innerHTML = data.html;
+
+        // 🔄 Reinitialize DataTable
+        initializeDataTable();
+
+        // 🔁 Rebind filters + stats
+        updateStatistics();
+    });
+}
+
+// ⏱ Refresh every 5 seconds
+setInterval(refreshTable, 5000);
+const COLUMN_INDEXES = {
+    studentId: {% if user.role == "moe_admin" %}3{% else %}2{% endif %},
+    date: {% if user.role == "moe_admin" %}12{% else %}11{% endif %},
+    result: {% if user.role == "moe_admin" %}11{% else %}10{% endif %},
+    filterable: {
+        {% if user.role == "moe_admin" %}
+        parent: 1,
+        {% endif %}
+        munisipiu: {% if user.role == "moe_admin" %}4{% else %}3{% endif %},
+        posto: {% if user.role == "moe_admin" %}5{% else %}4{% endif %},
+        tema: {% if user.role == "moe_admin" %}8{% else %}7{% endif %},
+        actividade: {% if user.role == "moe_admin" %}10{% else %}9{% endif %},
+        resultado: {% if user.role == "moe_admin" %}11{% else %}10{% endif %}
+    }
+};
+
+const FILTER_HEADERS = [
+    {% if user.role == "moe_admin" %}
+    { key: 'parent', trigger: '#parentHeader', title: 'Filtra Parent' },
+    {% endif %}
+    { key: 'munisipiu', trigger: '#munisipiuHeader', title: 'Filtra Munisipiu' },
+    { key: 'posto', trigger: '#postoHeader', title: 'Filtra Posto' },
+    { key: 'tema', trigger: '#temaHeader', title: 'Filtra Tema' },
+    { key: 'actividade', trigger: '#actividadeHeader', title: 'Filtra Atividade' },
+    { key: 'resultado', trigger: '#resultadoHeader', title: 'Filtra Rezultadu' }
+];
+
+const DATA_TABLE_LANGUAGE = {
+    search: 'Pesquisa:',
+    lengthMenu: 'Haree _MENU_ rejistu',
+    info: 'Hatudu _START_ to _END_ husi _TOTAL_ rejistu',
+    infoEmpty: 'Laiha rejistu',
+    infoFiltered: '(filtra husi _MAX_ total rejistu)',
+    zeroRecords: 'La hetan dadus',
+    paginate: { first: 'Uluk', last: 'Ikus', next: 'Tuir Mai', previous: 'Antes' }
+};
 
 const monthNameToIndex = {
     Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
     Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
 };
+
 const monthIndexToName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+let trendChart = null;
+let activityTable = null;
+let activeFilterKey = null;
+const currentFilterValues = {};
+
+function normalizeFilterText(value) {
+    return $('<div>').html(value || '').text().replace(/\s+/g, ' ').trim();
+}
 
 function parseTableDate(dateTime) {
     const [dayStr, monthName, year] = dateTime.split(' ');
     const day = parseInt(dayStr, 10);
     const monthIndex = monthNameToIndex[monthName] ?? 0;
+
     return {
         dateObj: new Date(parseInt(year, 10), monthIndex, day),
-        year: year,
-        month: String(monthIndex + 1).padStart(2, '0'),
-        monthName: monthName,
-        day: String(day).padStart(2, '0')
+        year,
+        month: String(monthIndex + 1).padStart(2, '0')
     };
 }
 
-function formatTrendKey(parsed, groupBy) {
-    const date = parsed.dateObj;
-    if (groupBy === 'yearly') return String(date.getFullYear());
-    if (groupBy === 'monthly') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+function formatTrendKey(parsedDate, groupBy) {
+    const { dateObj } = parsedDate;
+
+    if (groupBy === 'yearly') return String(dateObj.getFullYear());
+    if (groupBy === 'monthly') return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
+
+    return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
 }
 
-function formatTrendLabel(parsed, groupBy) {
-    const date = parsed.dateObj;
-    if (groupBy === 'yearly') return String(date.getFullYear());
-    if (groupBy === 'monthly') return `${monthIndexToName[date.getMonth()]} ${date.getFullYear()}`;
-    return `${String(date.getDate()).padStart(2, '0')} ${monthIndexToName[date.getMonth()]} ${date.getFullYear()}`;
+function formatTrendLabel(parsedDate, groupBy) {
+    const { dateObj } = parsedDate;
+
+    if (groupBy === 'yearly') return String(dateObj.getFullYear());
+    if (groupBy === 'monthly') return `${monthIndexToName[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+    return `${String(dateObj.getDate()).padStart(2, '0')} ${monthIndexToName[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+}
+
+function getFilteredRows() {
+    return activityTable.rows({ search: 'applied' }).data().toArray();
 }
 
 function getTrendFilterValues() {
@@ -307,203 +381,246 @@ function getTrendFilterValues() {
     };
 }
 
-function populateTrendSelectors(filteredData) {
-    const uniqueYears = new Set();
-    filteredData.toArray().forEach(row => {
-        const parsed = parseTableDate(row[row.length - 1]);
-        uniqueYears.add(parsed.year);
+function isAchievedResult(value) {
+    const normalizedValue = normalizeFilterText(value);
+    return normalizedValue !== '' && normalizedValue !== 'Tentadu' && normalizedValue !== '-';
+}
+
+function buildFilterOptions(columnKey) {
+    const columnIndex = COLUMN_INDEXES.filterable[columnKey];
+    const optionSet = new Set();
+
+    activityTable.column(columnIndex).data().each(function(cellValue) {
+        const optionText = normalizeFilterText(cellValue);
+        if (optionText) optionSet.add(optionText);
     });
+
+    return Array.from(optionSet).sort((a, b) => a.localeCompare(b));
+}
+
+function renderFilterSelect(columnKey) {
+    const filterSelect = $('<select>', {
+        id: 'columnPopupFilter',
+        class: 'form-select form-select-sm'
+    });
+
+    filterSelect.append($('<option>', { value: '', text: 'Hotu' }));
+
+    buildFilterOptions(columnKey).forEach(function(optionText) {
+        filterSelect.append($('<option>', {
+            value: optionText,
+            text: optionText
+        }));
+    });
+
+    filterSelect.val(currentFilterValues[columnKey] || '');
+    $('#filterContent').html(filterSelect);
+}
+
+function openFilter(columnKey, title) {
+    activeFilterKey = columnKey;
+    $('#filterTitle').text(title);
+    renderFilterSelect(columnKey);
+    $('#columnFilterModal').modal('show');
+}
+
+function populateTrendSelectors(filteredRows) {
+    const uniqueYears = new Set();
     const yearSelect = $('#trendYearSelect');
     const selectedYear = yearSelect.val();
+
+    filteredRows.forEach(function(row) {
+        uniqueYears.add(parseTableDate(row[COLUMN_INDEXES.date]).year);
+    });
+
     yearSelect.empty().append('<option value="">Hotu</option>');
-    Array.from(uniqueYears).sort().forEach(year => {
+    Array.from(uniqueYears).sort().forEach(function(year) {
         yearSelect.append(`<option value="${year}">${year}</option>`);
     });
+
     if (selectedYear) yearSelect.val(selectedYear);
 }
 
 function updateTrendControls() {
     const groupBy = $('#trendGroupBy').val();
-    if (groupBy === 'daily') {
-        $('#trendMonthSelect').prop('disabled', false);
-        $('#trendYearSelect').prop('disabled', false);
-    } else {
-        $('#trendMonthSelect').prop('disabled', true);
-        $('#trendYearSelect').prop('disabled', false);
+    $('#trendYearSelect').prop('disabled', false);
+    $('#trendMonthSelect').prop('disabled', groupBy !== 'daily');
+}
+
+function renderTrendChart(labels, successData, totalData) {
+    const ctx = document.getElementById('trendChart').getContext('2d');
+
+    if (trendChart) trendChart.destroy();
+
+    trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Atinji Rezultadu',
+                    data: successData,
+                    borderColor: '#1D9E75',
+                    backgroundColor: 'rgba(29,158,117,0.08)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Total Atividade',
+                    data: totalData,
+                    borderColor: '#378ADD',
+                    backgroundColor: 'rgba(55,138,221,0.08)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 12 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                }
+            }
+        }
+    });
+}
+
+function updateTrendChart() {
+    try {
+        const filteredRows = getFilteredRows();
+        const { groupBy, year, month } = getTrendFilterValues();
+        const dateMap = new Map();
+
+        populateTrendSelectors(filteredRows);
+        updateTrendControls();
+
+        filteredRows.forEach(function(row) {
+            const parsedDate = parseTableDate(row[COLUMN_INDEXES.date]);
+            const result = row[COLUMN_INDEXES.result];
+
+            if (year && parsedDate.year !== year) return;
+            if (month && parsedDate.month !== month) return;
+
+            const key = formatTrendKey(parsedDate, groupBy);
+            if (!dateMap.has(key)) dateMap.set(key, { parsedDate, total: 0, success: 0 });
+
+            const item = dateMap.get(key);
+            item.total += 1;
+            if (isAchievedResult(result)) item.success += 1;
+        });
+
+        const sortedEntries = Array.from(dateMap.values()).sort((a, b) => a.parsedDate.dateObj - b.parsedDate.dateObj);
+        const labels = sortedEntries.map(item => formatTrendLabel(item.parsedDate, groupBy));
+        const successData = sortedEntries.map(item => item.success);
+        const totalData = sortedEntries.map(item => item.total);
+
+        renderTrendChart(labels, successData, totalData);
+    } catch (error) {
+        console.error('Error updating chart:', error);
     }
 }
 
 function updateStatistics() {
     try {
-        const table = $('#myTable').DataTable();
-        const filteredData = table.rows({ search: 'applied' }).data();
-        const totalActivities = filteredData.length;
-        const studentIdColIdx = {% if user.role == "moe_admin" %}3{% else %}2{% endif %};
-        const totalChildren = new Set(
-            filteredData.toArray().map(row => row[studentIdColIdx])
-        ).size;
-        const achieved = filteredData.toArray().filter(row => {
-            const resultColumn = row[row.length - 3];
-            return resultColumn && resultColumn.trim() !== '' && resultColumn.trim() !== 'Tentadu';
-        }).length;
+        const filteredRows = getFilteredRows();
+        const totalActivities = filteredRows.length;
+        const totalChildren = new Set(filteredRows.map(row => row[COLUMN_INDEXES.studentId])).size;
+        const achieved = filteredRows.filter(row => isAchievedResult(row[COLUMN_INDEXES.result])).length;
         const rate = totalActivities > 0 ? ((achieved / totalActivities) * 100).toFixed(1) : 0;
-        document.getElementById('statTotalChildren').textContent = totalChildren;
-        document.getElementById('statTotalActivities').textContent = totalActivities;
-        document.getElementById('statAchieved').textContent = achieved;
-        document.getElementById('statRate').textContent = rate + '%';
+
+        $('#statTotalChildren').text(totalChildren);
+        $('#statTotalActivities').text(totalActivities);
+        $('#statAchieved').text(achieved);
+        $('#statRate').text(`${rate}%`);
+
         updateTrendChart();
     } catch (error) {
         console.error('Error updating statistics:', error);
     }
 }
 
-function updateTrendChart() {
-    try {
-        const table = $('#myTable').DataTable();
-        const filteredData = table.rows({ search: 'applied' }).data();
-        populateTrendSelectors(filteredData);
-        updateTrendControls();
-        const { groupBy, year, month } = getTrendFilterValues();
-        const dateMap = new Map();
-        filteredData.toArray().forEach(row => {
-            const parsed = parseTableDate(row[row.length - 1]);
-            const result = row[row.length - 4];
-            if (year && parsed.year !== year) return;
-            if (month && parsed.month !== month) return;
-            const key = formatTrendKey(parsed, groupBy);
-            if (!dateMap.has(key)) dateMap.set(key, { parsed, total: 0, success: 0 });
-            const item = dateMap.get(key);
-            item.total += 1;
-            if (result && result.trim() !== '' && result.trim() !== 'Tentadu') item.success += 1;
+function bindFilterSearch() {
+    $.fn.dataTable.ext.search.push(function(settings, data) {
+        if (settings.nTable !== activityTable.table().node()) return true;
+
+        return Object.entries(currentFilterValues).every(function([columnKey, selectedValue]) {
+            if (!selectedValue) return true;
+            const cellText = normalizeFilterText(data[COLUMN_INDEXES.filterable[columnKey]]);
+            return cellText === selectedValue;
         });
-        const sortedEntries = Array.from(dateMap.entries()).sort((a, b) => a[1].parsed.dateObj - b[1].parsed.dateObj);
-        const labels = sortedEntries.map(([, item]) => formatTrendLabel(item.parsed, groupBy));
-        const successData = sortedEntries.map(([, item]) => item.success);
-        const totalData = sortedEntries.map(([, item]) => item.total);
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        if (trendChart) trendChart.destroy();
-        trendChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Atinji Rezultadu', data: successData, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6 },
-                    { label: 'Total Atividade', data: totalData, borderColor: '#378ADD', backgroundColor: 'rgba(55,138,221,0.08)', tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: { legend: { position: 'top', labels: { font: { size: 12 } } } },
-                scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } } }
-            }
-        });
-    } catch (error) {
-        console.error('Error updating chart:', error);
-    }
+    });
 }
 
-document.getElementById('toggleChart').addEventListener('click', function() {
-    $('#trendChartModal').modal('show');
-});
-
-document.getElementById('exportChart').addEventListener('click', function() {
-    const link = document.createElement('a');
-    link.href = document.getElementById('trendChart').toDataURL();
-    link.download = 'trend_chart.png';
-    link.click();
-});
-
-$(document).ready(function () {
-    if (!$.fn.DataTable.isDataTable('#myTable')) {
-        let table = $('#myTable').DataTable({
-            language: {
-                search: "Pesquisa:",
-                lengthMenu: "Haree _MENU_ rejistu",
-                info: "Hatudu _START_ to _END_ husi _TOTAL_ rejistu",
-                infoEmpty: "Laiha rejistu",
-                infoFiltered: "(filtra husi _MAX_ total rejistu)",
-                zeroRecords: "La hetan dadus",
-                paginate: { first: "Uluk", last: "Ikus", next: "Tuir Mai", previous: "Antes" }
-            },
-            columnDefs: [{
-                targets: {% if user.role == "moe_admin" %}3{% else %}2{% endif %},
-                visible: false
-            }]
+function bindFilterHeaders() {
+    FILTER_HEADERS.forEach(function(filterConfig) {
+        $(filterConfig.trigger).on('click', function() {
+            openFilter(filterConfig.key, filterConfig.title);
         });
+    });
+}
 
-        let idx = {
-            parent: {% if user.role == "moe_admin" %}1{% else %}-1{% endif %},
-            munisipiu: {% if user.role == "moe_admin" %}4{% else %}3{% endif %},
-            posto: {% if user.role == "moe_admin" %}5{% else %}4{% endif %},
-            resultado: {% if user.role == "moe_admin" %}10{% else %}9{% endif %},
-            tema: {% if user.role == "moe_admin" %}8{% else %}7{% endif %},
-            actividade: {% if user.role == "moe_admin" %}9{% else %}8{% endif %},
-            data: {% if user.role == "moe_admin" %}11{% else %}10{% endif %}
-        };
+function bindPageActions() {
+    $('#toggleChart').on('click', function() {
+        $('#trendChartModal').modal('show');
+    });
 
-        let currentColumn = null;
+    $('#exportChart').on('click', function() {
+        const link = document.createElement('a');
+        link.href = document.getElementById('trendChart').toDataURL();
+        link.download = 'trend_chart.png';
+        link.click();
+    });
 
-        function openFilter(column, title) {
-            currentColumn = column;
-            $('#filterTitle').text(title);
-            let filterHTML = '<select id="columnPopupFilter" class="form-select form-select-sm"><option value="">Hotu</option>';
-            if (column === 'data') {
-                filterHTML = '<div>' +
-                    '<label class="form-label small text-muted">Husi Data</label>' +
-                    '<input type="date" id="dateFrom" class="form-control form-control-sm mb-2">' +
-                    '<label class="form-label small text-muted">To Data</label>' +
-                    '<input type="date" id="dateTo" class="form-control form-control-sm">' +
-                    '</div>';
-            } else {
-                table.column(idx[column]).data().unique().sort().each(function (d) {
-                    if (d) filterHTML += `<option value="${d}">${d}</option>`;
-                });
-                filterHTML += '</select>';
-            }
-            $('#filterContent').html(filterHTML);
-            $('#columnFilterModal').modal('show');
-        }
-
-        $('#munisipiuHeader').click(() => openFilter('munisipiu', 'Filtra Munisipiu'));
-        $('#postoHeader').click(() => openFilter('posto', 'Filtra Posto'));
-        $('#resultadoHeader').click(() => openFilter('resultado', 'Filtra Rezultadu'));
-        $('#temaHeader').click(() => openFilter('tema', 'Filtra Tema'));
-        $('#actividadeHeader').click(() => openFilter('actividade', 'Filtra Atividade'));
-        $('#dataHeader').click(() => openFilter('data', 'Filtra Data'));
-        {% if user.role == "moe_admin" %}
-        $('#parentHeader').click(() => openFilter('parent', 'Filtra Parent'));
-        {% endif %}
-
-        $('#applyColumnFilter').click(function () {
-            if (currentColumn === 'data') {
-                $.fn.dataTable.ext.search.pop();
-                const dateFrom = $('#dateFrom').val();
-                const dateTo = $('#dateTo').val();
-                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                    const dateStr = data[idx['data']];
-                    const date = dateStr.split(' ')[0];
-                    if (!dateFrom && !dateTo) return true;
-                    if (dateFrom && date < dateFrom) return false;
-                    if (dateTo && date > dateTo) return false;
-                    return true;
-                });
-                table.draw();
-                dateFilterActive = true;
-            } else {
-                let val = $('#columnPopupFilter').val();
-                table.column(idx[currentColumn]).search(val ? '^' + val + '$' : '', true, false).draw();
-            }
-            updateStatistics();
-            $('#columnFilterModal').modal('hide');
-        });
-
-        $('#trendGroupBy, #trendYearSelect, #trendMonthSelect').change(function () {
-            updateTrendChart();
-        });
-
+    $('#applyColumnFilter').on('click', function() {
+        const selectedValue = $('#columnPopupFilter').val() || '';
+        currentFilterValues[activeFilterKey] = selectedValue;
+        activityTable.draw();
         updateStatistics();
+        $('#columnFilterModal').modal('hide');
+    });
+
+    $('#trendGroupBy, #trendYearSelect, #trendMonthSelect').on('change', function() {
+        updateTrendChart();
+    });
+}
+
+function initializeDataTable() {
+    if ($.fn.DataTable.isDataTable('#myTable')) {
+        activityTable = $('#myTable').DataTable();
+        return;
     }
+
+    activityTable = $('#myTable').DataTable({
+        language: DATA_TABLE_LANGUAGE,
+         // 👇 ADD THIS
+      order: [[ COLUMN_INDEXES.date, 'desc' ]],
+
+        columnDefs: [{
+            targets: COLUMN_INDEXES.studentId,
+            visible: false
+        }]
+    });
+}
+
+$(document).ready(function() {
+    initializeDataTable();
+    bindFilterSearch();
+    bindFilterHeaders();
+    bindPageActions();
+    updateStatistics();
 });
 </script>
 {% endblock %}

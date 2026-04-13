@@ -2,74 +2,153 @@
 
 {% block title %}Ministeriu da Edukasaun Dashboard{% endblock %}
 
-
 {% block content %}
-<div class="container-fluid">
+
+<div class="container-fluid mt-4">
+
+  <!-- Page Header -->
   <div class="row">
     <div class="col-12">
-      <h1 class="mt-4">Ministeriu da Edukasaun Admin Dashboard</h1>
-      <hr>
-  <p>Bem-vindu ba dashboard administrativu Ministeriu da Edukasaun. Iha ne'e, ita bele haree rezumu kona-ba estatístika sira hosi sistema.</p>
-      
-    </div>  
+
+      <div class="card border shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+        <div class="card-body">
+          <h4 class="fw-semibold mb-1">Ministeriu da Edukasaun Admin Dashboard</h4>
+          <p class="text-muted mb-0">
+            Bem-vindu ba dashboard administrativu Ministeriu da Edukasaun. Iha ne'e ita bele haree rezumu kona-ba estatístika hosi sistema.
+          </p>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <div class="row">
-    <!-- All Users -->
+  <!-- Stats Cards -->
+  <div class="row g-4">
+
+    <!-- Administrators -->
     <div class="col-lg-3 col-6">
-      <div class="small-box text-bg-primary">
-        <div class="inner">
-          <h3>{{ all_users }}</h3>
-          <p>Administrator</p>
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-primary counter" data-target="{{ all_users }}">0</h3>
+            <p class="text-muted mb-2">Administrator</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-people-fill text-primary" style="font-size:32px;"></i>
+            <a href="{% url 'core:user_management' %}?tab=admins" class="text-decoration-none">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
         </div>
-        <i class="bi bi-people-fill small-box-icon"></i>
-        <a href="{% url 'core:user_management' %}?tab=admins" class="small-box-footer link-light link-underline-opacity-0">
-          Mais informasaun <i class="bi bi-link-45deg"></i>
-        </a>
       </div>
     </div>
 
     <!-- Parents -->
     <div class="col-lg-3 col-6">
-      <div class="small-box text-bg-success">
-        <div class="inner">
-          <h3>{{ parents }}</h3>
-          <p>Parentes</p>
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-success counter" data-target="{{ parents }}">0</h3>
+            <p class="text-muted mb-2">Parentes</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-person-hearts text-success" style="font-size:32px;"></i>
+            <a href="{% url 'core:user_management' %}?tab=parents" class="text-decoration-none">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
         </div>
-        <i class="bi bi-person-hearts small-box-icon"></i>
-        <a href="{% url 'core:user_management' %}?tab=parents" class="small-box-footer link-light link-underline-opacity-0">
-          Mais informasaun <i class="bi bi-link-45deg"></i>
-        </a>
       </div>
     </div>
 
     <!-- Municipality Analysts -->
     <div class="col-lg-3 col-6">
-      <div class="small-box text-bg-warning">
-        <div class="inner">
-          <h3>{{ municipality_analysts }}</h3>
-          <p>Analistas Munisípiu</p>
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-warning counter" data-target="{{ municipality_analysts }}">0</h3>
+            <p class="text-muted mb-2">Analistas Munisípiu</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-bar-chart-line-fill text-warning" style="font-size:32px;"></i>
+            <a href="{% url 'core:user_management' %}?tab=analysts" class="text-decoration-none">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
         </div>
-        <i class="bi bi-bar-chart-line-fill small-box-icon"></i>
-        <a href="{% url 'core:user_management' %}?tab=analysts" class="small-box-footer link-light link-underline-opacity-0">
-          Mais informasaun <i class="bi bi-link-45deg"></i>
-        </a>
       </div>
     </div>
 
     <!-- Children -->
     <div class="col-lg-3 col-6">
-      <div class="small-box text-bg-danger">
-        <div class="inner">
-          <h3>{{ children }}</h3>
-          <p>Oan sira</p>
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-danger counter" data-target="{{ children }}">0</h3>
+            <p class="text-muted mb-2">Oan sira</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-emoji-smile-fill text-danger" style="font-size:32px;"></i>
+            <a href="{% url 'core:user_management' %}?tab=children" class="text-decoration-none">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
         </div>
-        <i class="bi bi-emoji-smile-fill small-box-icon"></i>
-        <a href="{% url 'core:user_management' %}?tab=children" class="small-box-footer link-light link-underline-opacity-0">
-          Mais informasaun <i class="bi bi-link-45deg"></i>
-        </a>
       </div>
     </div>
+
   </div>
+
 </div>
+
+<!-- ✅ Animated Counter Script -->
+<script>
+  function animateCounter(counter) {
+    const target = +counter.getAttribute("data-target");
+    const duration = 1200; // in ms
+    const frameRate = 60;
+    const totalFrames = Math.round(duration / (1000 / frameRate));
+    let currentFrame = 0;
+
+    const updateCounter = () => {
+      currentFrame++;
+      const progress = currentFrame / totalFrames;
+      const eased = progress < 1 ? (-Math.pow(2, -10 * progress) + 1) : 1; // Smooth easing
+
+      counter.textContent = Math.round(target * eased);
+
+      if (currentFrame < totalFrames) {
+        requestAnimationFrame(updateCounter);
+      }
+    };
+
+    updateCounter();
+  }
+
+  // Trigger animation on scroll into view
+  const counters = document.querySelectorAll(".counter");
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.classList.contains("counted")) {
+        animateCounter(entry.target);
+        entry.target.classList.add("counted");
+      }
+    });
+  }, { threshold: 0.3 });
+
+  counters.forEach(counter => observer.observe(counter));
+</script>
+
 {% endblock %}

@@ -115,16 +115,27 @@ class ParentRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-#User login form 
+#login forms
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        label="WhatsApp Number",
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Hakerek numeru whatsapp '})
+        label="Numeru WhatsApp",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Hakerek numeru WhatsApp'
+        })
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Hakerek password'})
+        label="Password",
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Hakerek password'
+        })
     )
+
+    error_messages = {
+        "invalid_login": "Numeru WhatsApp ou password la loos. Halo Favor verifica fila fali.",
+        "inactive": "Kontu ida ne’e la ativa ona.",
+    }
 
 class ChildRegistrationForm(forms.ModelForm):
     class Meta:
@@ -166,7 +177,6 @@ class ChildRegistrationForm(forms.ModelForm):
                 cleaned_data['age_group'] = 'B'
             else:
                 raise forms.ValidationError("Child must be between 3–6 years old.")
-
         return cleaned_data
 
     def save(self, commit=True):
@@ -475,7 +485,7 @@ class UserRegistrationForm(forms.ModelForm):
 
         # Municipality dropdown
         self.fields["municipality"].queryset = Municipality.objects.all()
-        self.fields["municipality"].empty_label = "Select Municipality"
+        self.fields["municipality"].empty_label = "Selesiona Munisípiu"
 
         # Empty dependent dropdowns by default
         self.fields["administrative_post"].queryset = AdministrativePost.objects.none()

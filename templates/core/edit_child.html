@@ -1,12 +1,119 @@
 {% extends "core/base.html" %}
+{% load static %}
+
 {% block content %}
 <div class="container-fluid mt-4">
-  <h3>Editar: {{ child.first_name }}</h3>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Rai</button>
-    <a href="{% url 'core:children_list' %}" class="btn btn-secondary">Cancela</a>
-  </form>
+  <div class="row justify-content-center">
+    <div class="col">
+
+      <div class="card border shadow-sm" style="border-radius: 12px; overflow: hidden;">
+        <!-- BODY -->
+        <div class="card-body">
+
+          <!-- SUCCESS MESSAGE -->
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success alert-dismissible fade show auto-hide"
+                   role="alert"
+                   style="border-radius: 8px;">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <!-- FORM -->
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- GLOBAL ERRORS -->
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <!-- FIRST NAME -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Naran Kompletu</label>
+              <input type="text"
+                     id="first_name"
+                     name="first_name"
+                     class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                     value="{{ form.first_name.value|default_if_none:'' }}"
+                     placeholder="Oan nia naran kompletu">
+
+              {% if form.first_name.errors %}
+                <div class="invalid-feedback">
+                  {{ form.first_name.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- YEAR OF BIRTH -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tinan Moris</label>
+
+              <select name="year_of_birth"
+                      class="form-select {% if form.year_of_birth.errors %}is-invalid{% endif %}">
+
+                {% for value, label in form.year_of_birth.field.choices %}
+                  <option value="{{ value }}"
+                    {% if value|stringformat:"s" == form.year_of_birth.value|stringformat:"s" %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ label }}
+                  </option>
+                {% endfor %}
+
+              </select>
+
+              {% if form.year_of_birth.errors %}
+                <div class="invalid-feedback">
+                  {{ form.year_of_birth.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+              <!-- Action buttons -->
+            <div class="card-footer bg-white border-top d-flex gap-2 flex-wrap">
+              <button type="submit" class="btn btn-primary"> <i class="fas fa-edit me-1"></i>Guardar</button>
+              
+              <a href="{% url 'core:children_list' %}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="fas fa-key me-1"></i> Cancelar
+              </a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
+
+<!-- AUTO-HIDE + ANIMATION -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // Auto focus first field
+  const firstInput = document.getElementById("first_name");
+  if (firstInput) {
+    firstInput.focus();
+  }
+
+  // Auto-hide alerts after 5s
+  const alerts = document.querySelectorAll(".auto-hide");
+  alerts.forEach(function(alert) {
+    setTimeout(function() {
+      let bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    }, 5000);
+  });
+
+});
+</script>
+
 {% endblock %}

@@ -1,106 +1,159 @@
-
 {% extends "registration/layout.html" %}
-{%block content%}
-   <!-- Background Carousel -->
-   <div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="/static/img/Background 1_Transport.png" alt="Background 1">
-      </div>
-      <div class="carousel-item">
-        <img src="/static/img/Background 2_Me.png" alt="Background 2">
-      </div>
-      <div class="carousel-item">
-        <img src="/static/img/Background 3_Culture.png" alt="Background 3">
-      </div>
+<title>{% block title %}HAAP | Login{% endblock %}</title>
+{% block content %}
+
+<!-- Background Carousel (UNCHANGED) -->
+<div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/static/img/Background 1_Transport.png" alt="Background 1">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 2_Me.png" alt="Background 2">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 3_Culture.png" alt="Background 3">
     </div>
   </div>
+</div>
 
-  <!-- Login Form Overlay -->
-  <div class="overlay-container">
-    <div class="container w-100 pt-3">
+<!-- Login Form Overlay -->
+<div class="overlay-container">
+  <div class="container w-100 pt-3">
+
     <div class="login-title d-flex align-items-center mt-2">
-        <img src="/static/img/logo-ori.png" alt="Logo" class="logo">
-        <h1>Bemvindo Mai hahu App!</h1>
+      <img src="/static/img/logo-ori.png" alt="Logo" class="logo">
+      <h1>Bemvindo Mai hahu App!</h1>
     </div>
+
     <div class="login-container mt-2">
-      <!-- Error Messages -->
+
+      <!-- ✅ ALERTS -->
       {% if messages %}
         <div class="alert-container mb-3">
           {% for message in messages %}
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border: 1px solid #f5c6cb; padding: 12px 16px;">
-              <i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i> 
-              <strong>Error:</strong> {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert" style="border-radius: 8px; padding: 12px 16px;">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
           {% endfor %}
         </div>
       {% endif %}
 
-      <!-- Form validation errors -->
-      {% if form.non_field_errors %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 8px; border: 1px solid #f5c6cb; padding: 12px 16px;">
-          <i class="bi bi-exclamation-circle-fill" style="margin-right: 8px;"></i>
-          <strong>Error:</strong>
-          {% for error in form.non_field_errors %}
-            {{ error }}
-          {% endfor %}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endif %}
+          {% if form.errors %}
+              <div class="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                  style="border-radius: 8px; padding: 12px 16px;">
+
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                {% for field in form %}
+                  {% for error in field.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                {% endfor %}
+
+                {% for error in form.non_field_errors %}
+                  <div>{{ error }}</div>
+                {% endfor %}
+
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+        {% endif %}
 
       <form action="{% url 'core:login' %}" method="POST">
         {% csrf_token %}
+
+        <!-- WhatsApp -->
         <div class="form-group">
-         
-          <label for="username" class="label">Numeru Telefone</label>
+          <label class="label">Numeru Telefone</label>
           <div class="input-group">
             {{ form.username }}
             <div class="input-group-append">
               <span class="input-group-text">
-              <i class="fas fa-solid fa-phone"></i>
-                {% comment %} <i class="fas fa-sharp fa-solid fa-user"></i> {% endcomment %}
-
-                <!--
-                In the example above, you add...
-                1. `fa-solid` class for Solid style
-                2. `user` icon with the `fa-` prefix
-                3. `fa-sharp` class for Sharp family
-                ... and you'll see the Sharp Solid User icon
-                -->
-
+                <i class="bi bi-whatsapp"></i>
               </span>
             </div>
           </div>
         </div>
+
+        <!-- Password -->
         <div class="form-group">
-          <label for="password" class="label">Palavras Passe</label>
+          <label class="label">Palavras Passe</label>
           <div class="input-group">
+
             {{ form.password }}
+
+            <!-- Lock icon -->
             <div class="input-group-append">
               <span class="input-group-text">
-                  <i class="fas fa-lock"></i>
+                <i class="fas fa-lock"></i>
               </span>
             </div>
+
           </div>
         </div>
+
+        <!-- BUTTON (UNCHANGED) -->
         <div class="form-group">
           <button id="submit-button" style="border: none; background: none; padding: 0;">
             <img src="/static/img/Button 1_Login.png" alt="Rejistu" style="height: 70px; border: none; outline: none;">
           </button>
         </div>
+
+        <!-- Register -->
         <div class="text-block text-center my-3">
-          <span class="text-small font-weight-semibold" style="color: rgb(115, 99, 92);">Laos Membro ?</span>
-          <a href="{% url 'core:parent_register'%}" class="text-black text-small">Rejistu Konta Foun</a>
+          <span style="color: rgb(115, 99, 92);">Laos Membro ?</span>
+          <a href="{% url 'core:parent_register'%}" >Rejistu Konta Foun</a>
         </div>
-        
+
+        <!-- Forgot Password -->
         <div class="text-center">
-          <span class="text-small font-weight-semibold "  style="color: rgb(115, 99, 92);">Haluan Password ?</span>
-          <a href="{%url 'core:forgot_password' %}">Haluan Password?</a>
+          <span style="color: rgb(115, 99, 92);">Haluan Password ?</span>
+          <a href="{%url 'core:forgot_password' %}">Klik iha ne’e</a>
         </div>
+
       </form>
     </div>
   </div>
-{% endblock %}
+</div>
 
- 
+<!-- ✅ AUTO HIDE ALERTS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const alerts = document.querySelectorAll('.alert');
+
+  alerts.forEach(function(alert) {
+    setTimeout(function() {
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }, 5000);
+  });
+});
+</script>
+
+<!-- ✅ SHOW / HIDE PASSWORD -->
+<script>
+function togglePassword() {
+  const passwordField = document.getElementById("passwordField");
+  const icon = document.getElementById("eyeIcon");
+
+  if (passwordField.type === "password") {
+    passwordField.type = "text";
+    icon.classList.replace("bi-eye", "bi-eye-slash");
+  } else {
+    passwordField.type = "password";
+    icon.classList.replace("bi-eye-slash", "bi-eye");
+  }
+}
+</script>
+
+<!-- ✅ SMOOTH FADE -->
+<style>
+.alert {
+  transition: opacity 0.10s ease-out;
+}
+</style>
+
+{% endblock %}

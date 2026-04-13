@@ -74,5 +74,10 @@ class ParentRegisterView(View):
         form = ParentRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+
+            # ✅ ADD THIS LINE
+            messages.success(request, f"Konta {form.cleaned_data['first_name']} kria ho susesu!")
+
             return redirect("core:login")
+
         return render(request, "registration/parent_register.html", {"form": form})

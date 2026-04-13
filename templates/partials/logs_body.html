@@ -1,0 +1,50 @@
+ {% for log in logs %}
+            <tr>
+              <td class="px-3 text-muted" style="font-size:12px;">{{ log.id }}</td>
+
+              {% if user.role == "moe_admin" %}
+                <td class="px-3">{{ log.parent.get_full_name|default:log.parent.username|default:"-" }}</td>
+              {% endif %}
+
+              <td class="px-3 fw-500">
+                {% if log.student %}{{ log.student.first_name }}{% else %}-{% endif %}
+              </td>
+              <td style="display:none;">
+                {% if log.student %}{{ log.student.id }}{% else %}-{% endif %}
+              </td>
+
+              <td class="px-3">{{ log.parent.municipality }}</td>
+              <td class="px-3">{{ log.parent.administrative_post }}</td>
+              <td class="px-3">{{ log.parent.suco }}</td>
+              <td class="px-3">{{ log.parent.aldeia }}</td>
+              <td class="px-3">{{ log.tema|default:"-" }}</td>
+              <td class="px-3">{{ log.tipu|default:"-" }}</td>
+              <td class="px-3">{{ log.activity_name|default:"-" }}</td>
+              <td class="px-3">
+                {% if log.activity_result and log.activity_result != 'Tentadu' %}
+                  <span class="badge rounded-pill"
+                        style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
+                    {{ log.activity_result }}
+                  </span>
+                {% elif log.activity_result == 'Tentadu' %}
+                  <span class="badge rounded-pill"
+                        style="background:#FAECE7; color:#993C1D; font-size:11px; font-weight:500;">
+                    {{ log.activity_result }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td class="px-3 text-muted" style="font-size:12px; white-space:nowrap;">
+                {{ log.created_at|date:"d M Y H:i" }}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="{% if user.role == 'moe_admin' %}13{% else %}12{% endif %}"
+                  class="text-center text-muted py-5">
+                <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
+                Laiha rejistu atividade
+              </td>
+            </tr>
+{% endfor %}

@@ -1,5 +1,6 @@
 import uuid
 
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,6 +8,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.views.generic import ListView
 from django.core.exceptions import PermissionDenied
+from django.template.loader import render_to_string
 
 from core.models import ActivityResult, User, Child
 
@@ -85,6 +87,14 @@ def AppUsageLogListView(request):
         "paginator": None,
         "is_paginated": False,
     }
+    # 👇 ADD THIS BLOCK
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        html = render_to_string(
+            "partials/logs_body.html",
+            context,   # you already have "logs" inside
+            request=request
+        )
+        return JsonResponse({"html": html})
 
     return render(request, "dashboards/logs.html", context)
 class ChildActivityView(LoginRequiredMixin, ListView):

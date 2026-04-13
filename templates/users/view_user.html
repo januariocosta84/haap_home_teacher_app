@@ -1,31 +1,76 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header">
-      <h5>Ver Utilizador</h5>
-    </div>
-    <div class="card-body">
-      <dl class="row">
-        <dt class="col-sm-3">Naran</dt>
-        <dd class="col-sm-9">{{ obj.first_name }} {{ obj.last_name }}</dd>
+<div class="container-fluid mt-4">
+  <div class="row justify-content-center">
+    <div class="col-12">
 
-        <dt class="col-sm-3">WhatsApp</dt>
-        <dd class="col-sm-9">{{ obj.whatsapp_number }}</dd>
+      <div class="card border shadow-sm" style="border-radius: 12px; overflow: hidden;">
 
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9">{{ obj.email }}</dd>
+        <!-- Header: Avatar + Name + Role -->
+        <div class="card-body border-bottom d-flex align-items-center gap-4 flex-wrap">
 
-        <dt class="col-sm-3">Role</dt>
-        <dd class="col-sm-9">{{ obj.get_role_display }}</dd>
+          <!-- Avatar / Photo -->
+          <div class="text-center">
+            {% if obj.image.url %}
+              <img src="{{ obj.image.url }}"
+                   alt="Foto Perfil"
+                   class="rounded-circle"
+                   style="width:100px; height:100px; object-fit:cover; border: 2px solid #e0e0e0;">
+            {% else %}
+              <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                   style="width:100px; height:100px; background:#E6F1FB; font-size:32px; font-weight:500; color:#185FA5;">
+                {{ obj.first_name|slice:":1"|upper }}{{ obj.last_name|slice:":1"|upper }}
+              </div>
+            {% endif %}
+          </div>
 
-  <dt class="col-sm-3">Munisipiu</dt>
-  <dd class="col-sm-9">{% if obj.municipality %}{{ obj.municipality.name }}{% else %}-{% endif %}</dd>
-      </dl>
+          <!-- Name + WhatsApp + Badge -->
+          <div>
+            <h5 class="mb-0 fw-semibold">
+              {{ obj.first_name }} {{ obj.last_name }}
+            </h5>
+            <p class="text-muted mb-2" style="font-size:13px;">
+              {{ obj.whatsapp_number|default:"—" }}
+            </p>
 
-      <a href="{% url 'core:edit_user' obj.id %}" class="btn btn-sm btn-warning">Editar</a>
-      <a href="{% url 'core:user_management' %}" class="btn btn-secondary btn-sm">Fila</a>
+            {% if obj.is_superuser %}
+              <span class="badge" style="background:#E6F1FB; color:#0C447C; font-weight:500; font-size:11px;">
+                Administrator
+              </span>
+            {% elif obj.is_staff %}
+              <span class="badge" style="background:#EAF3DE; color:#27500A; font-weight:500; font-size:11px;">
+                Staff
+              </span>
+            {% else %}
+              <span class="badge" style="background:#F1EFE8; color:#444441; font-weight:500; font-size:11px;">
+                {{ obj.get_role_display }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- User Detail Fields -->
+        <div class="card-body px-4 py-0">
+          {% include "partials/_profile_field.html" with label="Naran Kompletu" value=obj.first_name|add:" "|add:obj.last_name %}
+          {% include "partials/_profile_field.html" with label="Email" value=obj.email|default:"—" %}
+          {% include "partials/_profile_field.html" with label="WhatsApp" value=obj.whatsapp_number|default:"—" %}
+          {% include "partials/_profile_field.html" with label="Role" value=obj.get_role_display|default:"—" %}
+          {% include "partials/_profile_field.html" with label="Munisípiu" value=obj.municipality.name|default:"—" %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-footer bg-white border-top d-flex gap-2 flex-wrap">
+          <a href="{% url 'core:edit_user' obj.id %}" class="btn btn-primary btn-sm px-3">
+            <i class="fas fa-edit me-1"></i> Editar
+          </a>
+          <a href="{% url 'core:user_management' %}" class="btn btn-outline-secondary btn-sm px-3">
+            <i class="fas fa-arrow-left me-1"></i> Fila
+          </a>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>

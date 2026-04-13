@@ -1,38 +1,111 @@
 {% extends "./layout.html" %}
 {% block content %}
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-5">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Verifica OTP</h5>
-        </div>
-        <div class="card-body">
-          {% if messages %}
-            {% for msg in messages %}
-              <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
-            {% endfor %}
-          {% endif %}
 
-          <p class="text-muted" style="font-size:14px;">
-            Hakerek OTP ne'ebé haruka ba ita nia WhatsApp.
-          </p>
+<style>
+  body {
+    background: linear-gradient(135deg, #e3f2fd, #ffffff);
+  }
+  .otp-card {
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  .otp-header {
+    background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+    padding: 20px;
+    text-align: center;
+  }
+  .otp-header i {
+    font-size: 30px;
+    margin-bottom: 8px;
+  }
+  .otp-input {
+    text-align: center;
+    font-size: 22px;
+    letter-spacing: 8px;
+    border-radius: 10px;
+  }
+  .btn-primary {
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 500;
+  }
+</style>
 
-          <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label class="form-label">OTP</label>
-              <input type="text" name="otp" class="form-control"
-                     placeholder="123456" maxlength="6" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Verifica</button>
-          </form>
-        </div>
-        <div class="card-footer text-center">
-          <a href="{% url 'core:forgot_password' %}" style="font-size:13px;">Husu OTP fali</a>
-        </div>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <div class="col-md-4">
+    <div class="card shadow otp-card">
+
+      <!-- Header -->
+      <div class="otp-header text-white">
+        <i class="bi bi-key"></i>
+        <h5 class="mb-0">Verifika OTP</h5>
+        <small>Konfirma ita nia identidade</small>
       </div>
+
+      <!-- Body -->
+      <div class="card-body p-4">
+
+        <!-- Messages -->
+        {% if messages %}
+          {% for msg in messages %}
+            <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Instruction -->
+        <p class="text-muted small text-center mb-4">
+          Hatama <strong>OTP</strong> ne'ebé ami haruka ba ita nia WhatsApp.
+        </p>
+
+        <!-- Form -->
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <input type="text"
+                   name="otp"
+                   class="form-control otp-input"
+                   placeholder="••••••"
+                   maxlength="6"
+                   required
+                   autofocus>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check-circle"></i> Verifika
+          </button>
+        </form>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer text-center bg-light">
+        <small>
+          <a href="{% url 'core:forgot_password' %}" class="text-decoration-none">
+            🔄 Husu OTP fali
+          </a>
+        </small>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- Optional UX Script -->
+<script>
+  // Auto move cursor effect (simple UX)
+  const otpInput = document.querySelector('input[name="otp"]');
+  otpInput.addEventListener('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+
+  // Button loading effect
+  document.querySelector("form").addEventListener("submit", function() {
+    document.querySelector("button").innerHTML = "Verifying...";
+  });
+</script>
+
 {% endblock %}

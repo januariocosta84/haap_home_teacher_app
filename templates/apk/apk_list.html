@@ -1,55 +1,134 @@
 {% extends "core/base.html" %}
 {% block content %}
-<div class="container-fluid mt-4">
-  <h3>Versaun HAAP</h3>
-  {% if user.role == 'moe_admin' %}
-    <a href="{% url 'core:upload_apk' %}" class="btn btn-success mb-3">Adisiona HAAP Foun</a>
-  {% endif %}
 
-  {% if apks %}
-    <table class="table table-striped">
-      <thead class="table-dark">
-        <tr>
-          <th>Versaun</th>
-          <th>Download URL</th>
-          <th>Ikus?</th>
-          <th>Release</th>
-          <th>Aksaun</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for apk in apks %}
-          <tr>
-            <td>{{ apk.version_name }}</td>
-            <td>
-              <a href="{{ apk.apk_file.url }}"
-              class="btn btn-sm btn-success {% if user.role == 'moe_admin' %}disabled{% endif %}"
-              download>
-              Download
-            </a>
-            </td>
-                    <td>
-              {% if apk.is_latest %}
-                <span class="badge bg-success">Ikus</span>
-              {% else %}
-                <span class="badge bg-secondary">Arkivadu</span>
-              {% endif %}
-            </td>
-            <td>{{ apk.released_at|date:"Y-m-d H:i" }}</td>
-            <td>
+<div class="container-fluid mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Versaun HAAP</h3>
+
+    {% if user.role == 'moe_admin' %}
+      <a href="{% url 'core:upload_apk' %}" class="btn btn-success shadow-sm">
+        <i class="fas fa-plus"></i> Adisiona HAAP Foun
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Card -->
+  <div class="card shadow-sm border-0">
+
+    <div class="card-body p-0">
+
+      {% if apks %}
+
+      <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
+        <table class="table table-hover mb-0" style="font-size:13px;" id="apkTable">
+
+          <!-- THEAD -->
+          <thead style="position:sticky; top:0; z-index:1;">
+            <tr style="background:#f8f9fa;">
+
+              <th class="px-3 py-2"
+                  style="font-size:11px; font-weight:500; color:#888;">
+                Versaun
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:11px; font-weight:500; color:#888;">
+                Download
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:11px; font-weight:500; color:#888;">
+                Status
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:11px; font-weight:500; color:#888;">
+                Release
+              </th>
+
+              <th class="px-3 py-2"
+                  style="font-size:11px; font-weight:500; color:#888;">
+                Aksaun
+              </th>
+
+            </tr>
+          </thead>
+
+          <!-- TBODY -->
+          <tbody>
+            {% for apk in apks %}
+            <tr>
+
+              <!-- Version -->
+              <td class="px-3" style="font-weight:500;">
+                {{ apk.version_name }}
+              </td>
+
+              <!-- Download -->
+              <td class="px-3">
+                <a href="{{ apk.apk_file.url }}"
+                   class="btn btn-sm btn-outline-success {% if user.role == 'moe_admin' %}disabled{% endif %}"
+                   download>
+                  <i class="fas fa-download"></i>
+                </a>
+              </td>
+
+              <!-- Status Badge -->
+              <td class="px-3">
+                {% if apk.is_latest %}
+                  <span class="badge rounded-pill"
+                        style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
+                    Ikus
+                  </span>
+                {% else %}
+                  <span class="badge rounded-pill"
+                        style="background:#F1F3F5; color:#666; font-size:11px; font-weight:500;">
+                    Arkivadu
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- Date -->
+              <td class="px-3 text-muted"
+                  style="font-size:12px; white-space:nowrap;">
+                {{ apk.released_at|date:"d M Y H:i" }}
+              </td>
+
+              <!-- Actions -->
+              <td class="px-3">
                 {% if user.role == 'moe_admin' %}
-                  <a href="{% url 'core:edit_apk' apk.id %}" class="btn btn-sm btn-primary">Editar</a>
-                
-                {%else %}
+                  <a href="{% url 'core:edit_apk' apk.id %}"
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                {% else %}
                   <span class="text-muted fst-italic">N/A</span>
                 {% endif %}
-          </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <div class="alert alert-info">Sedauk iha versaun HAAP Foun.</div>
-  {% endif %}
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+
+      {% else %}
+
+      <!-- Empty State -->
+      <div class="text-center text-muted py-5">
+        <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
+        Sedauk iha versaun HAAP foun
+      </div>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
 </div>
+
 {% endblock %}
