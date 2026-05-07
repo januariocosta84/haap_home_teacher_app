@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container-fluid mt-5">
@@ -40,27 +41,88 @@
               <span class="input-group-text">🔎</span>
               <input class="form-control" id="searchParents" placeholder="Filtra naran/telefone..." />
             </div>
-            <small class="text-muted align-self-center">Total: {{ parents|length }}</small>
+            <small class="text-muted align-self-center mb-0">
+              Total: <span id="parentsVisibleCount">{{ parents|length }}</span> / {{ parents|length }}
+            </small>
+          </div>
+
+          <div class="card border-0 shadow-sm mb-4" style="background:#f8fbff;">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 class="mb-1">Grafiku Rejistu Parentes</h6>
+                  <!-- <small class="text-muted">X axis: Data, Y axis: Total rejistu</small> -->
+                </div>
+                <div class="d-flex gap-2 align-items-end flex-wrap">
+                  <div>
+                    <label for="parentsGroupBy" class="form-label small text-muted mb-1">Filtra Periodu</label>
+                    <select id="parentsGroupBy" class="form-select form-select-sm" style="width:auto;">
+                      <option value="daily">Loron</option>
+                      <option value="monthly" selected>Fulan</option>
+                      <option value="yearly">Tinan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="parentsYearSelect" class="form-label small text-muted mb-1">Tinan</label>
+                    <select id="parentsYearSelect" class="form-select form-select-sm" style="width:auto;">
+                      <option value="">Hotu</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="parentsMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
+                    <select id="parentsMonthSelect" class="form-select form-select-sm" style="width:auto;">
+                      <option value="">Hotu</option>
+                      <option value="01">Jan</option>
+                      <option value="02">Feb</option>
+                      <option value="03">Mar</option>
+                      <option value="04">Abr</option>
+                      <option value="05">Mai</option>
+                      <option value="06">Jun</option>
+                      <option value="07">Jul</option>
+                      <option value="08">Ago</option>
+                      <option value="09">Set</option>
+                      <option value="10">Out</option>
+                      <option value="11">Nov</option>
+                      <option value="12">Dec</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div style="position:relative; height:280px; width:100%;">
+                <canvas id="parentsRegistrationChart"></canvas>
+              </div>
+            </div>
           </div>
 
           <div class="table-responsive">
             <table class="table table-hover table-sm align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
+                  
                   <th>Naran</th>
                   <th>WhatsApp</th>
                   <th>Email</th>
+                  <th id="parentsMunicipalityHeader" style="cursor:pointer; white-space:nowrap;">
+                    Munisipiu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
+                    <span id="parentsMunicipalityActive" class="badge bg-light text-dark ms-1" style="display:none;"></span>
+                  </th>
+                   <th>Rejistu</th>
                   <th class="text-end">Aksaun</th>
                 </tr>
               </thead>
               <tbody id="parentsTable">
                 {% for parent in parents %}
-                <tr>
-                  <td>{{ parent.id }}</td>
+                <tr
+                  data-municipality="{{ parent.municipality.name|default_if_none:'' }}"
+                  data-created-date="{{ parent.created_at|date:'Y-m-d' }}"
+                  data-created-label="{{ parent.created_at|date:'d M Y' }}"
+                >
+                
                   <td>{{ parent.first_name }} {{ parent.last_name }}</td>
                   <td>{{ parent.whatsapp_number }}</td>
                   <td>{{ parent.email }}</td>
+                  <td>{{ parent.municipality }}</td>
+                  <td>{{ parent.created_at|date:"d M Y " }}</td>
                   <td class="text-end">
                     <a href="{% url 'core:view_user' parent.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
                     <a href="{% url 'core:edit_user' parent.id %}" class="btn btn-sm btn-warning">Editar</a>
@@ -68,7 +130,7 @@
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5">No parents found</td></tr>
+                <tr><td colspan="6">No parents found</td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -89,25 +151,74 @@
             <small class="text-muted align-self-center">Total: {{ children|length }}</small>
           </div>
 
+          <div class="card border-0 shadow-sm mb-4" style="background:#f8fbff;">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h6 class="mb-1">Grafiku Rejistu Oan sira</h6>
+                </div>
+                <div class="d-flex gap-2 align-items-end flex-wrap">
+                  <div>
+                    <label for="childrenGroupBy" class="form-label small text-muted mb-1">Filtra Periodu</label>
+                    <select id="childrenGroupBy" class="form-select form-select-sm" style="width:auto;">
+                      <option value="daily">Loron</option>
+                      <option value="monthly" selected>Fulan</option>
+                      <option value="yearly">Tinan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="childrenYearSelect" class="form-label small text-muted mb-1">Tinan</label>
+                    <select id="childrenYearSelect" class="form-select form-select-sm" style="width:auto;">
+                      <option value="">Hotu</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="childrenMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
+                    <select id="childrenMonthSelect" class="form-select form-select-sm" style="width:auto;">
+                      <option value="">Hotu</option>
+                      <option value="01">Jan</option>
+                      <option value="02">Feb</option>
+                      <option value="03">Mar</option>
+                      <option value="04">Abr</option>
+                      <option value="05">Mai</option>
+                      <option value="06">Jun</option>
+                      <option value="07">Jul</option>
+                      <option value="08">Ago</option>
+                      <option value="09">Set</option>
+                      <option value="10">Out</option>
+                      <option value="11">Nov</option>
+                      <option value="12">Dec</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div style="position:relative; height:280px; width:100%;">
+                <canvas id="childrenRegistrationChart"></canvas>
+              </div>
+            </div>
+          </div>
+
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
+            <table class="table table-hover table-sm align-middle" style="font-size:0.88rem; --bs-table-cell-padding: .35rem .5rem;">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
+                  
                   <th>Naran</th>
                   <th>Parent</th>
                   <th>Tinan</th>
+                  <th>Rejistu</th>
                   <th>Group Idade</th>
                   <!-- <th class="text-end">Aksaun</th> -->
                 </tr>
               </thead>
               <tbody id="childrenTable">
                 {% for child in children %}
-                <tr>
-                  <td>{{ child.id }}</td>
+                <tr data-created-date="{{ child.created_at|date:'Y-m-d' }}" data-created-label="{{ child.created_at|date:'d M Y' }}">
+                  
                   <td>{{ child.first_name }}</td>
                   <td>{{ child.parent.first_name }} {{ child.parent.last_name }}</td>
                   <td>{{ child.year_of_birth }}</td>
+                  <td>{{ child.created_at|date:'d M Y' }}</td>
                   <td>{{ child.get_age_group_display }}</td>
                   <!-- <td class="text-end">
                     <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-warning">Editar</a>
@@ -140,7 +251,7 @@
             <table class="table table-hover table-sm align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
+                 
                   <th>Naran</th>
                   <th>WhatsApp</th>
                   <th class="text-end">Aksaun</th>
@@ -149,7 +260,7 @@
               <tbody id="teachersTable">
                 {% for teacher in teachers %}
                 <tr>
-                  <td>{{ teacher.id }}</td>
+                  
                   <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
                   <td>{{ teacher.whatsapp_number }}</td>
                   <td class="text-end">
@@ -184,7 +295,7 @@
             <table class="table table-hover table-sm align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
+                  
                   <th>Naran</th>
                   <th>WhatsApp</th>
                   <th>Munisipiu</th>
@@ -194,7 +305,7 @@
               <tbody id="analystsTable">
                 {% for analyst in analysts %}
                 <tr>
-                  <td>{{ analyst.id }}</td>
+                  
                   <td>{{ analyst.first_name }} {{ analyst.last_name }}</td>
                   <td>{{ analyst.whatsapp_number }}</td>
                   <td>{{ analyst.municipality.name }}</td>
@@ -230,7 +341,7 @@
             <table class="table table-hover table-sm align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>ID</th>
+                  
                   <th>Naran</th>
                   <th>Funsaun</th>
                   <th class="text-end">Aksaun</th>
@@ -239,7 +350,7 @@
               <tbody id="adminsTable">
                 {% for admin in admins %}
                 <tr>
-                  <td>{{ admin.id }}</td>
+                 
                   <td>{{ admin.first_name }} {{ admin.last_name }}</td>
                   <td>{{ admin.get_role_display }}</td>
                   <td class="text-end">
@@ -260,9 +371,30 @@
 
 </div>
 
+<div class="modal fade" id="parentsMunicipalityModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content" style="border-radius:12px;">
+      <div class="modal-header">
+        <h6 class="modal-title mb-0">Filtra Munisipiu</h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <select id="parentsMunicipalityFilter" class="form-select form-select-sm">
+          <option value="">Hotu</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="clearParentsMunicipalityFilter">Reset</button>
+        <button type="button" class="btn btn-primary btn-sm" id="applyParentsMunicipalityFilter">Aplika</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
 <script>
   // Generic table filter helper
   function setupTableFilter(inputId, tableBodyId) {
@@ -282,13 +414,320 @@
     });
   }
 
+  const registrationMonthNames = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dec'];
+
+  function getRegistrationControls(prefix) {
+    return {
+      groupBy: document.getElementById(`${prefix}GroupBy`),
+      year: document.getElementById(`${prefix}YearSelect`),
+      month: document.getElementById(`${prefix}MonthSelect`)
+    };
+  }
+
+  function getRegistrationFilterValues(prefix) {
+    const controls = getRegistrationControls(prefix);
+    return {
+      groupBy: controls.groupBy?.value || 'monthly',
+      year: controls.year?.value || '',
+      month: controls.month?.value || ''
+    };
+  }
+
+  function populateRegistrationYearSelector(prefix, visibleRows) {
+    const yearSelect = getRegistrationControls(prefix).year;
+    if (!yearSelect) return;
+
+    const selectedYear = yearSelect.value;
+    const uniqueYears = new Set();
+
+    visibleRows.forEach(row => {
+      const dateKey = row.dataset.createdDate;
+      if (!dateKey) return;
+      uniqueYears.add(dateKey.split('-')[0]);
+    });
+
+    yearSelect.innerHTML = '<option value="">Hotu</option>';
+    Array.from(uniqueYears).sort().reverse().forEach(year => {
+      const option = document.createElement('option');
+      option.value = year;
+      option.textContent = year;
+      yearSelect.appendChild(option);
+    });
+
+    if (selectedYear && uniqueYears.has(selectedYear)) {
+      yearSelect.value = selectedYear;
+    }
+  }
+
+  function updateRegistrationControls(prefix) {
+    const { groupBy, month } = getRegistrationControls(prefix);
+    if (month) {
+      month.disabled = groupBy?.value === 'yearly';
+    }
+  }
+
+  function buildRegistrationSeries(visibleRows, prefix) {
+    const { groupBy, year: selectedYear, month: selectedMonth } = getRegistrationFilterValues(prefix);
+    const grouped = {};
+
+    visibleRows.forEach(row => {
+      const dateKey = row.dataset.createdDate;
+      if (!dateKey) return;
+
+      const [year, month, day] = dateKey.split('-');
+      if (selectedYear && year !== selectedYear) return;
+      if (selectedMonth && month !== selectedMonth) return;
+
+      let key = dateKey;
+      let label = day;
+
+      if (groupBy === 'yearly') {
+        key = year;
+        label = year;
+      } else if (groupBy === 'monthly') {
+        key = `${year}-${month}`;
+        label = `${registrationMonthNames[parseInt(month, 10) - 1]} ${year}`;
+      }
+
+      if (!grouped[key]) {
+        grouped[key] = { label, total: 0 };
+      }
+      grouped[key].total += 1;
+    });
+
+    if (groupBy === 'daily' && selectedYear && selectedMonth) {
+      const daysInMonth = new Date(parseInt(selectedYear, 10), parseInt(selectedMonth, 10), 0).getDate();
+      const completeEntries = [];
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const key = `${selectedYear}-${selectedMonth}-${String(day).padStart(2, '0')}`;
+        completeEntries.push(grouped[key] || {
+          label: String(day).padStart(2, '0'),
+          total: 0
+        });
+      }
+
+      return {
+        labels: completeEntries.map(item => item.label),
+        totals: completeEntries.map(item => item.total)
+      };
+    }
+
+    const sortedKeys = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
+    return {
+      labels: sortedKeys.map(key => grouped[key].label),
+      totals: sortedKeys.map(key => grouped[key].total)
+    };
+  }
+
+  function renderPeriodRegistrationChart(chartCanvas, visibleRows, labelText, prefix) {
+    if (!chartCanvas || typeof Chart === 'undefined') return;
+
+    updateRegistrationControls(prefix);
+    const { labels, totals } = buildRegistrationSeries(visibleRows, prefix);
+
+    if (chartCanvas.chartInstance) {
+      chartCanvas.chartInstance.destroy();
+    }
+
+    chartCanvas.chartInstance = new Chart(chartCanvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels.length ? labels : ['Laiha dadus'],
+        datasets: [{
+          label: labelText,
+          data: totals.length ? totals : [0],
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25, 135, 84, 0.18)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 5,
+          lineTension: 0.25,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 0 },
+        hover: { animationDuration: 0 },
+        responsiveAnimationDuration: 0,
+        legend: { display: false },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              precision: 0
+            }
+          }]
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem) {
+              return 'Total rejistu: ' + tooltipItem.yLabel;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function setDefaultRegistrationPeriod(prefix, rows) {
+    const controls = getRegistrationControls(prefix);
+    if (!controls.year || !controls.month) return;
+
+    populateRegistrationYearSelector(prefix, rows);
+
+    const now = new Date();
+    const currentYear = String(now.getFullYear());
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+
+    if ([...controls.year.options].some(option => option.value === currentYear)) {
+      controls.year.value = currentYear;
+    }
+    controls.month.value = currentMonth;
+  }
+
+  function setupParentsMunicipalityFilter() {
+    const searchInput = document.getElementById('searchParents');
+    const municipalityFilter = document.getElementById('parentsMunicipalityFilter');
+    const municipalityHeader = document.getElementById('parentsMunicipalityHeader');
+    const municipalityActive = document.getElementById('parentsMunicipalityActive');
+    const tbody = document.getElementById('parentsTable');
+    const visibleCount = document.getElementById('parentsVisibleCount');
+    const applyButton = document.getElementById('applyParentsMunicipalityFilter');
+    const clearButton = document.getElementById('clearParentsMunicipalityFilter');
+
+    if (!searchInput || !municipalityFilter || !municipalityHeader || !tbody || !visibleCount || !applyButton || !clearButton) return;
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length > 1);
+    const municipalityModalElement = document.getElementById('parentsMunicipalityModal');
+    const municipalityModal = municipalityModalElement ? new bootstrap.Modal(municipalityModalElement) : null;
+    const chartCanvas = document.getElementById('parentsRegistrationChart');
+    let selectedMunicipality = '';
+    const municipalityValues = [...new Set(
+      rows
+        .map(row => (row.dataset.municipality || '').trim())
+        .filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b));
+
+    municipalityValues.forEach(value => {
+      const option = document.createElement('option');
+      option.value = value.toLowerCase();
+      option.textContent = value;
+      municipalityFilter.appendChild(option);
+    });
+
+    function renderRegistrationChart(visibleRows) {
+      renderPeriodRegistrationChart(chartCanvas, visibleRows, 'Total rejistu parentes', 'parents');
+    }
+
+    // Update month select enable/disable based on group by
+    function updateParentsControls() {
+      updateRegistrationControls('parents');
+    }
+
+    function applyParentsFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      let count = 0;
+      const visibleRows = [];
+
+      rows.forEach(row => {
+        const rowText = row.innerText.toLowerCase();
+        const rowMunicipality = (row.dataset.municipality || '').trim().toLowerCase();
+        const matchesSearch = !query || rowText.includes(query);
+        const matchesMunicipality = !selectedMunicipality || rowMunicipality === selectedMunicipality;
+        const isVisible = matchesSearch && matchesMunicipality;
+
+        row.style.display = isVisible ? '' : 'none';
+        if (isVisible) {
+          count += 1;
+          visibleRows.push(row);
+        }
+      });
+
+      visibleCount.textContent = count;
+      populateRegistrationYearSelector('parents', visibleRows);
+      renderRegistrationChart(visibleRows);
+      if (selectedMunicipality) {
+        municipalityActive.textContent = municipalityFilter.options[municipalityFilter.selectedIndex].text;
+        municipalityActive.style.display = 'inline-block';
+      } else {
+        municipalityActive.textContent = '';
+        municipalityActive.style.display = 'none';
+      }
+    }
+
+    searchInput.addEventListener('input', applyParentsFilters);
+    municipalityHeader.addEventListener('click', function () {
+      municipalityFilter.value = selectedMunicipality;
+      if (municipalityModal) {
+        municipalityModal.show();
+      }
+    });
+    applyButton.addEventListener('click', function () {
+      selectedMunicipality = municipalityFilter.value;
+      applyParentsFilters();
+      if (municipalityModal) {
+        municipalityModal.hide();
+      }
+    });
+    clearButton.addEventListener('click', function () {
+      municipalityFilter.value = '';
+      selectedMunicipality = '';
+      applyParentsFilters();
+      if (municipalityModal) {
+        municipalityModal.hide();
+      }
+    });
+    
+    // Add event listeners for chart filters
+    document.getElementById('parentsGroupBy')?.addEventListener('change', function() {
+      updateParentsControls();
+      applyParentsFilters();
+    });
+    document.getElementById('parentsYearSelect')?.addEventListener('change', applyParentsFilters);
+    document.getElementById('parentsMonthSelect')?.addEventListener('change', applyParentsFilters);
+    
+    setDefaultRegistrationPeriod('parents', rows);
+    
+    applyParentsFilters();
+  }
+
+  function setupChildrenRegistrationChart() {
+    const searchInput = document.getElementById('searchChildren');
+    const tbody = document.getElementById('childrenTable');
+    const chartCanvas = document.getElementById('childrenRegistrationChart');
+    if (!searchInput || !tbody || !chartCanvas) return;
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length > 0);
+
+    function updateChildrenChart() {
+      const visibleRows = rows.filter(row => row.style.display !== 'none');
+      populateRegistrationYearSelector('children', visibleRows);
+      renderPeriodRegistrationChart(chartCanvas, visibleRows, 'Total rejistu oan sira', 'children');
+    }
+
+    searchInput.addEventListener('input', updateChildrenChart);
+    document.getElementById('childrenGroupBy')?.addEventListener('change', function() {
+      updateRegistrationControls('children');
+      updateChildrenChart();
+    });
+    document.getElementById('childrenYearSelect')?.addEventListener('change', updateChildrenChart);
+    document.getElementById('childrenMonthSelect')?.addEventListener('change', updateChildrenChart);
+
+    setDefaultRegistrationPeriod('children', rows);
+    updateChildrenChart();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
-    setupTableFilter('searchParents', 'parentsTable');
     setupTableFilter('searchTeachers', 'teachersTable');
     setupTableFilter('searchAnalysts', 'analystsTable');
     // admins do not have a search input but we keep function available
     setupTableFilter('searchAdmins', 'adminsTable');
     setupTableFilter('searchChildren', 'childrenTable');
+    setupParentsMunicipalityFilter();
+    setupChildrenRegistrationChart();
 
       // Activate a specific tab if `?tab=` is present in the URL
     try {

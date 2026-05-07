@@ -18,6 +18,11 @@ from core.views.user_management import user_list, add_user, edit_user, delete_us
 from core.views.profile import profile_view
 from core.views.apk import download_apk
 from core.views.ajax_loads import get_children_by_parent, get_parents_by_municipality
+# project/urls.py
+handler404 = 'haap_app.core.views.custom_404'
+
+
+# project/urls.py
 
 # ----------------------------
 # Root redirect based on user role
@@ -39,6 +44,7 @@ def root_redirect(request):
 # ----------------------------
 # URL Patterns
 # ----------------------------
+handler404 = 'core.views.custom_404'  # ✅ must be here
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
@@ -91,6 +97,8 @@ urlpatterns = [
     path("ajax/parents_by_municipality/", get_parents_by_municipality, name="ajax_parents_by_municipality"),
 
     path('dashboard/parents/', parents_list, name='parent_list'),
+
+    
 ]
 
 # ----------------------------

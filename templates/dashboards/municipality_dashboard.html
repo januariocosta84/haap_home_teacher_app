@@ -1,88 +1,185 @@
 {% extends "core/base.html" %}
+
 {% block content %}
-<div class="container-fluid">
-  <h2>🏛 Dashboard Munisipiu - {{ municipality.name }}</h2>
-  <hr>
-  <!-- Summary Stats -->
+<div class="container-fluid mt-4">
+
+  <!-- Header -->
   <div class="row">
-    <div class="col-md-4">
-      <div class="card text-center shadow-sm">
+    <div class="col-12">
+      <div class="card border shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
         <div class="card-body">
-          <h5 class="card-title">👨‍👩‍👧 Parentes</h5>
-          <p class="display-4">{{ parents_count }}</p>
+          <h4 class="fw-semibold mb-1">🏛 Dashboard Munisipiu - {{ municipality.name }}</h4>
+          <p class="text-muted mb-0">
+            Rezumu estatístika ba munisipiu ne'e inklui parentes, formadores no labarik sira.
+          </p>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">📚 Formadores</h5>
-          <p class="display-4">{{ teachers_count }}</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row g-4">
+
+    <!-- Parents -->
+    <div class="col-lg-4 col-6">
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-success counter" data-target="{{ parents_count }}">0</h3>
+            <p class="text-muted mb-2">Parentes</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-person-hearts text-success" style="font-size:32px;"></i>
+          </div>
+
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">🧒 Labarik sira</h5>
-          <p class="display-4">{{ children_count }}</p>
+
+    <!-- Teachers -->
+    <div class="col-lg-4 col-6">
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-warning counter" data-target="{{ teachers_count }}">0</h3>
+            <p class="text-muted mb-2">Formadores</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-mortarboard-fill text-warning" style="font-size:32px;"></i>
+          </div>
+
         </div>
       </div>
     </div>
+
+    <!-- Children -->
+    <div class="col-lg-4 col-6">
+      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-danger counter" data-target="{{ children_count }}">0</h3>
+            <p class="text-muted mb-2">Labarik sira</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-emoji-smile-fill text-danger" style="font-size:32px;"></i>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Tabs -->
-  <ul class="nav nav-tabs mt-5" id="municipalityTabs" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="parents-tab" data-toggle="tab" href="#parents" role="tab">Parentes</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="teachers-tab" data-toggle="tab" href="#teachers" role="tab">Formadores</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="children-tab" data-toggle="tab" href="#children" role="tab">Labarik sira</a>
-    </li>
-  </ul>
+  <div class="card border shadow-sm mt-5" style="border-radius: 12px;">
+    <div class="card-body">
 
-  <div class="tab-content mt-3" id="municipalityTabsContent">
-    <!-- Parents Tab -->
-    <div class="tab-pane fade show active" id="parents" role="tabpanel">
-      <ul class="list-group">
-        {% for parent in parents_list %}
-          <li class="list-group-item">
-            {{ parent.first_name }} {{ parent.last_name }} — {{ parent.municipality.name }}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Parentes la iha munisipiu ne'e.</li>
-        {% endfor %}
+      <ul class="nav nav-tabs" id="municipalityTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parents">Parentes</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#teachers">Formadores</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#children">Labarik sira</button>
+        </li>
       </ul>
-    </div>
 
-    <!-- Teachers Tab -->
-    <div class="tab-pane fade" id="teachers" role="tabpanel">
-      <ul class="list-group">
-        {% for teacher in teachers_list %}
-          <li class="list-group-item">
-            {{ teacher.first_name }} {{ teacher.last_name }} — {{ teacher.municipality.name }}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Formadores la iha munisipiu ne'e.</li>
-        {% endfor %}
-      </ul>
-    </div>
+      <div class="tab-content mt-3">
 
-    <!-- Children Tab -->
-    <div class="tab-pane fade" id="children" role="tabpanel">
-      <ul class="list-group">
-        {% for child in children_list %}
-          <li class="list-group-item">
-            {{ child.first_name }} {{ child.last_name }} — Parent: {{ child.parent.first_name }} {{ child.parent.last_name }}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Labarik sira la iha munisipiu ne'e.</li>
-        {% endfor %}
-      </ul>
+        <!-- Parents -->
+        <div class="tab-pane fade show active" id="parents">
+          <ul class="list-group list-group-flush">
+            {% for parent in parents_list %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{ parent.first_name }} {{ parent.last_name }}</span>
+                <small class="text-muted">{{ parent.municipality.name }}</small>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">Parentes la iha munisipiu ne'e.</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Teachers -->
+        <div class="tab-pane fade" id="teachers">
+          <ul class="list-group list-group-flush">
+            {% for teacher in teachers_list %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>{{ teacher.first_name }} {{ teacher.last_name }}</span>
+                <small class="text-muted">{{ teacher.municipality.name }}</small>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">Formadores la iha munisipiu ne'e.</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Children -->
+        <div class="tab-pane fade" id="children">
+          <ul class="list-group list-group-flush">
+            {% for child in children_list %}
+              <li class="list-group-item">
+                {{ child.first_name }} {{ child.last_name }}
+                <small class="text-muted d-block">
+                  Parent: {{ child.parent.first_name }} {{ child.parent.last_name }}
+                </small>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">Labarik sira la iha munisipiu ne'e.</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+
     </div>
   </div>
+
 </div>
+
+<!-- Counter Script (same as your main dashboard) -->
+<script>
+  function animateCounter(counter) {
+    const target = parseInt(counter.getAttribute("data-target")) || 0;
+    const duration = 1200;
+    const frameRate = 60;
+    const totalFrames = Math.round(duration / (1000 / frameRate));
+    let currentFrame = 0;
+
+    const updateCounter = () => {
+      currentFrame++;
+      const progress = currentFrame / totalFrames;
+      const eased = progress < 1 ? (-Math.pow(2, -10 * progress) + 1) : 1;
+
+      counter.textContent = Math.round(target * eased);
+
+      if (currentFrame < totalFrames) {
+        requestAnimationFrame(updateCounter);
+      }
+    };
+
+    updateCounter();
+  }
+
+  const counters = document.querySelectorAll(".counter");
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.classList.contains("counted")) {
+        animateCounter(entry.target);
+        entry.target.classList.add("counted");
+      }
+    });
+  }, { threshold: 0.3 });
+
+  counters.forEach(counter => observer.observe(counter));
+</script>
+
 {% endblock %}

@@ -24,7 +24,7 @@ class UserManagementView(View):
             return redirect("core:children_list")
 
         # Query users by role
-        parents = User.objects.filter(role="parent")
+        parents = User.objects.filter(role="parent").order_by('-created_at')
         teachers = User.objects.filter(role="teacher")
         analysts = User.objects.filter(role="municipality_analyst")
         admins = User.objects.filter(role="moe_admin")
@@ -34,7 +34,7 @@ class UserManagementView(View):
             "teachers": teachers,
             "analysts": analysts,
             "admins": admins,
-            "children": Child.objects.all(),
+            "children": Child.objects.all().order_by('-created_at'),
         }
         return render(request, "users/user_management.html", context)
 

@@ -23,7 +23,7 @@ urlpatterns = [
     path("dashboard/users/<uuid:user_id>/delete/", delete_user, name="delete_user"),
     path("dashboard/register/user/", register_user, name="register_user"),
 
-    path("logs/", AppUsageLogListView, name="logs"),
+    path("dashboard/logs/", AppUsageLogListView, name="logs"),
    # path("reports/activities/", ActivityReportView.as_view(), name="activity_report"),
 
     path("export/parents/", export_parents_pdf, name="export_parents_pdf"),

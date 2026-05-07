@@ -33,6 +33,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth import get_user_model
 import uuid
+from django.shortcuts import render
 
 
 @login_required
@@ -892,3 +893,8 @@ def export_parents_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
+
+
+
+def custom_404(request, exception):
+    return render(request, '404.html', status=404)
