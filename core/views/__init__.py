@@ -14,6 +14,7 @@ from .user_management import UserManagementView, register_user, view_user, edit_
 # core/views/__init__.py
 from .errors import custom_404
 
+
 __all__ = [
     'user_login', 'user_logout',
     'children_list', 'child_registration', 'edit_child', 'delete_child',
@@ -25,7 +26,7 @@ __all__ = [
     'home', 'parent_home', 'admin_parent_child_list',
     'ChildrenReportView', 'UserManagementView', 'register_user', 'view_user', 'edit_user', 'delete_user',
     'get_children_by_parent', 'get_parents_by_municipality', 'load_administrative_posts', 'load_sucos', 'load_aldeias',
-    'custom_404'
+    'custom_404', 
     
   
 ]

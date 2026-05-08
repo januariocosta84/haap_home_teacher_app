@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 # ----------------------------
 # Import views from modular files
 # ----------------------------
+
 from core.views.login_views import user_login, user_logout
 from core.views.children import children_list, child_registration
 from core.views.dashboards import moe_admin_dashboard, municipality_dashboard, teacher_dashboard
@@ -97,6 +98,8 @@ urlpatterns = [
     path("ajax/parents_by_municipality/", get_parents_by_municipality, name="ajax_parents_by_municipality"),
 
     path('dashboard/parents/', parents_list, name='parent_list'),
+
+ 
 
     
 ]

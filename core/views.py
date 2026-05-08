@@ -16,6 +16,7 @@ from reportlab.lib import colors
 from datetime import datetime
 
 from core.models import AdministrativePost, Aldeia, ApkVersion, AppUsageLog, Child, Municipality, Suco, User,ActivityResult
+from core.services.whatsapp_service import WhatsAppService
 from .forms import ApkVersionForm, ChildRegistrationForm, LoginForm, ParentRegisterForm, ParentRegistrationForm, ProfileImageForm, UserRegistrationForm
 from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login, logout
@@ -898,3 +899,4 @@ def export_parents_pdf(request):
 
 def custom_404(request, exception):
     return render(request, '404.html', status=404)
+
