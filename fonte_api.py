@@ -1,6 +1,6 @@
 import requests
 
-FONNTE_TOKEN = "17s5BQ2xkAnXajLzF7Fd"
+FONNTE_TOKEN = "fU3iADWKve58kdnaFNzh"
 URL = "https://api.fonnte.com/send"
 
 def send_whatsapp_message(target, message):

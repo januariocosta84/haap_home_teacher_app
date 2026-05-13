@@ -225,7 +225,7 @@ def verify_otp(request):
             django_cache.delete(cache_key)
             django_cache.delete(attempt_key)
 
-            messages.error(request, "Too many attempts.")
+            messages.error(request, "ita koko dala barak.")
             return redirect('core:forgot_password')
 
         # Wrong OTP
@@ -352,7 +352,7 @@ def send_whatsapp_otp(phone, otp):
     url = "https://api.fonnte.com/send"
 
     headers = {
-        "Authorization": settings.FONNTE_TOKEN
+        "Authorization": 'fU3iADWKve58kdnaFNzh'
     }
 
     message = f"""Kode OTP ita nian mak:{otp} Kode ne'e validu durante minutu 10.Labele fo ba ema seluk."""
@@ -364,5 +364,5 @@ def send_whatsapp_otp(phone, otp):
     }
 
     response = requests.post(url, headers=headers, data=data)
-
+    print(response.status_code, response.text)
     return response.json()

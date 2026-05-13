@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43', '*']
+ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43', '*', 'timor.rev-school.com']
 
 
 # Application definition
@@ -174,4 +174,4 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")      
 EMAIL_USE_TLS = True
 
-FRONTEND_TOKEN = "FAD2jdFh3o2TDk5zNkqu"
+FRONTEND_TOKEN = "fU3iADWKve58kdnaFNzh"  # Change this to a secure token for frontend-backend communication

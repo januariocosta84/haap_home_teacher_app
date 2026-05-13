@@ -1,9 +1,13 @@
+import random
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import View
 from core.forms import ParentForm, ParentRegisterForm, ParentRegistrationForm
 from core.models import User
+from core.views.user_management import send_whatsapp_otp
+from django.core.cache import cache as django_cache
 
 @login_required
 def parents_list(request):
@@ -64,20 +68,231 @@ def parent_register(request):
         form = ParentRegistrationForm()
     return render(request, 'core/parent_register.html', {'form': form})
 
+##Kode ida ne registu parent la ho OTP, mas ho form ne suporta registu normal. Se iha tempu, sei remove form ne.
+# class ParentRegisterView(View):
+#     def get(self, request):
+#         form = ParentRegisterForm()
+#         return render(request, "registration/parent_register.html", {"form": form})
 
+#     def post(self, request):
+#         form = ParentRegisterForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+
+#             # ✅ ADD THIS LINE
+#             messages.success(request, f"Konta {form.cleaned_data['first_name']} kria ho susesu!")
+
+#             return redirect("core:login")
+
+#         return render(request, "registration/parent_register.html", {"form": form})
+
+
+##Code ida ne registu parent ho OTP, mas ho form ne suporta registu normal. Se iha tempu, sei remove form ne.
 class ParentRegisterView(View):
+
     def get(self, request):
         form = ParentRegisterForm()
-        return render(request, "registration/parent_register.html", {"form": form})
+
+        return render(
+            request,
+            "registration/parent_register.html",
+            {"form": form}
+        )
 
     def post(self, request):
+
         form = ParentRegisterForm(request.POST)
+
         if form.is_valid():
+
+            whatsapp_number = form.cleaned_data['whatsapp_number']
+
+            # Check existing number
+            if User.objects.filter(
+                whatsapp_number=whatsapp_number
+            ).exists():
+
+                messages.error(
+                    request,
+                    "Numeru WhatsApp rejistadu ona."
+                )
+
+                return render(
+                    request,
+                    "registration/parent_register.html",
+                    {"form": form}
+                )
+
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+
+            # Cache keys
+            cache_key = f"register_otp_{whatsapp_number}"
+            attempt_key = f"register_attempts_{whatsapp_number}"
+
+            # Save OTP
+            django_cache.set(cache_key, otp, timeout=600)
+
+            # Reset attempts
+            django_cache.set(attempt_key, 0, timeout=600)
+
+            # Save registration data temporarily
+            request.session['register_data'] = request.POST.dict()
+            request.session['register_whatsapp'] = whatsapp_number
+
+            # Send OTP
+            try:
+                send_whatsapp_otp(
+                    whatsapp_number,
+                    otp
+                )
+
+            except Exception:
+
+                messages.error(
+                    request,
+                    "Labele haruka OTP."
+                )
+
+                return render(
+                    request,
+                    "registration/parent_register.html",
+                    {"form": form}
+                )
+
+            messages.success(
+                request,
+                "OTP haruka ona ba WhatsApp."
+            )
+
+            return redirect(
+                'core:verify_register_otp'
+            )
+
+        return render(
+            request,
+            "registration/parent_register.html",
+            {"form": form}
+        )
+
+
+
+MAX_OTP_ATTEMPTS = 3
+def verify_register_otp(request):
+
+    whatsapp_number = request.session.get(
+        'register_whatsapp'
+    )
+
+    register_data = request.session.get(
+        'register_data'
+    )
+
+    if not whatsapp_number or not register_data:
+
+        messages.error(
+            request,
+            "Sesaun expirou."
+        )
+
+        return redirect(
+            'core:parent_register'
+        )
+
+    cache_key = f"register_otp_{whatsapp_number}"
+    attempt_key = f"register_attempts_{whatsapp_number}"
+
+    saved_otp = django_cache.get(cache_key)
+
+    attempts = django_cache.get(
+        attempt_key,
+        0
+    )
+
+    if request.method == 'POST':
+
+        entered_otp = request.POST.get(
+            'otp',
+            ''
+        ).strip()
+
+        # OTP expired
+        if not saved_otp:
+
+            messages.error(
+                request,
+                "OTP expirou."
+            )
+
+            return redirect(
+                'core:parent_register'
+            )
+
+        # Too many attempts
+        if attempts >= MAX_OTP_ATTEMPTS:
+
+            django_cache.delete(cache_key)
+            django_cache.delete(attempt_key)
+
+            messages.error(
+                request,
+                "Too many attempts."
+            )
+
+            return redirect(
+                'core:parent_register'
+            )
+
+        # Wrong OTP
+        if entered_otp != saved_otp:
+
+            django_cache.set(
+                attempt_key,
+                attempts + 1,
+                timeout=600
+            )
+
+            messages.error(
+                request,
+                "OTP sala."
+            )
+
+            return render(
+                request,
+                'registration/verify_register_otp.html'
+            )
+
+        # SUCCESS
+        django_cache.delete(cache_key)
+        django_cache.delete(attempt_key)
+
+        form = ParentRegisterForm(register_data)
+
+        if form.is_valid():
+
             form.save()
 
-            # ✅ ADD THIS LINE
-            messages.success(request, f"Konta {form.cleaned_data['first_name']} kria ho susesu!")
+        # cleanup session
+        request.session.pop(
+            'register_whatsapp',
+            None
+        )
 
-            return redirect("core:login")
+        request.session.pop(
+            'register_data',
+            None
+        )
 
-        return render(request, "registration/parent_register.html", {"form": form})
+        messages.success(
+            request,
+            f"Konta {form.cleaned_data['first_name']} kria ho susesu!"
+        )
+
+        return redirect(
+            'core:login'
+        )
+
+    return render(
+        request,
+        'registration/verify_register_otp.html'
+    )

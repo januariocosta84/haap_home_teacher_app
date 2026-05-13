@@ -5,6 +5,7 @@ from core.views import *
 
 from core.views.activity_logs import ChildActivityView
 from core.views.analytics_api import trend_data_api, summary_stats_api, get_municipalities_api
+from core.views.parents import verify_register_otp
 from core.views.send import send_whatsapp
 from core.views.user_management import forgot_password, reset_password, verify_otp
 
@@ -76,4 +77,10 @@ urlpatterns = [
     path('reset-password/', reset_password, name='reset_password'),
 
     path('send-whatsapp/', send_whatsapp, name='send_whatsapp'),
+
+    path(
+    'verify-register-otp/',
+    verify_register_otp,
+    name='verify_register_otp'
+),
 ]
