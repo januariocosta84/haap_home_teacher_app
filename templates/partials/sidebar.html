@@ -10,7 +10,7 @@
     {% elif user.role == "municipality_analyst" %}
     <a href="{% url 'core:municipality_dashboard' %}" class="brand-link">
     {% elif user.role == "teacher" %}
-    <a href="{% url 'core:teacher_dashboard' %}" class="brand-link">
+    <a href="{% url 'preschools:preschool_list_claim' %}" class="brand-link">
     {% else %}
     <a href="#" class="brand-link">
     {% endif %}
@@ -59,9 +59,9 @@
         </li>
       {% elif user.role == "teacher" %}
         <li class="nav-item">
-          <a href="{% url 'core:teacher_dashboard' %}" class="nav-link active">
+          <a href="{% url 'preschools:preschool_list_claim' %}" class="nav-link active">
             <i class="nav-icon bi bi-journal-text"></i>
-            <p>Dashboard ba Professor</p>
+            <p>Lista Eskola Sira.</p>
           </a>
         </li>
       {% endif %}
@@ -166,9 +166,9 @@
         {% elif user.role == "teacher" %}
           <!-- Teacher Dashboard -->
           <li class="nav-item">
-            <a href="{% url 'core:teacher_dashboard' %}" class="nav-link">
+            <a href="{% url 'klase:teacher-schools' %}" class="nav-link">
               <i class="nav-icon bi bi-person-badge"></i>
-              <p>Dashboard ba Professor</p>
+              <p>Lista Eskola ho Klase sira.</p>
             </a>
           </li>
                   <!-- Logs (all roles can see) -->

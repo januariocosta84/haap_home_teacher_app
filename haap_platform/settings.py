@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43', '*', 'timor.rev-school.com']
+ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43', '*']
 
 
 # Application definition
@@ -41,6 +41,10 @@ INSTALLED_APPS = [
      "django_extensions",
        "rest_framework",
     "rest_framework.authtoken",
+    'preschools',
+    'klase',
+    'equipment',
+    'ticket',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +89,7 @@ WSGI_APPLICATION = 'haap_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': ("haap"),  # os.getenv("DB_NAME"),
+        'NAME': ("worldmosaic"),  # os.getenv("DB_NAME"),
         'USER': ("root"),  # os.getenv("DB_USER"),
         'PASSWORD': ("Paddington2025yoyo"),  # os.getenv("DB_PASSWORD"),
         'HOST': ("localhost"),  # os.getenv("DB_HOST"),
@@ -175,3 +179,26 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 
 FRONTEND_TOKEN = "fU3iADWKve58kdnaFNzh"  # Change this to a secure token for frontend-backend communication
+
+ROOT_URLCONF = 'haap_platform.urls'
+
+# BASE_DIR = Path(__file__).resolve().parent.parent
+
+# from pathlib import Path
+
+# BASE_DIR = Path(__file__).resolve().parent.parent
+
+# # URL (because app is under /new)
+# STATIC_URL = "/new/static/"
+# MEDIA_URL = "/new/media/"
+
+# # Where collectstatic will output files (VERY IMPORTANT)
+# STATIC_ROOT = BASE_DIR / "static"
+# MEDIA_ROOT = BASE_DIR / "media"
+
+# # ONLY for development (optional)
+# STATICFILES_DIRS = [
+#     # Put extra folders here ONLY if you have them
+#     # Example:
+#     # BASE_DIR / "assets",
+# ]

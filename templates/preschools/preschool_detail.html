@@ -1,0 +1,231 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- MODERN HEADER (APPLIED SAME STYLE) -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+
+                <!-- LEFT -->
+                <div>
+
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            Pre-Eskolár
+                        </span>
+                    </div>
+
+                    <h3 class="fw-bold mb-1">
+                        {{ preschool.name }}
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        {{ preschool.municipality }} • {{ preschool.administrative_post }} • {{ preschool.suco }}
+                    </p>
+
+                </div>
+
+                <!-- RIGHT ACTION -->
+                <div>
+
+                    <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+                        class="btn btn-success rounded-pill px-4 shadow-sm">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                 Adisiona klase
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- gradient accent -->
+        <div style="height:4px; background: linear-gradient(90deg,#0d6efd,#20c997,#6610f2);"></div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-3">
+
+            <!-- OVERVIEW -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3"> Rezumu Eskola</h5>
+                    <hr>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Total Klase</small>
+                        <h4 class="fw-bold text-primary mb-0">
+                            {{ classrooms|length }}
+                        </h4>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Total Profesór</small>
+                        <h4 class="fw-bold text-success mb-0">
+                            {{ preschool.teachers.count }}
+                        </h4>
+                    </div>
+
+                    <div>
+                        <small class="text-muted">Estadu</small><br>
+                        <span class="badge bg-success rounded-pill px-3 py-2">
+                            Aktivu
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- LOCATION -->
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">📍 Informasaun Fatin</h5>
+                    <hr>
+
+                    <p class="mb-2"><strong>Munisípiu:</strong> {{ preschool.municipality }}</p>
+                    <p class="mb-2"><strong>Postu Administrativu:</strong> {{ preschool.administrative_post }}</p>
+                    <p class="mb-2"><strong>Suco:</strong> {{ preschool.suco }}</p>
+                    <p class="mb-0"><strong>Aldeia:</strong> {{ preschool.aldeia }}</p>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MAIN -->
+        <div class="col-lg-9">
+
+            <!-- TITLE BAR -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+
+                    <h5 class="fw-bold mb-0"> Lista Klase Sira</h5>
+
+                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                        {{ classrooms|length }} Klase
+                    </span>
+
+                </div>
+            </div>
+
+            {% if classrooms %}
+            <div class="row g-4">
+
+                {% for classroom in classrooms %}
+                <div class="col-md-6 col-xl-4">
+
+                    <div class="card border-0 shadow-sm rounded-4 h-100 classroom-card">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <div class="mb-3">
+                                <h5 class="fw-bold mb-1">
+                                    <a href="{% url 'preschools:classroom_detail' id=classroom.id %}"
+                                       class="text-decoration-none text-dark">
+                                        {{ classroom.name }}
+                                    </a>
+                                </h5>
+
+                                <small class="text-muted">
+                                    Grup: {{ classroom.group }}
+                                </small>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Profesór:</strong><br>
+
+                                {% if classroom.teacher %}
+                                    <span class="text-success fw-semibold">
+                                        {{ classroom.teacher.get_full_name }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill">
+                                        Seidauk iha profesór
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- ACTIONS -->
+                            <div class="mt-auto d-flex gap-2">
+
+                                <a href="{% url 'preschools:classroom_detail' id=classroom.id %}"
+                                   class="btn btn-outline-primary btn-sm rounded-pill flex-fill">
+                                    Haree
+                                </a>
+
+                                <a href="{% url 'preschools:edit_classroom' id=classroom.id %}"
+                                   class="btn btn-outline-secondary btn-sm rounded-pill flex-fill">
+                                    Edita
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <!-- EMPTY STATE -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center py-5">
+
+
+                    <h5 class="fw-bold">Seidauk iha klase rejista</h5>
+
+                    <p class="text-muted">
+                        Klik iha <strong>Aumenta Klase Foun</strong> atu kria klase.
+                    </p>
+
+                    <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+                       class="btn btn-primary rounded-pill px-4">
+                         Aumenta Klase
+                    </a>
+
+                </div>
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<!-- STYLE -->
+<style>
+    .classroom-card {
+        transition: all 0.25s ease;
+    }
+
+    .classroom-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+    }
+
+    .card {
+        overflow: hidden;
+    }
+
+    h2, h3, h4, h5 {
+        letter-spacing: -0.3px;
+    }
+</style>
+
+{% endblock %}

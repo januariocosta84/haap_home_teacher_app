@@ -8,6 +8,7 @@ from django.views import View
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 import requests
+from fonte_api import send_whatsapp_message
 
 from core.forms import ForgotPasswordForm, ResetPasswordForm, UserForm, UserRegistrationForm, UserEditForm
 # Make sure this is at the top of your views file
@@ -27,7 +28,7 @@ class UserManagementView(View):
 
         # Query users by role
         parents = User.objects.filter(role="parent").order_by('-created_at')
-        teachers = User.objects.filter(role="teacher")
+        teachers = User.objects.filter(role="teacher").order_by('is_active', '-created_at')
         analysts = User.objects.filter(role="municipality_analyst")
         admins = User.objects.filter(role="moe_admin")
 
@@ -64,6 +65,34 @@ def view_user(request, user_id):
 
     user = get_object_or_404(User, id=user_id)
     return render(request, "users/view_user.html", {"obj": user})
+
+
+@login_required
+def approve_teacher(request, user_id):
+    if request.user.role != "moe_admin":
+        messages.error(request, "Aksesu negadu.")
+        return redirect("core:user_management")
+
+    teacher = get_object_or_404(User, id=user_id, role="teacher")
+    if teacher.is_active:
+        messages.info(request, "Ita nia pedidu aprovadu ona.")
+        return redirect("core:user_management")
+
+    teacher.is_active = True
+    teacher.is_verified = True
+    teacher.save()
+
+    message = (
+        f"Hello {teacher.first_name},\n\n"
+        "Ita nia pedidu rejistu ba professor aprovadu ona. ita bele login ona uja  WhatsApp number."
+    )
+    try:
+        send_whatsapp_message(teacher.whatsapp_number, message)
+        messages.success(request, "Teacher approved and WhatsApp notification sent.")
+    except Exception as exc:
+        messages.warning(request, f"Teacher approved, but WhatsApp notification failed: {exc}")
+
+    return redirect("core:user_management")
 
 
 @login_required

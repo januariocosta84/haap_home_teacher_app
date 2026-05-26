@@ -28,7 +28,7 @@
             {% endif %}
 
             <!-- Hidden file input + Tetum button -->
-            <form method="post" enctype="multipart/form-data" id="photoForm">
+            <form method="post" enctype="multipart/form-data" id="photoForm" action="{% url 'core:update_profile_image' %}">
               {% csrf_token %}
               <input type="file"
                      id="id_image"

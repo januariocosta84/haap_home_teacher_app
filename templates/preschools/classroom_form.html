@@ -1,0 +1,76 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="mb-0">
+        {% if object %}
+          ✏️ Edit Classroom
+        {% else %}
+          ➕ Create Classroom
+        {% endif %}
+      </h3>
+      <small class="text-muted">
+        Manage classroom information inside preschool system
+      </small>
+    </div>
+
+    <a href="{% if object %}{% url 'preschools:preschool_detail' id=object.preschool.id %}{% else %}{% url 'preschools:preschool_detail' id=preschool.id %}{% endif %}" class="btn btn-outline-secondary">
+      ← Back to Preschool
+    </a>
+  </div>
+
+  <!-- Form Card -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="row">
+
+          <!-- Classroom Name -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Classroom Name</label>
+            {{ form.name }}
+          </div>
+
+          <!-- Group -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Group</label>
+            {{ form.group }}
+          </div>
+
+          <!-- Teacher -->
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Assign Teacher</label>
+            {{ form.teacher }}
+          </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-end gap-2 mt-3">
+
+          <a href="{% if object %}{% url 'preschools:preschool_detail' id=object.preschool.id %}{% else %}{% url 'preschools:preschool_detail' id=preschool.id %}{% endif %}" class="btn btn-light">
+            Cancel
+          </a>
+
+          <button type="submit" class="btn btn-primary">
+            {% if object %}Update{% else %}Save{% endif %}
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

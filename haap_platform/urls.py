@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-
+from preschools.views import PreschoolListView
+from django.urls import path, include
 # ----------------------------
 # Import views from modular files
 # ----------------------------
@@ -19,6 +21,7 @@ from core.views.user_management import user_list, add_user, edit_user, delete_us
 from core.views.profile import profile_view
 from core.views.apk import download_apk
 from core.views.ajax_loads import get_children_by_parent, get_parents_by_municipality
+
 # project/urls.py
 handler404 = 'haap_app.core.views.custom_404'
 
@@ -99,8 +102,10 @@ urlpatterns = [
 
     path('dashboard/parents/', parents_list, name='parent_list'),
 
- 
-
+    path('preschool/', include('preschools.urls')),
+    path('equipment/', include('equipment.urls')),
+    path('classroom/', include('klase.urls')),
+   
     
 ]
 

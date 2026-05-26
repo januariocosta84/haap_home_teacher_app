@@ -1,0 +1,172 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="d-flex" style="min-height: calc(100vh - 60px);">
+    <!-- SIDEBAR -->
+    {% include "klase/partials/teacher_sidebar.html" with active_school_id=classroom.preschool_id %}
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-grow-1 py-5" style="overflow-y: auto;">
+        <div class="container-lg">
+            <!-- BREADCRUMB -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'klase:teacher-schools' %}" class="text-decoration-none">Lista Pre escolar</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'klase:school-classrooms' classroom.preschool_id %}" class="text-decoration-none">
+                            {{ classroom.preschool_name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ classroom.name }}</li>
+                </ol>
+            </nav>
+
+            <!-- PAGE HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">{{ classroom.name }}</h2>
+                    <small class="text-muted">
+                        <strong>Group {{ classroom.group }}</strong> | 
+                        <strong>{{ classroom.preschool_name }}</strong>
+                    </small>
+                </div>
+                <div>
+                    <span class="badge bg-primary rounded-pill fs-6">{{ student_count }} Students</span>
+                </div>
+            </div>
+
+            <!-- ALERTS -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row g-4">
+                <!-- LEFT COLUMN: STUDENTS LIST -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="card-title mb-0">👥 Enrolled Students</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if students %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Child Name</th>
+                                                <th>Child Code</th>
+                                                <th>Age Group</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for student in students %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ student.child__first_name }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <code class="bg-light p-2 rounded">{{ student.child__user_id }}</code>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-secondary">Group {{ student.child__age_group }}</span>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info mb-0">
+                                    <i class="bi bi-info-circle"></i> No students enrolled in this class yet.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: ADD CHILD FORM -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="card-title mb-0">➕ Add Child to Class</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" class="needs-validation" novalidate>
+                                {% csrf_token %}
+
+                                <div class="mb-3">
+                                    <label for="id_child_code" class="form-label">Child Code</label>
+                                    <div class="input-group">
+                                        <input 
+                                            type="text" 
+                                            id="id_child_code"
+                                            name="child_code" 
+                                            class="form-control form-control-lg"
+                                            placeholder="e.g., CHD-ABC123"
+                                            autocomplete="off"
+                                            required
+                                        >
+                                        <button class="btn btn-outline-secondary" type="button" 
+                                                onclick="document.getElementById('id_child_code').focus();">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-lightbulb"></i> Ask the parent for the child's unique code (user_id)
+                                    </small>
+                                    
+                                    {% if form.child_code.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.child_code.errors|join:"" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="bi bi-plus-circle"></i> Add Child
+                                </button>
+                            </form>
+
+                            <!-- Info Box -->
+                            <div class="alert alert-light mt-4 border-start border-info" role="alert">
+                                <small>
+                                    <strong>📌 Steps to add a child:</strong>
+                                    <ol class="mb-0 mt-2">
+                                        <li>Ask the parent for their child's code</li>
+                                        <li>Paste the code in the field above</li>
+                                        <li>Click "Add Child" to enroll</li>
+                                    </ol>
+                                </small>
+                            </div>
+
+                            <!-- Class Info -->
+                            <div class="alert alert-info mt-4" role="alert">
+                                <small>
+                                    <strong>📚 Class Information:</strong><br>
+                                    <strong>Group:</strong> {{ classroom.group }}<br>
+                                    <strong>Students:</strong> {{ student_count }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus the child code input on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('id_child_code').focus();
+});
+</script>
+
+{% endblock %}

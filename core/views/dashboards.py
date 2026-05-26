@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.models import User, Child
+from preschools.models import PreschoolTeacher, Preschool
 
 @login_required
 def moe_admin_dashboard(request):
@@ -10,6 +11,8 @@ def moe_admin_dashboard(request):
         "municipality_analysts": User.objects.filter(role="municipality_analyst").count(),
         "children": Child.objects.count(),
         "teachers": User.objects.filter(role="teacher").count(),
+        "preschools": Preschool.objects.count(),
+        "pending_teacher_requests": PreschoolTeacher.objects.filter(is_active=True, is_approved=False).count(),
         "all_parents": User.objects.filter(role="parent"),
         "all_children": Child.objects.all(),
         "all_teachers": User.objects.filter(role="teacher"),

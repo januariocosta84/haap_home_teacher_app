@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Adisiona Ekipamentu{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                Adisiona Ekipamentu
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.equipment_type.label }}
+                        </label>
+                        {{ form.equipment_type }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.model_number.label }}
+                        </label>
+                        {{ form.model_number }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.serial_number.label }}
+                        </label>
+                        {{ form.serial_number }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.preschool.label }}
+                        </label>
+                        {{ form.preschool }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.classroom.label }}
+                        </label>
+                        {{ form.classroom }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {{ form.teacher.label }}
+                        </label>
+                        {{ form.teacher }}
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Rai Ekipamentu
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    document.getElementById('id_preschool').addEventListener('change', function () {
+
+        const preschoolId = this.value;
+
+        fetch(`/equipment/ajax/load-classrooms/?preschool_id=${preschoolId}`)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                let classroomSelect = document.getElementById('id_classroom');
+
+                classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
+
+                data.forEach(function (item) {
+
+                    classroomSelect.innerHTML +=
+                        `<option value="${item.id}">${item.name}</option>`;
+                });
+            });
+    });
+
+</script>
+
+{% endblock %}

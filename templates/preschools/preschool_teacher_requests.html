@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Pedidu Aprovasaun</h2>
+      <small class="text-muted">Hare'e no aprova pedidu professores atu Join eskola.</small>
+    </div>
+    <a href="{% url 'core:moe_admin_dashboard' %}" class="btn btn-secondary">Fila ba Dashboard</a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      {% if requests %}
+        <div class="table-responsive">
+          <table class="table table-hover table-sm align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Professor</th>
+                <th>Pre escolar</th>
+                <th>Loron pedidu</th>
+                <th>Estadu</th>
+                <th class="text-end">Aksaun</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for request in requests %}
+              <tr>
+                <td>{{ request.teacher.get_full_name }}</td>
+                <td>{{ request.preschool.name }}</td>
+                <td>{{ request.assigned_at|date:'d M Y H:i' }}</td>
+                <td><span class="badge bg-warning text-dark">Aprovasaun pendente</span></td>
+                <td class="text-end">
+                  <a href="{% url 'preschools:preschool_detail' request.preschool.id %}" class="btn btn-sm btn-outline-secondary">Pre eskolar</a>
+                  <a href="{% url 'preschools:approve_preschool_teacher_request' request.id %}" class="btn btn-sm btn-success">Aprovadu</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert alert-info">
+          Laiha pedidu pendentes. <a href="{% url 'preschools:preschool_list' %}?tab=preschools" class="alert-link">Hare'e lista pre-eskolars</a>.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

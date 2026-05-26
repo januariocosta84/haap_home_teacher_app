@@ -23,6 +23,7 @@ urlpatterns = [
     # User management (MoE admin)
     path("dashboard/users/", UserManagementView.as_view(), name="user_management"),
     path("dashboard/users/<uuid:user_id>/view/", view_user, name="view_user"),
+    path("dashboard/users/<uuid:user_id>/approve/", approve_teacher, name="approve_teacher"),
     path("dashboard/users/<uuid:user_id>/edit/", edit_user, name="edit_user"),
     path("dashboard/users/<uuid:user_id>/delete/", delete_user, name="delete_user"),
     path("dashboard/register/user/", register_user, name="register_user"),
@@ -34,6 +35,7 @@ urlpatterns = [
 
     # Public parent registration
     path("register/parent/", ParentRegisterView.as_view(), name="parent_register"),
+    path("register/teacher/", TeacherRegisterView.as_view(), name="teacher_register"),
     path("dashboard/profile/", profile_view, name="profile"),
     path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
     path("dashboard/profile/change-password/", change_password, name="change_password"),

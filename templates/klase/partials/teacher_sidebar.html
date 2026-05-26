@@ -1,0 +1,107 @@
+<!-- Teacher Sidebar Navigation -->
+<nav class="sidebar bg-light border-end" style="width: 280px; min-height: 100vh; position: sticky; top: 0;">
+    <div class="p-3 border-bottom">
+        <h5 class="mb-0">Eskola sira</h5>
+        <small class="text-muted">Navegasaun Lais</small>
+    </div>
+
+    <div class="nav flex-column p-2">
+        <!-- All Schools Link -->
+        <a href="{% url 'klase:teacher-schools' %}" 
+           class="nav-link {% if request.resolver_match.url_name == 'teacher-schools' %}active bg-primary text-white{% else %}text-dark{% endif %} mb-2 rounded">
+            <i class="bi bi-house-fill me-2"></i>
+            <span>Eskola sira hotuI</span>
+            {% if total_schools %}
+                <span class="badge bg-secondary rounded-pill ms-auto">{{ total_schools }}</span>
+            {% endif %}
+        </a>
+
+        <!-- Schools List -->
+        {% if schools %}
+            <div class="mb-3">
+                <small class="text-muted text-uppercase px-2 d-block mb-2">Hau nia eskola sira</small>
+                {% for school in schools %}
+                    <a href="{% url 'klase:school-classrooms' school.id %}" 
+                       class="nav-link {% if active_school_id == school.id %}active bg-info text-white{% else %}text-dark{% endif %} mb-1 rounded ps-4">
+                        <i class="bi bi-building me-2"></i>
+                        <span class="d-inline-block" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">
+                            {{ school.name }}
+                        </span>
+                        <span class="badge bg-secondary rounded-pill ms-auto" style="font-size: 0.75rem;">
+                            {{ school.classroom_count }}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-sm alert-warning m-2" role="alert">
+                <small>Sedauk iha atribuisaun</small>
+            </div>
+        {% endif %}
+
+        <hr class="my-2">
+
+        <!-- School Stats -->
+        {% if schools %}
+            <div class="p-2">
+                <small class="text-muted d-block mb-2"><strong> Statistikas</strong></small>
+                <div class="mb-2 p-2 bg-white rounded border-start border-4 border-primary">
+                    <small class="text-muted d-block">Total alunos</small>
+                    <strong>{{ total_students }}</strong>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</nav>
+
+<style>
+    .sidebar {
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0.75rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        text-decoration: none;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+
+    .sidebar .nav-link.active {
+        background-color: #0d6efd !important;
+        color: white !important;
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+    }
+
+    .sidebar .nav-link.active.bg-info {
+        background-color: #0dcaf0 !important;
+    }
+
+    .alert-sm {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.875rem;
+        margin-bottom: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            z-index: 1000;
+            width: 280px;
+            height: 100vh;
+            transition: left 0.3s ease;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
+    }
+</style>

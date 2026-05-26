@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import View
-from core.forms import ParentForm, ParentRegisterForm, ParentRegistrationForm
+from core.forms import ParentForm, ParentRegisterForm, ParentRegistrationForm, TeacherRegistrationForm
 from core.models import User
 from core.views.user_management import send_whatsapp_otp
 from django.core.cache import cache as django_cache
@@ -175,6 +175,50 @@ class ParentRegisterView(View):
             {"form": form}
         )
 
+
+
+class TeacherRegisterView(View):
+
+    def get(self, request):
+        form = TeacherRegistrationForm()
+        return render(
+            request,
+            "registration/teacher_register.html",
+            {"form": form}
+        )
+
+    def post(self, request):
+        form = TeacherRegistrationForm(request.POST)
+
+        if form.is_valid():
+            whatsapp_number = form.cleaned_data['whatsapp_number']
+
+            if User.objects.filter(
+                whatsapp_number=whatsapp_number
+            ).exists():
+                messages.error(
+                    request,
+                    "Numeru WhatsApp rejistadu ona."
+                )
+                return render(
+                    request,
+                    "registration/teacher_register.html",
+                    {"form": form}
+                )
+
+            form.save()
+            messages.success(
+                request,
+                "Registrasaun formadór pendente. Favor espera MoE admin aprova."
+            )
+            return redirect('core:login')
+
+        messages.error(request, "Favor korije erros sira iha fomulariu.")
+        return render(
+            request,
+            "registration/teacher_register.html",
+            {"form": form}
+        )
 
 
 MAX_OTP_ATTEMPTS = 3

@@ -105,7 +105,10 @@
         <!-- Register -->
         <div class="text-block text-center my-3">
           <span style="color: rgb(115, 99, 92);">Laos Membro ?</span>
-          <a href="{% url 'core:parent_register'%}" >Rejistu Konta Foun</a>
+          <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'core:parent_register' %}" class="btn btn-outline-primary">Rejistu Parent</a>
+            <a href="{% url 'core:teacher_register' %}" class="btn btn-outline-success">Rejistu Formadores</a>
+          </div>
         </div>
 
         <!-- Forgot Password -->

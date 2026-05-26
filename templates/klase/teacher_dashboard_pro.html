@@ -1,0 +1,187 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h2>🚀 Teacher Pro Dashboard</h2>
+            <small class="text-muted">Real-time classroom management</small>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <!-- NEW BUTTON -->
+            <button class="btn btn-primary"
+                    onclick="openGlobalRegister()">
+                ➕ Add Student
+            </button>
+
+            <!-- SEARCH -->
+            <input id="searchBox"
+                   class="form-control w-50"
+                   placeholder="Search class...">
+
+        </div>
+
+    </div>
+    <!-- END HEADER -->
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center shadow-sm">
+                <h6>Total Classes</h6>
+                <h3>{{ total_classes }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center shadow-sm">
+                <h6>Total Students</h6>
+                <h3>{{ total_students }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center shadow-sm">
+                <h6>Group A</h6>
+                <h3>{{ group_a }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card p-3 text-center shadow-sm">
+                <h6>Group B</h6>
+                <h3>{{ group_b }}</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="card p-3 mb-4">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- CLASS LIST -->
+    <div class="row" id="classList">
+
+        {% for c in classrooms %}
+
+        <div class="col-md-4 mb-3 class-card">
+
+            <div class="card shadow-sm p-3">
+
+                <h5 class="class-name">{{ c.name }}</h5>
+
+                <p>Group {{ c.group }}</p>
+
+                <span class="badge bg-primary">
+                    {{ c.students }} Students
+                </span>
+
+                <div class="mt-3 d-grid gap-2">
+
+                    <a href="{% url 'classroom-dashboard' c.id %}"
+                       class="btn btn-outline-primary btn-sm">
+                        Open
+                    </a>
+
+                    <a href="{% url 'assign-student' c.id %}"
+                       class="btn btn-success btn-sm">
+                        Assign Student
+                    </a>
+
+                    <button class="btn btn-warning btn-sm"
+                            onclick="openRegister('{{ c.id }}')">
+                        Register Student
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content p-3">
+
+            <h5>Add / Register Student</h5>
+
+            <form id="registerForm">
+
+                <input type="hidden" id="classroom_id">
+
+                <input class="form-control mb-2"
+                       name="user_id"
+                       placeholder="Parent Code">
+
+                <input class="form-control mb-2"
+                       name="first_name"
+                       placeholder="Child Name">
+
+                <button type="submit" class="btn btn-success w-100">
+                    Submit
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+let modal = new bootstrap.Modal(document.getElementById('registerModal'));
+
+/* OPEN CLASS-SPECIFIC REGISTER */
+function openRegister(classId){
+    document.getElementById("classroom_id").value = classId;
+    modal.show();
+}
+
+/* GLOBAL REGISTER BUTTON */
+function openGlobalRegister(){
+    document.getElementById("classroom_id").value = "";
+    modal.show();
+}
+
+/* CHART */
+new Chart(document.getElementById('chart'), {
+    type: 'bar',
+    data: {
+        labels: ['Group A', 'Group B'],
+        datasets: [{
+            data: [{{ group_a }}, {{ group_b }}]
+        }]
+    }
+});
+
+/* SEARCH */
+document.getElementById("searchBox").addEventListener("keyup", function () {
+    let value = this.value.toLowerCase();
+
+    document.querySelectorAll(".class-card").forEach(card => {
+        let name = card.querySelector(".class-name").innerText.toLowerCase();
+        card.style.display = name.includes(value) ? "block" : "none";
+    });
+});
+
+</script>
+
+{% endblock %}

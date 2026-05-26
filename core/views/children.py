@@ -17,7 +17,10 @@ def child_registration(request):
             child = form.save(commit=False)
             child.parent = request.user
             child.save()
-            messages.success(request, f"Labarik '{child.first_name}' rejistu ho susesu.")
+            messages.success(
+                request,
+                f"Labarik '{child.first_name}' rejistu ho susesu. Kodigu nia: {child.user_id}"
+            )
             return redirect('children_list')
     else:
         form = ChildRegistrationForm()

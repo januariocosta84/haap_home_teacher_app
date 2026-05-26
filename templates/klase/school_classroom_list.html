@@ -1,0 +1,149 @@
+{% extends "core/base.html" %}
+{% block content %}
+
+<div class="d-flex" style="min-height: calc(100vh - 60px);">
+    <!-- SIDEBAR -->
+    {% include "klase/partials/teacher_sidebar.html" with active_school_id=preschool.id %}
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-grow-1 py-5" style="overflow-y: auto;">
+        <div class="container-lg">
+            <!-- BREADCRUMB & HEADER -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'klase:teacher-schools' %}" class="text-decoration-none">Lista Pre eskolar</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ preschool.name }}</li>
+                    </ol>
+                </nav>
+
+                <div>
+                    <h2 class="mb-1">{{ preschool.name }}</h2>
+                    <small class="text-muted">{{ preschool.preschool_type }}</small>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-0">Total Klase</h6>
+                            <h3 class="mb-0">{{ total_classrooms }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-0">Total alunos</h6>
+                            <h3 class="mb-0">{{ total_students }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-0">Grupu A</h6>
+                            <h3 class="mb-0">{{ group_a_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <h6 class="text-muted mb-0">Grupu B</h6>
+                            <h3 class="mb-0">{{ group_b_count }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLASSROOMS -->
+            {% if classrooms %}
+                <div class="row g-4">
+                    {% for classroom in classrooms %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card shadow-sm h-100 hover-card">
+                                <!-- Card Header -->
+                                <div class="card-header bg-white border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ classroom.name }}</h5>
+                                        <span class="badge bg-primary rounded-pill">Group {{ classroom.group }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                    <!-- Student Count -->
+                                    <div class="mb-3 p-2 bg-light rounded text-center">
+                                        <small class="text-muted d-block">Total alunos</small>
+                                        <h4 class="mb-0">{{ classroom.student_count }}</h4>
+                                    </div>
+
+                                    <!-- Enrolled Students Preview -->
+                                    {% if classroom.students %}
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-2"><i class="bi bi-people-fill"></i> alunos</small>
+                                            <div class="list-group list-group-sm">
+                                                {% for student in classroom.students|slice:":3" %}
+                                                    <div class="list-group-item px-0 py-1">
+                                                        <small>
+                                                            <strong>{{ student.child__first_name }}</strong> 
+                                                            <span class="badge bg-secondary">{{ student.child__user_id }}</span>
+                                                        </small>
+                                                    </div>
+                                                {% endfor %}
+                                                {% if classroom.students|length > 3 %}
+                                                    <div class="list-group-item px-0 py-1">
+                                                        <small class="text-muted">+{{ classroom.students|length|add:"-3" }} more...</small>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-sm alert-info mb-3 p-2">
+                                            No students enrolled yet
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Card Footer -->
+                                <div class="card-footer bg-white border-top">
+                                    <a href="{% url 'klase:classroom-detail' classroom.id %}" 
+                                       class="btn btn-primary btn-sm w-100">
+                                        <i class="bi bi-arrow-right"></i> Hare Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> No classes found for this school.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+.alert-sm {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem;
+}
+</style>
+
+{% endblock %}

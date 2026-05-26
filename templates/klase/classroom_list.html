@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+    <div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="mb-0">📚 My Classrooms</h3>
+            </div>
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-0">
+
+                    <ul class="list-group list-group-flush">
+{% for preschool in preschools %}
+
+<div class="card mb-2">
+
+    <div class="card-body d-flex justify-content-between align-items-center">
+
+        <div>
+            <h5>{{ preschool.name }}</h5>
+        </div>
+
+        <div>
+
+            {% if preschool.id in claimed_ids %}
+
+                <a href="{% url 'preschool_classrooms' preschool.id %}"
+                   class="btn btn-success btn-sm">
+                    Open
+                </a>
+
+            {% else %}
+
+                <form method="post" action="{% url 'claim_preschool' preschool.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-sm">
+                        Claim
+                    </button>
+                </form>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% block content % }

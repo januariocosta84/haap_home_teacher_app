@@ -37,10 +37,16 @@ def AppUsageLogListView(request):
     if user.role == "parent":
         queryset = queryset.filter(student__parent=user)
 
-    elif user.role in ["municipality_analyst", "teacher"]:
+    elif user.role == "municipality_analyst":
         queryset = queryset.filter(
             student__parent__municipality=user.municipality
         )
+
+    elif user.role == "teacher":
+        queryset = queryset.filter(
+            student__classroom_history__classroom__teacher=user,
+            student__classroom_history__is_active=True
+        ).distinct()
 
     elif user.role == "moe_admin":
         pass

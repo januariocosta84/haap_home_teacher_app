@@ -115,6 +115,163 @@ class ParentRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+class TeacherRegistrationForm(forms.ModelForm):
+    whatsapp_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Hakerek numeru whatsapp (e.g., +67077123456)."
+    )
+
+    whatsapp_number = forms.CharField(
+        validators=[whatsapp_regex],
+        max_length=15,
+        label="WhatsApp Number",
+        help_text="Use the WhatsApp number you will login with."
+    )
+
+    municipality = forms.ModelChoiceField(
+        queryset=Municipality.objects.all(),
+        empty_label="Hili munisípiu",
+        label="Municipality"
+    )
+
+    administrative_post = forms.ModelChoiceField(
+        queryset=AdministrativePost.objects.none(),
+        empty_label="Hili Postu Administrativu",
+        required=True,
+        label="Administrative Post"
+    )
+
+    suco = forms.ModelChoiceField(
+        queryset=Suco.objects.none(),
+        empty_label="Hili Suco",
+        required=True,
+        label="Suco"
+    )
+
+    aldeia = forms.ModelChoiceField(
+        queryset=Aldeia.objects.none(),
+        empty_label="Hili Aldeia",
+        required=True,
+        label="Aldeia"
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Password'
+        }),
+        label='Password'
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'address',
+            'whatsapp_number',
+            'email',
+            'municipality',
+            'administrative_post',
+            'suco',
+            'aldeia',
+            'password'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.instance.role = 'teacher'
+        self.instance.is_verified = False
+        self.instance.is_active = False
+
+        # Bootstrap classes for all fields
+        for field_name, field in self.fields.items():
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({
+                    'class': 'form-select'
+                })
+            else:
+                field.widget.attrs.update({
+                    'class': 'form-control'
+                })
+
+        # Placeholders
+        self.fields['first_name'].widget.attrs.update({
+            'placeholder': 'First Name'
+        })
+        self.fields['last_name'].widget.attrs.update({
+            'placeholder': 'Last Name'
+        })
+        self.fields['address'].widget.attrs.update({
+            'placeholder': 'Address'
+        })
+        self.fields['whatsapp_number'].widget.attrs.update({
+            'placeholder': '+67077XXXXXX'
+        })
+        self.fields['email'].widget.attrs.update({
+            'placeholder': 'Email Address'
+        })
+
+        # Dynamic queryset loading
+        if 'municipality' in self.data:
+            try:
+                municipality_id = int(self.data.get('municipality'))
+                self.fields[
+                    'administrative_post'
+                ].queryset = AdministrativePost.objects.filter(
+                    municipality_id=municipality_id
+                )
+            except (ValueError, TypeError):
+                pass
+
+        if 'administrative_post' in self.data:
+            try:
+                ap_id = int(self.data.get('administrative_post'))
+                self.fields['suco'].queryset = Suco.objects.filter(
+                    administrative_post_id=ap_id
+                )
+            except (ValueError, TypeError):
+                pass
+
+        if 'suco' in self.data:
+            try:
+                suco_id = int(self.data.get('suco'))
+                self.fields['aldeia'].queryset = Aldeia.objects.filter(
+                    suco_id=suco_id
+                )
+            except (ValueError, TypeError):
+                pass
+
+        elif self.instance.pk:
+            if self.instance.municipality:
+                self.fields[
+                    'administrative_post'
+                ].queryset = AdministrativePost.objects.filter(
+                    municipality=self.instance.municipality
+                )
+
+            if self.instance.administrative_post:
+                self.fields['suco'].queryset = Suco.objects.filter(
+                    administrative_post=self.instance.administrative_post
+                )
+
+            if self.instance.suco:
+                self.fields['aldeia'].queryset = Aldeia.objects.filter(
+                    suco=self.instance.suco
+                )
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data['whatsapp_number']
+        user.set_password(self.cleaned_data['password'])
+
+        if commit:
+            user.save()
+
+        return user
+
 #login forms
 class LoginForm(AuthenticationForm):
     username = forms.CharField(

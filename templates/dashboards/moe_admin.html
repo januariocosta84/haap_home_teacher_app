@@ -27,7 +27,7 @@
 
     <!-- Administrators -->
     <div class="col-lg-3 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+      <div class="card border-primary shadow-sm h-100 small-box-card bg-primary bg-opacity-10" style="border-radius: 12px;">
         <div class="card-body d-flex flex-column justify-content-between">
 
           <div>
@@ -37,7 +37,7 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <i class="bi bi-people-fill text-primary" style="font-size:32px;"></i>
-            <a href="{% url 'core:user_management' %}?tab=admins" class="text-decoration-none">
+            <a href="{% url 'core:user_management' %}?tab=admins" class="text-decoration-none text-primary">
               Mais informasaun <i class="bi bi-link-45deg"></i>
             </a>
           </div>
@@ -48,7 +48,7 @@
 
     <!-- Parents -->
     <div class="col-lg-3 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+      <div class="card border-success shadow-sm h-100 small-box-card bg-success bg-opacity-10" style="border-radius: 12px;">
         <div class="card-body d-flex flex-column justify-content-between">
 
           <div>
@@ -58,7 +58,7 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <i class="bi bi-person-hearts text-success" style="font-size:32px;"></i>
-            <a href="{% url 'core:user_management' %}?tab=parents" class="text-decoration-none">
+            <a href="{% url 'core:user_management' %}?tab=parents" class="text-decoration-none text-success">
               Mais informasaun <i class="bi bi-link-45deg"></i>
             </a>
           </div>
@@ -69,7 +69,7 @@
 
     <!-- Municipality Analysts -->
     <div class="col-lg-3 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+      <div class="card border-warning shadow-sm h-100 small-box-card bg-warning bg-opacity-10" style="border-radius: 12px;">
         <div class="card-body d-flex flex-column justify-content-between">
 
           <div>
@@ -79,7 +79,7 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <i class="bi bi-bar-chart-line-fill text-warning" style="font-size:32px;"></i>
-            <a href="{% url 'core:user_management' %}?tab=analysts" class="text-decoration-none">
+            <a href="{% url 'core:user_management' %}?tab=analysts" class="text-decoration-none text-warning">
               Mais informasaun <i class="bi bi-link-45deg"></i>
             </a>
           </div>
@@ -90,7 +90,7 @@
 
     <!-- Children -->
     <div class="col-lg-3 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
+      <div class="card border-danger shadow-sm h-100 small-box-card bg-danger bg-opacity-10" style="border-radius: 12px;">
         <div class="card-body d-flex flex-column justify-content-between">
 
           <div>
@@ -100,7 +100,7 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <i class="bi bi-emoji-smile-fill text-danger" style="font-size:32px;"></i>
-            <a href="{% url 'core:user_management' %}?tab=children" class="text-decoration-none">
+            <a href="{% url 'core:user_management' %}?tab=children" class="text-decoration-none text-danger">
               Mais informasaun <i class="bi bi-link-45deg"></i>
             </a>
           </div>
@@ -108,6 +108,121 @@
         </div>
       </div>
     </div>
+
+    <!-- Professores -->
+    <div class="col-lg-3 col-6">
+      <div class="card border-info shadow-sm h-100 small-box-card bg-info bg-opacity-10" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-info counter" data-target="{{ teachers }}">0</h3>
+            <p class="text-muted mb-2">Professores</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-person-workspace text-info" style="font-size:32px;"></i>
+
+            <a href="{% url 'core:user_management' %}?tab=teachers" class="text-decoration-none text-info">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipamentus -->
+    <div class="col-lg-3 col-6">
+      <div class="card border-secondary shadow-sm h-100 small-box-card bg-secondary bg-opacity-10" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-secondary counter" data-target="{{ equipments }}">0</h3>
+            <p class="text-muted mb-2">Equipamentus</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-box-seam-fill text-secondary" style="font-size:32px;"></i>
+
+            <a href="{% url 'core:user_management' %}?tab=equipments" class="text-decoration-none text-secondary">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tickets -->
+    <div class="col-lg-3 col-6">
+      <div class="card border-dark shadow-sm h-100 small-box-card bg-dark bg-opacity-10" style="border-radius: 12px;">
+        <div class="card-body d-flex flex-column justify-content-between">
+
+          <div>
+            <h3 class="fw-bold text-dark counter" data-target="{{ tickets }}">0</h3>
+            <p class="text-muted mb-2">Tickets</p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <i class="bi bi-ticket-perforated-fill text-dark" style="font-size:32px;"></i>
+
+            <a href="{% url 'core:user_management' %}?tab=tickets" class="text-decoration-none text-dark">
+              Mais informasaun <i class="bi bi-link-45deg"></i>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- Pre-Escolar -->
+<div class="col-lg-3 col-6">
+  <div class="card border-purple shadow-sm h-100 small-box-card"
+       style="border-radius: 12px; background-color: rgba(111, 66, 193, 0.10); border-color:#6f42c1 !important;">
+
+    <div class="card-body d-flex flex-column justify-content-between">
+
+      <div>
+        <h3 class="fw-bold counter" 
+            data-target="{{ preschools }}" 
+            style="color:#6f42c1;">
+          0
+        </h3>
+
+        <p class="text-muted mb-2">Pre-Escolar</p>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <i class="bi bi-building-fill"
+           style="font-size:32px; color:#6f42c1;"></i>
+
+        <a href="{% url 'preschools:preschool_list' %}?tab=preschools"
+           class="text-decoration-none"
+           style="color:#6f42c1;">
+          Mais informasaun <i class="bi bi-link-45deg"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <!-- Pending Teacher Requests -->
+<div class="col-lg-3 col-6">
+  <div class="card border-info shadow-sm h-100 small-box-card bg-info bg-opacity-10" style="border-radius: 12px;">
+    <div class="card-body d-flex flex-column justify-content-between">
+      <div>
+        <h3 class="fw-bold text-info counter" data-target="{{ pending_teacher_requests }}">0</h3>
+        <p class="text-muted mb-2">Pedidu Aprovasaun</p>
+      </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <i class="bi bi-envelope-fill text-info" style="font-size:32px;"></i>
+        <a href="{% url 'preschools:preschool_teacher_requests' %}" class="text-decoration-none text-info">
+          Loke <i class="bi bi-link-45deg"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
   </div>
 
@@ -117,7 +232,7 @@
 <script>
   function animateCounter(counter) {
     const target = +counter.getAttribute("data-target");
-    const duration = 1200; // in ms
+    const duration = 1200;
     const frameRate = 60;
     const totalFrames = Math.round(duration / (1000 / frameRate));
     let currentFrame = 0;
@@ -125,7 +240,7 @@
     const updateCounter = () => {
       currentFrame++;
       const progress = currentFrame / totalFrames;
-      const eased = progress < 1 ? (-Math.pow(2, -10 * progress) + 1) : 1; // Smooth easing
+      const eased = progress < 1 ? (-Math.pow(2, -10 * progress) + 1) : 1;
 
       counter.textContent = Math.round(target * eased);
 
@@ -137,8 +252,8 @@
     updateCounter();
   }
 
-  // Trigger animation on scroll into view
   const counters = document.querySelectorAll(".counter");
+
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting && !entry.target.classList.contains("counted")) {
