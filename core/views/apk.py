@@ -8,17 +8,20 @@ from core.forms import ApkVersionForm
 
 
 def download_apk(request, apk_id):
-    """Redirect to the APK's configured download URL.
-
-    We no longer store an APK file object in the DB; `ApkVersion` has
-    a `download_url` (external or S3) which we redirect users to.
-    """
     apk = get_object_or_404(ApkVersion, id=apk_id)
-    return redirect(apk.download_url)
+    download_url = apk.get_download_url()
+    if not download_url:
+        messages.error(request, "Download APK seidauk disponivel.")
+        return redirect("core:apk_list")
+    return redirect(download_url)
 
 
 @login_required
 def upload_apk(request):
+    if request.user.role != "moe_admin":
+        messages.error(request, "Ita la iha permisaun atu upload APK.")
+        return redirect("core:apk_list")
+
     apk = ApkVersion.objects.first()  # 🔥 only one record
     if request.method == 'POST':
         form = ApkVersionForm(request.POST, request.FILES, instance=apk)
@@ -33,13 +36,17 @@ def upload_apk(request):
 
 @login_required
 def edit_apk(request, apk_id):
+    if request.user.role != "moe_admin":
+        messages.error(request, "Ita la iha permisaun atu altera APK.")
+        return redirect("core:apk_list")
+
     apk = get_object_or_404(ApkVersion, id=apk_id)
     if request.method == 'POST':
         form = ApkVersionForm(request.POST, request.FILES, instance=apk)
         if form.is_valid():
             form.save()
             messages.success(request, "APK version updated successfully.")
-            return redirect('apk_list')
+            return redirect('core:apk_list')
     else:
         form = ApkVersionForm(instance=apk)
     return render(request, 'apk/edit_apk.html', {'form': form, 'apk': apk})

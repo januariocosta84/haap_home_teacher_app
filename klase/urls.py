@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     AddChildToClassroomView, AjaxRegisterChild, ClassroomListView, 
     TeacherDashboardView, TeacherProDashboardView,
-    TeacherSchoolListView, SchoolClassroomListView, ClassroomDetailView
+    TeacherSchoolListView, SchoolClassroomListView, ClassroomDetailView,
+    RemoveStudentFromClassroomView, DownloadClassroomChildrenView
 )
 app_name = 'klase'
 urlpatterns = [
@@ -15,6 +16,8 @@ urlpatterns = [
     # Classroom details and add children
     path('classroom/<uuid:classroom_id>/', ClassroomDetailView.as_view(), name='classroom-detail'),
     path('classroom/<uuid:classroom_id>/add-child/', AddChildToClassroomView.as_view(), name='add-child-classroom'),
+    path('classroom/<uuid:classroom_id>/remove-student/<uuid:enrollment_id>/', RemoveStudentFromClassroomView.as_view(), name='remove-student'),
+    path('classroom/<uuid:classroom_id>/children/download/', DownloadClassroomChildrenView.as_view(), name='download-classroom-children'),
     
     # Legacy endpoints
     path('teacher/dashboard/', TeacherDashboardView.as_view(), name='teacher-dashboard'),

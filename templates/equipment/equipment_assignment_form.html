@@ -1,0 +1,164 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Halo Atribisaun Fali - {{ equipment.serial_number }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0">Halo Atribisaun Fali / Hamos Ekipamentu</h4>
+          <small>Serial: {{ equipment.serial_number }}</small>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <strong>Ekipamentu Atual:</strong><br>
+            Pre-Escolar: {{ equipment.preschool.name|default:"Nao atribuado" }}<br>
+            Sala Aula: {{ equipment.classroom.name|default:"Nao atribuado" }}<br>
+            Professor: {{ equipment.teacher.first_name|default:"Nao atribuado" }} {{ equipment.teacher.last_name|default:"" }}
+          </div>
+
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Action Selection -->
+            <div class="mb-4">
+              <label class="form-label"><strong>{{ form.action.label }}</strong></label>
+              <div class="border rounded p-3">
+                {% for value, label in form.action.field.choices %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input action-radio" type="radio" name="action" value="{{ value }}" id="action_{{ value }}" {% if form.action.value == value %}checked{% endif %} onchange="toggleReassignForm()">
+                    <label class="form-check-label" for="action_{{ value }}">
+                      {{ label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+              {% if form.action.errors %}
+                <div class="alert alert-danger mt-2">{{ form.action.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Reassign Section -->
+            <div id="reassignSection" class="card mb-4" style="display: none;">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Atribisaun Foun</h5>
+              </div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="{{ form.preschool.id_for_label }}" class="form-label">{{ form.preschool.label }}</label>
+                  {{ form.preschool }}
+                  {% if form.preschool.errors %}
+                    <div class="alert alert-danger mt-2">{{ form.preschool.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="mb-3">
+                  <label for="{{ form.classroom.id_for_label }}" class="form-label">{{ form.classroom.label }}</label>
+                  {{ form.classroom }}
+                  {% if form.classroom.errors %}
+                    <div class="alert alert-danger mt-2">{{ form.classroom.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="mb-3">
+                  <label for="{{ form.teacher.id_for_label }}" class="form-label">{{ form.teacher.label }}</label>
+                  {{ form.teacher }}
+                  {% if form.teacher.errors %}
+                    <div class="alert alert-danger mt-2">{{ form.teacher.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Change Reason -->
+            <div class="mb-4">
+              <label for="{{ form.change_reason.id_for_label }}" class="form-label">{{ form.change_reason.label }}</label>
+              {{ form.change_reason }}
+              {% if form.change_reason.errors %}
+                <div class="alert alert-danger mt-2">{{ form.change_reason.errors }}</div>
+              {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-warning">
+                Halo Mudansa
+              </button>
+              <a href="{% url 'equipment-detail' equipment.pk %}" class="btn btn-secondary">Kansela</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleReassignForm() {
+    const action = document.querySelector('input[name="action"]:checked').value;
+    const reassignSection = document.getElementById('reassignSection');
+    const preschoolField = document.getElementById('{{ form.preschool.id_for_label }}');
+    const classroomField = document.getElementById('{{ form.classroom.id_for_label }}');
+    const teacherField = document.getElementById('{{ form.teacher.id_for_label }}');
+
+    if (action === 'reassign') {
+      reassignSection.style.display = 'block';
+      preschoolField.required = true;
+    } else {
+      reassignSection.style.display = 'none';
+      preschoolField.required = false;
+      classroomField.required = false;
+      teacherField.required = false;
+    }
+  }
+
+  // Dynamic classroom loading
+  document.getElementById('{{ form.preschool.id_for_label }}').addEventListener('change', function() {
+    let preschoolId = this.value;
+    let classroomSelect = document.getElementById('{{ form.classroom.id_for_label }}');
+
+    if (preschoolId) {
+      fetch(`{% url 'ajax-load-classrooms' %}?preschool_id=${preschoolId}`)
+        .then(response => response.json())
+        .then(data => {
+          classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
+          data.forEach(classroom => {
+            classroomSelect.innerHTML += `<option value="${classroom.id}">${classroom.name}</option>`;
+          });
+        });
+    } else {
+      classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
+    }
+  });
+
+  // Initialize on page load
+  toggleReassignForm();
+
+  // Bootstrap validation
+  (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+      let forms = document.querySelectorAll('.needs-validation');
+      Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    }, false);
+  })();
+</script>
+{% endblock %}

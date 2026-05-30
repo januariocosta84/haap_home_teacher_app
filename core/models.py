@@ -266,11 +266,18 @@ class ApkVersion(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     version_name = models.CharField(max_length=20)
 
-    # change from URLField → FileField
-    apk_file = models.FileField(upload_to=apk_upload_path)
+    apk_file = models.FileField(upload_to=apk_upload_path, blank=True, null=True)
+    download_url = models.URLField(max_length=500, blank=True, null=True)
 
     is_latest = models.BooleanField(default=False)
     released_at = models.DateTimeField(auto_now_add=True)
+
+    def get_download_url(self):
+        if self.download_url:
+            return self.download_url
+        if self.apk_file:
+            return self.apk_file.url
+        return ""
 
     def save(self, *args, **kwargs):
 
@@ -278,13 +285,17 @@ class ApkVersion(models.Model):
         if self.pk:
             try:
                 old = ApkVersion.objects.get(pk=self.pk)
-                if old.apk_file and old.apk_file.name != self.apk_file.name:
-                    if os.path.exists(old.apk_file.path):
-                        os.remove(old.apk_file.path)
+                new_file_name = self.apk_file.name if self.apk_file else ""
+                if old.apk_file and old.apk_file.name != new_file_name:
+                    if old.apk_file.storage.exists(old.apk_file.name):
+                        old.apk_file.storage.delete(old.apk_file.name)
             except ApkVersion.DoesNotExist:
                 pass
 
         super().save(*args, **kwargs)
+
+        if self.is_latest:
+            ApkVersion.objects.exclude(pk=self.pk).update(is_latest=False)
 
     class Meta:
         db_table = "apk_versions"
@@ -381,5 +392,4 @@ class ActivityResult(models.Model):
 
     def __str__(self):
         return f"ActivityResult {self.id} ({self.activity_name}) -> {self.activity_result}"
-
 

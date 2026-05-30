@@ -98,6 +98,12 @@ class PreschoolDetailView(DetailView):
     template_name = 'preschools/preschool_detail.html'
     context_object_name = 'preschool'
     pk_url_kwarg = 'id'
+
+    def get_object(self, queryset=None):
+        if 'id' in self.kwargs and 'pk' not in self.kwargs:
+            self.kwargs['pk'] = self.kwargs['id']
+        return super().get_object(queryset)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -256,8 +262,8 @@ def approve_preschool_teacher_request(request, request_id):
 
     message = (
         f"Hello {preschool_teacher.teacher.first_name},\n\n"
-        f"Your request to join {preschool_teacher.preschool.name} has been approved. "
-        "You will receive class assignment details soon."
+        f"Ola {preschool_teacher.preschool.name} ita nia pedidu aprovadu. "
+        "Iha tempu badak ita sei hetan ativasaun ba klase nian."
     )
     try:
         send_whatsapp_message(preschool_teacher.teacher.whatsapp_number, message)
@@ -422,14 +428,14 @@ def enroll_child(request, id):
             child = Child.objects.get(user_id=code)
         except Child.DoesNotExist:
             from django.contrib import messages
-            messages.error(request, 'Child code not found.')
+            messages.error(request, 'Kodigu seidauk iha sistema.')
             return redirect('preschools:classroom_detail', id=classroom.id)
 
         if child.age_group != classroom.group:
             from django.contrib import messages
             messages.error(
                 request,
-                'Child group does not match this classroom. Please enroll in the correct A/B group.'
+                f"Child group '{child.age_group}' cannot be enrolled in classroom group '{classroom.group}'. Please use the correct A/B group."
             )
             return redirect('preschools:classroom_detail', id=classroom.id)
 

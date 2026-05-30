@@ -1,4 +1,7 @@
-from django.http import JsonResponse
+import csv
+from io import BytesIO
+
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.views import View
@@ -12,6 +15,14 @@ from .forms import AddChildToClassForm, ChildCodeEnrollmentForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
+from django.utils.text import slugify
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 from preschools.models import PreschoolTeacher
 from preschools.models import Preschool
@@ -20,14 +31,15 @@ from .models import Classroom
 
 @method_decorator(login_required, name='dispatch')
 class TeacherSchoolListView(View):
-    """Teacher's dashboard showing all schools they teach at"""
+    """Teacher's dashboard showing all approved schools with assigned classes."""
     template_name = "klase/teacher_school_list.html"
 
     def get(self, request):
-        # Get all schools where the teacher is assigned
+        # Get approved teacher-school relations
         preschool_teachers = PreschoolTeacher.objects.filter(
             teacher=request.user,
-            is_active=True
+            is_active=True,
+            is_approved=True
         ).select_related('preschool')
 
         preschools_data = []
@@ -42,7 +54,10 @@ class TeacherSchoolListView(View):
             ).prefetch_related('enrollments')
             
             classroom_count = classrooms.count()
-            student_count = sum(c.enrollments.count() for c in classrooms)
+            if classroom_count == 0:
+                continue
+
+            student_count = sum(c.enrollments.filter(is_active=True).count() for c in classrooms)
             total_students += student_count
 
             preschools_data.append({
@@ -95,7 +110,7 @@ class SchoolClassroomListView(View):
         group_b_count = 0
 
         for classroom in classrooms:
-            enrollments = classroom.enrollments.all()
+            enrollments = classroom.enrollments.filter(is_active=True)
             student_count = enrollments.count()
             total_students += student_count
 
@@ -111,7 +126,7 @@ class SchoolClassroomListView(View):
                 'name': classroom.name,
                 'group': classroom.group,
                 'student_count': student_count,
-                'students': list(enrollments.values('child__first_name', 'child__user_id', 'child__age_group')),
+                'students': list(enrollments.values('child__id', 'child__first_name', 'child__user_id', 'child__age_group')),
             })
 
         context = {
@@ -160,38 +175,55 @@ class ClassroomDetailView(View):
     """Show classroom details with enrolled students and option to add children"""
     template_name = "klase/classroom_detail.html"
 
+    def get_classroom_queryset(self, request):
+        queryset = Classroom.objects.select_related('preschool', 'teacher')
+        if request.user.role == 'moe_admin':
+            return queryset
+        return queryset.filter(teacher=request.user)
+
     def get(self, request, classroom_id):
         classroom = get_object_or_404(
-            Classroom,
-            id=classroom_id,
-            teacher=request.user
+            self.get_classroom_queryset(request),
+            id=classroom_id
         )
 
-        enrollments = classroom.enrollments.all().select_related('child')
+        enrollments = classroom.enrollments.filter(is_active=True).select_related('child', 'child__parent')
         form = ChildCodeEnrollmentForm()
 
         # Get all schools for sidebar
-        all_preschools = PreschoolTeacher.objects.filter(
-            teacher=request.user,
-            is_active=True
-        ).select_related('preschool')
-
         schools_for_sidebar = []
         total_students_all = 0
-        for pt in all_preschools:
-            ps = pt.preschool
+        if request.user.role == 'moe_admin':
             classrooms_list = Classroom.objects.filter(
-                preschool=ps,
-                teacher=request.user
+                preschool=classroom.preschool
             ).prefetch_related('enrollments')
-            classrooms_count = classrooms_list.count()
-            students_count = sum(c.enrollments.count() for c in classrooms_list)
+            students_count = sum(c.enrollments.filter(is_active=True).count() for c in classrooms_list)
             total_students_all += students_count
             schools_for_sidebar.append({
-                'id': ps.id,
-                'name': ps.name,
-                'classroom_count': classrooms_count,
+                'id': classroom.preschool.id,
+                'name': classroom.preschool.name,
+                'classroom_count': classrooms_list.count(),
             })
+        else:
+            all_preschools = PreschoolTeacher.objects.filter(
+                teacher=request.user,
+                is_active=True
+            ).select_related('preschool')
+
+            for pt in all_preschools:
+                ps = pt.preschool
+                classrooms_list = Classroom.objects.filter(
+                    preschool=ps,
+                    teacher=request.user
+                ).prefetch_related('enrollments')
+                classrooms_count = classrooms_list.count()
+                students_count = sum(c.enrollments.filter(is_active=True).count() for c in classrooms_list)
+                total_students_all += students_count
+                schools_for_sidebar.append({
+                    'id': ps.id,
+                    'name': ps.name,
+                    'classroom_count': classrooms_count,
+                })
 
         context = {
             'classroom': {
@@ -201,7 +233,17 @@ class ClassroomDetailView(View):
                 'preschool_id': classroom.preschool.id,
                 'preschool_name': classroom.preschool.name,
             },
-            'students': list(enrollments.values('child__id', 'child__first_name', 'child__user_id', 'child__age_group')),
+            'students': list(enrollments.values(
+                'id',
+                'child__id',
+                'child__first_name',
+                'child__user_id',
+                'child__age_group',
+                'child__parent__first_name',
+                'child__parent__last_name',
+                'child__parent__username',
+                'child__parent__whatsapp_number',
+            )),
             'student_count': enrollments.count(),
             'form': form,
             # For sidebar
@@ -213,6 +255,10 @@ class ClassroomDetailView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, classroom_id):
+        if request.user.role == 'moe_admin':
+            messages.error(request, "MoE admin bele haree klase, maibe labele aumenta alunu iha pajina ida ne'e.")
+            return redirect('klase:classroom-detail', classroom_id=classroom_id)
+
         classroom = get_object_or_404(
             Classroom,
             id=classroom_id,
@@ -223,39 +269,201 @@ class ClassroomDetailView(View):
 
         if form.is_valid():
             child_code = form.cleaned_data['child_code']
+            print("Received child code:", child_code)
 
             # Find child by user_id (the code)
             child = Child.objects.filter(user_id=child_code).first()
+            print("Found child:", child.first_name if child else "No child found")
+            print("Child age group:", child.age_group if child else "N/A")
 
             if not child:
-                messages.error(request, f"Child with code '{child_code}' not found.")
+                messages.error(request, f"Kodigu ida ne '{child_code}' laiha rejistadu iha sistema.")
                 return redirect('klase:classroom-detail', classroom_id=classroom.id)
 
-            # Check if child's age group matches classroom group
+            # Validate child group against classroom group based on child registration age group
             if child.age_group != classroom.group:
                 messages.error(
                     request,
-                    f"Child age group '{child.age_group}' does not match classroom group '{classroom.group}'."
+                    f"Labarik group '{child.age_group}' la iha group ida ne'e '{classroom.group}'. Favor usa kodigu labarik grupu korreta."
                 )
                 return redirect('klase:classroom-detail', classroom_id=classroom.id)
 
-            # Check if already enrolled in this classroom
-            if ClassroomChild.objects.filter(classroom=classroom, child=child, is_active=True).exists():
-                messages.warning(request, f"{child.first_name} is already enrolled in this class.")
+            enrollment = ClassroomChild.objects.filter(classroom=classroom, child=child).first()
+
+            if enrollment and enrollment.is_active:
+                messages.warning(request, f"{child.first_name} Rejistadu ona iha klase ida ne'e.")
                 return redirect('klase:classroom-detail', classroom_id=classroom.id)
 
-            # Create enrollment
-            ClassroomChild.objects.create(
-                classroom=classroom,
-                child=child,
-                is_active=True
-            )
+            if enrollment:
+                enrollment.is_active = True
+                enrollment.save(update_fields=['is_active'])
+            else:
+                ClassroomChild.objects.create(
+                    classroom=classroom,
+                    child=child,
+                    is_active=True
+                )
 
-            messages.success(request, f"{child.first_name} has been added to {classroom.name}.")
+            messages.success(request, f"{child.first_name} adisiona ona ba klase {classroom.name}.")
             return redirect('klase:classroom-detail', classroom_id=classroom.id)
         else:
-            messages.error(request, "Invalid child code.")
+            messages.error(request, "Kodigu invalidu.")
             return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+
+@method_decorator(login_required, name='dispatch')
+class RemoveStudentFromClassroomView(View):
+    """Allow a teacher to remove a child from one of their classrooms."""
+
+    def post(self, request, classroom_id, enrollment_id):
+        classroom = get_object_or_404(
+            Classroom,
+            id=classroom_id,
+            teacher=request.user
+        )
+        enrollment = get_object_or_404(
+            ClassroomChild.objects.select_related('child'),
+            id=enrollment_id,
+            classroom=classroom,
+            is_active=True
+        )
+
+        child_name = enrollment.child.first_name
+        enrollment.is_active = False
+        enrollment.save(update_fields=['is_active'])
+
+        messages.success(request, f"{child_name} remove ona hosi klase {classroom.name}.")
+        return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+
+@method_decorator(login_required, name='dispatch')
+class DownloadClassroomChildrenView(View):
+    """Download active children in a teacher-owned classroom."""
+
+    headers = [
+        'No',
+        'Child name',
+        'Student code',
+        'Age group',
+        'Year of birth',
+        'Parent name',
+        'Parent WhatsApp',
+        'Enrolled at',
+    ]
+
+    def get(self, request, classroom_id):
+        classrooms = Classroom.objects.select_related('preschool')
+        if request.user.role != 'moe_admin':
+            classrooms = classrooms.filter(teacher=request.user)
+        classroom = get_object_or_404(classrooms, id=classroom_id)
+        enrollments = (
+            classroom.enrollments
+            .filter(is_active=True)
+            .select_related('child', 'child__parent')
+            .order_by('child__first_name')
+        )
+
+        rows = self.get_rows(enrollments)
+        filename = slugify(f"{classroom.name}-children") or "classroom-children"
+        export_format = request.GET.get('format', 'xlsx').lower()
+
+        if export_format == 'csv':
+            return self.csv_response(filename, rows)
+        if export_format == 'pdf':
+            return self.pdf_response(filename, classroom, rows)
+        return self.excel_response(filename, rows)
+
+    def get_rows(self, enrollments):
+        rows = []
+        for index, enrollment in enumerate(enrollments, start=1):
+            child = enrollment.child
+            parent = child.parent
+            rows.append([
+                index,
+                child.first_name,
+                child.user_id,
+                child.get_age_group_display(),
+                child.year_of_birth,
+                parent.get_full_name() or parent.username,
+                parent.whatsapp_number,
+                enrollment.enrolled_at.strftime('%Y-%m-%d %H:%M'),
+            ])
+        return rows
+
+    def csv_response(self, filename, rows):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(self.headers)
+        writer.writerows(rows)
+        return response
+
+    def excel_response(self, filename, rows):
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = 'Children'
+
+        sheet.append(self.headers)
+        for row in rows:
+            sheet.append(row)
+
+        header_fill = PatternFill(start_color='D9EAF7', end_color='D9EAF7', fill_type='solid')
+        for cell in sheet[1]:
+            cell.font = Font(bold=True)
+            cell.fill = header_fill
+
+        for column_cells in sheet.columns:
+            width = max(len(str(cell.value or '')) for cell in column_cells) + 2
+            sheet.column_dimensions[column_cells[0].column_letter].width = min(width, 35)
+
+        buffer = BytesIO()
+        workbook.save(buffer)
+        buffer.seek(0)
+
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
+        return response
+
+    def pdf_response(self, filename, classroom, rows):
+        buffer = BytesIO()
+        document = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A4),
+            rightMargin=0.35 * inch,
+            leftMargin=0.35 * inch,
+            topMargin=0.35 * inch,
+            bottomMargin=0.35 * inch,
+        )
+
+        styles = getSampleStyleSheet()
+        story = [
+            Paragraph(f"{classroom.name} - Child List", styles['Title']),
+            Paragraph(classroom.preschool.name, styles['Normal']),
+            Spacer(1, 0.15 * inch),
+        ]
+
+        table = Table([self.headers] + rows, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#D9EAF7')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.grey),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F8F9FA')]),
+        ]))
+        story.append(table)
+
+        document.build(story)
+        buffer.seek(0)
+
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+        return response
 
 
 class TeacherDashboardView(View):
@@ -275,7 +483,7 @@ class TeacherDashboardView(View):
 
         for c in classrooms:
 
-            student_count = c.enrollments.count()
+            student_count = c.enrollments.filter(is_active=True).count()
             total_students += student_count
 
             classroom_data.append({
@@ -310,7 +518,7 @@ class TeacherProDashboardView(View):
 
         for c in classrooms:
 
-            count = c.enrollments.count()
+            count = c.enrollments.filter(is_active=True).count()
             total_students += count
 
             group_a += c.enrollments.filter(child__age_group='A').count()

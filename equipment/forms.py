@@ -1,9 +1,10 @@
 from django import forms
-
-from core.views.user_management import User
-from equipment.models import Equipment
+from core.models import User
+from equipment.models import Equipment, EquipmentAssignmentHistory
 from klase.models import Classroom
 from preschools.models import Preschool
+
+
 class EquipmentForm(forms.ModelForm):
 
     class Meta:
@@ -16,15 +17,19 @@ class EquipmentForm(forms.ModelForm):
             'preschool',
             'classroom',
             'teacher',
+            'status',
+            'notes',
         ]
 
         labels = {
             'equipment_type': 'Tipu Ekipamentu',
             'model_number': 'Modelu',
-            'serial_number': 'Númeru Serial',
+            'serial_number': 'Numeru Serial',
             'preschool': 'Pre-Escolar',
             'classroom': 'Sala Aula',
-            'teacher': 'Professor / Utilizadór',
+            'teacher': 'Professor / Utilizador',
+            'status': 'Status',
+            'notes': 'Notas',
         }
 
         widgets = {
@@ -55,6 +60,16 @@ class EquipmentForm(forms.ModelForm):
             'teacher': forms.Select(attrs={
                 'class': 'form-select'
             }),
+
+            'status': forms.Select(attrs={
+                'class': 'form-select'
+            }),
+
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Notas adisionais (opcionál)'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -66,7 +81,7 @@ class EquipmentForm(forms.ModelForm):
         self.fields['classroom'].queryset = Classroom.objects.none()
 
         self.fields['teacher'].queryset = User.objects.filter(
-            groups__name='Teacher'
+            role='teacher'
         ).distinct()
 
         self.fields['preschool'].empty_label = 'Hili Pre-Escolar'
@@ -110,5 +125,77 @@ class EquipmentForm(forms.ModelForm):
                     'classroom',
                     'Sala aula la pertence ba pre-escolar ne’e.'
                 )
+
+        return cleaned_data
+
+class EquipmentAssignmentForm(forms.Form):
+    """Form for changing or deleting equipment assignment"""
+
+    ACTION_CHOICES = [
+        ('reassign', 'Halo Atribisaun Fali'),
+        ('delete', 'Hamos Atribisaun'),
+        ('retire', 'Retira Ekipamentu'),
+    ]
+
+    action = forms.ChoiceField(
+        choices=ACTION_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-input'
+        }),
+        label='Aksaun'
+    )
+
+    preschool = forms.ModelChoiceField(
+        queryset=Preschool.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        label='Pre-Escolar Foun (se halo atribisaun fali)',
+        empty_label='Hili Pre-Escolar'
+    )
+
+    classroom = forms.ModelChoiceField(
+        queryset=Classroom.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        label='Sala Aula Foun (se halo atribisaun fali)',
+        empty_label='Hili Sala Aula'
+    )
+
+    teacher = forms.ModelChoiceField(
+        queryset=User.objects.filter(role='teacher'),
+        required=False,
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        label='Professor Foun (se halo atribisaun fali)',
+        empty_label='Hili Professor'
+    )
+
+    change_reason = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Razaun ba mudansa (opcionál)'
+        }),
+        label='Razaun ba Mudansa'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        action = cleaned_data.get('action')
+
+        if action == 'reassign':
+            preschool = cleaned_data.get('preschool')
+            if not preschool:
+                self.add_error('preschool', 'Pre-Escolar nee rekeridu atu halo atribisaun fali.')
+
+            classroom = cleaned_data.get('classroom')
+            if classroom and preschool and classroom.preschool != preschool:
+                self.add_error('classroom', 'Sala aula la pertence ba pre-escolar nee.')
 
         return cleaned_data

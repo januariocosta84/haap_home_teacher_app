@@ -105,6 +105,50 @@
             </ul>
           </li>
 
+          <!-- Equipment Management -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon bi bi-laptop"></i>
+              <p>
+                Ekipamentu
+                <i class="nav-arrow bi bi-chevron-right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'equipment-list' %}" class="nav-link">
+                  <i class="nav-icon bi bi-list"></i>
+                  <p>Lista Ekipamentu</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'equipment-add' %}" class="nav-link">
+                  <i class="nav-icon bi bi-plus-circle"></i>
+                  <p>Adisiona Ekipamentu</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Support Tickets Management -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon bi bi-ticket"></i>
+              <p>
+                Tiket Suporta
+                <i class="nav-arrow bi bi-chevron-right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'support-ticket-list' %}" class="nav-link">
+                  <i class="nav-icon bi bi-list"></i>
+                  <p>Lista Tiket</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
           <!-- APK Versions -->
           <li class="nav-item">
             <a href="{% url 'core:apk_list' %}" class="nav-link">
@@ -126,6 +170,12 @@
           <a href="{% url 'core:logs' %}" class="nav-link">
             <i class="nav-icon bi bi-activity"></i>
             <p>Atividades</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'core:class_association_report' %}" class="nav-link">
+            <i class="nav-icon bi bi-diagram-3"></i>
+            <p>Klase Asosiasaun</p>
           </a>
         </li>
         {% elif user.role == "parent" %}
@@ -164,6 +214,7 @@
           </a>
         </li>
         {% elif user.role == "teacher" %}
+        
           <!-- Teacher Dashboard -->
           <li class="nav-item">
             <a href="{% url 'klase:teacher-schools' %}" class="nav-link">
@@ -171,9 +222,35 @@
               <p>Lista Eskola ho Klase sira.</p>
             </a>
           </li>
-                  <!-- Logs (all roles can see) -->
+
+          <!-- Support Tickets for Teachers -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon bi bi-ticket"></i>
+              <p>
+                Tiket Suporta
+                <i class="nav-arrow bi bi-chevron-right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{% url 'support-ticket-create' %}" class="nav-link">
+                  <i class="nav-icon bi bi-plus-circle"></i>
+                  <p>Kria Tiket Foun</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'support-ticket-list' %}" class="nav-link">
+                  <i class="nav-icon bi bi-list"></i>
+                  <p>Hau nia Tiket</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Logs (all roles can see) -->
         <li class="nav-item">
-          <a href="{% url 'core:logs' %}" class="nav-link">
+          <a href="{% url 'core:logs' %}" class="nav-link ">
             <i class="nav-icon bi bi-activity"></i>
             <p>Atividades</p>
           </a>

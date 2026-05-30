@@ -1,0 +1,113 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Detalhe Ekipamentu - {{ equipment.serial_number }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Ekipamentu: {{ equipment.serial_number }}</h4>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p class="mb-2">
+                <strong>Tipu:</strong> {{ equipment.get_equipment_type_display }}
+              </p>
+              <p class="mb-2">
+                <strong>Modelo:</strong> {{ equipment.model_number }}
+              </p>
+              <p class="mb-2">
+                <strong>Serial Number:</strong> {{ equipment.serial_number }}
+              </p>
+              <p class="mb-2">
+                <strong>Status:</strong>
+                <span class="badge bg-{% if equipment.status == 'active' %}success{% elif equipment.status == 'inactive' %}secondary{% elif equipment.status == 'damaged' %}danger{% else %}dark{% endif %}">
+                  {{ equipment.get_status_display }}
+                </span>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-2">
+                <strong>Pre-Escolar:</strong> {{ equipment.preschool.name|default:"-" }}
+              </p>
+              <p class="mb-2">
+                <strong>Sala Aula:</strong> {{ equipment.classroom.name|default:"-" }}
+              </p>
+              <p class="mb-2">
+                <strong>Professor:</strong> {{ equipment.teacher.first_name|default:"-" }} {{ equipment.teacher.last_name|default:"" }}
+              </p>
+              <p class="mb-2">
+                <strong>Kria:</strong> {{ equipment.created_at|date:"d/m/Y H:i" }}
+              </p>
+            </div>
+          </div>
+
+          {% if equipment.notes %}
+            <div class="alert alert-info">
+              <strong>Notas:</strong>
+              {{ equipment.notes|linebreaks }}
+            </div>
+          {% endif %}
+
+          <hr>
+
+          <h5 class="mb-3">Istoria Atribisaun</h5>
+          {% if assignment_history %}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Data</th>
+                    <th>Pre-Escolar Antes</th>
+                    <th>Pre-Escolar Agora</th>
+                    <th>Professor Antes</th>
+                    <th>Professor Agora</th>
+                    <th>Razaun</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for change in assignment_history %}
+                    <tr>
+                      <td>{{ change.changed_at|date:"d/m/Y H:i" }}</td>
+                      <td>{{ change.old_preschool.name|default:"-" }}</td>
+                      <td>{{ change.new_preschool.name|default:"-" }}</td>
+                      <td>{{ change.old_teacher.first_name|default:"-" }}</td>
+                      <td>{{ change.new_teacher.first_name|default:"-" }}</td>
+                      <td>{{ change.change_reason|default:"-" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted">Nenhum historico de atribuicao encontrado.</p>
+          {% endif %}
+
+          <hr>
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'equipment-update' equipment.pk %}" class="btn btn-warning">
+              Hadia Ekipamentu
+            </a>
+            <a href="{% url 'equipment-assignment-change' equipment.pk %}" class="btn btn-primary">
+              Halo Atribisaun Fali
+            </a>
+            <a href="{% url 'equipment-delete' equipment.pk %}" class="btn btn-danger">
+              Hamos Ekipamentu
+            </a>
+            <a href="{% url 'equipment-list' %}" class="btn btn-secondary">
+              Halo Hili
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

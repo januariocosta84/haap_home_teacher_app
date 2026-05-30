@@ -1,0 +1,147 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Lista Tiket Suporta
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h3>Tiket Suporta</h3>
+    </div>
+    <div class="col-md-4 text-end">
+      {% if user.role == 'teacher' %}
+        <a href="{% url 'support-ticket-create' %}" class="btn btn-primary">
+          Kria Tiket Foun
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <input type="text" name="ticket_number" class="form-control" placeholder="Numeru Tiket" value="{{ request.GET.ticket_number }}">
+        </div>
+        <div class="col-md-4">
+          <select name="status" class="form-select">
+            <option value="">Hili Status</option>
+            {% for status_value, status_label in statuses %}
+              <option value="{{ status_value }}" {% if request.GET.status == status_value %}selected{% endif %}>
+                {{ status_label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary w-100">
+            Foer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="card shadow">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Numeru Tiket</th>
+            <th>Mestri</th>
+            <th>Pre-Escolar</th>
+            <th>Tipu</th>
+            <th>Status</th>
+            <th>Kria</th>
+            <th>Aksaun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in tickets %}
+            <tr>
+              <td>
+                <strong>{{ ticket.ticket_number }}</strong>
+              </td>
+              <td>{{ ticket.teacher.first_name }} {{ ticket.teacher.last_name }}</td>
+              <td>{{ ticket.preschool.name }}</td>
+              <td>
+                {% if ticket.is_equipment_request and ticket.is_training_request %}
+                  <span class="badge bg-info">Ekipamentu no Formasaun</span>
+                {% elif ticket.is_equipment_request %}
+                  <span class="badge bg-primary">Ekipamentu</span>
+                {% else %}
+                  <span class="badge bg-success">Formasaun</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-{% if ticket.status == 'open' %}danger{% elif ticket.status == 'in_progress' %}warning{% elif ticket.status == 'closed' %}secondary{% else %}success{% endif %}">
+                  {{ ticket.get_status_display }}
+                </span>
+              </td>
+              <td>{{ ticket.created_at|date:"d/m/Y" }}</td>
+              <td>
+                <a href="{% url 'support-ticket-detail' ticket.pk %}" class="btn btn-sm btn-info">
+                  Tamba
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">
+                Nenhum tiket encontrado.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+      <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+        <div class="text-muted">
+          Pahina {{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
+        </div>
+        <nav>
+          <ul class="pagination mb-0">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1">Uluk</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+              </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Tuir Nian</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Tapos</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

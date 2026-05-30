@@ -1,0 +1,212 @@
+{% extends "core/base.html" %}
+
+{% block title %}Klase Asosiasaun{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h4 class="fw-semibold mb-1">Labarik no Inan-Aman ne'ebe Aumenta ba Klase</h4>
+      <small class="text-muted">Haree ligasaun klase tuir pre-eskolar no intervalu data.</small>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4" style="border-radius:10px;">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label for="preschool" class="form-label">Pre-eskolar</label>
+          <select name="preschool" id="preschool" class="form-select">
+            <option value="">Pre-eskolar hotu</option>
+            {% for preschool in preschools %}
+              <option value="{{ preschool.id }}" {% if selected_preschool == preschool.id|stringformat:"s" %}selected{% endif %}>
+                {{ preschool.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="start_date" class="form-label">Data hahuu</label>
+          <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}">
+        </div>
+        <div class="col-md-3">
+          <label for="end_date" class="form-label">Data remata</label>
+          <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-funnel me-1"></i> Filtra
+          </button>
+          <a href="{% url 'core:class_association_report' %}" class="btn btn-outline-secondary" title="Hamoos filtru">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-body">
+          <small class="text-muted text-uppercase">Labarik aumenta</small>
+          <h3 class="fw-semibold mb-0">{{ total_child_additions }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-body">
+          <small class="text-muted text-uppercase">Inan-aman aumenta</small>
+          <h3 class="fw-semibold mb-0">{{ total_parent_additions }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-body">
+          <small class="text-muted text-uppercase">Pre-eskolar</small>
+          <h3 class="fw-semibold mb-0">{{ total_preschools }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-body">
+          <small class="text-muted text-uppercase">Klase</small>
+          <h3 class="fw-semibold mb-0">{{ total_classes }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-semibold">Total tuir klase</h6>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Pre-eskolar</th>
+                  <th>Klase</th>
+                  <th>Grupu</th>
+                  <th class="text-end">Labarik</th>
+                  <th class="text-end">Inan-aman</th>
+                  <th>Primeiru aumenta</th>
+                  <th>Ikus aumenta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in classroom_summary %}
+                  <tr>
+                    <td>{{ row.classroom__preschool__name|default:"-" }}</td>
+                    <td>{{ row.classroom__name|default:"-" }}</td>
+                    <td>{{ row.classroom__group|default:"-" }}</td>
+                    <td class="text-end">{{ row.child_total }}</td>
+                    <td class="text-end">{{ row.parent_total }}</td>
+                    <td>{{ row.first_added|date:"d M Y" }}</td>
+                    <td>{{ row.last_added|date:"d M Y" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Laiha ligasaun klase ne'ebe hetan.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100" style="border-radius:10px;">
+        <div class="card-header bg-white">
+          <h6 class="mb-0 fw-semibold">Aumenta tuir tempu</h6>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Data</th>
+                  <th>Pre-eskolar</th>
+                  <th class="text-end">Labarik</th>
+                  <th class="text-end">Inan-aman</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in daily_summary %}
+                  <tr>
+                    <td>{{ row.day|date:"d M Y" }}</td>
+                    <td>{{ row.classroom__preschool__name|default:"-" }}</td>
+                    <td class="text-end">{{ row.child_total }}</td>
+                    <td class="text-end">{{ row.parent_total }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted py-4">Laiha aumentu iha periodu ida ne'e.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm" style="border-radius:10px;">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <h6 class="mb-0 fw-semibold">Naran labarik no inan-aman</h6>
+      <span class="badge bg-secondary">{{ total_child_additions }} linha</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Aumenta</th>
+              <th>Pre-eskolar</th>
+              <th>Klase</th>
+              <th>Labarik</th>
+              <th>Kodigu labarik</th>
+              <th>Inan-aman</th>
+              <th>WhatsApp inan-aman</th>
+              <th>Estatus</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enrollment in enrollments %}
+              <tr>
+                <td style="white-space:nowrap;">{{ enrollment.enrolled_at|date:"d M Y H:i" }}</td>
+                <td>{{ enrollment.classroom.preschool.name }}</td>
+                <td>{{ enrollment.classroom.name }}</td>
+                <td>{{ enrollment.child.first_name }}</td>
+                <td>{{ enrollment.child.user_id }}</td>
+                <td>{{ enrollment.child.parent.get_full_name|default:enrollment.child.parent.username }}</td>
+                <td>{{ enrollment.child.parent.whatsapp_number }}</td>
+                <td>
+                  {% if enrollment.is_active %}
+                    <span class="badge bg-success">Ativu</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Remove ona</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="8" class="text-center text-muted py-5">Laiha labarik ka inan-aman ne'ebe hetan ba filtru ne'ebe hili.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

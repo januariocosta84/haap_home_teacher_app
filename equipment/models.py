@@ -4,9 +4,7 @@ from preschools.models import Preschool
 from klase.models import Classroom
 from core.models import User
 from django.conf import settings
-from core.models import User
-from preschools.models import Preschool
-
+from django.utils import timezone
 
 
 class Equipment(models.Model):
@@ -16,6 +14,13 @@ class Equipment(models.Model):
         ('projector', 'Projector'),
         ('screen', 'Screen'),
         ('adapter', 'Adapter'),
+    ]
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('damaged', 'Damaged'),
+        ('retired', 'Retired'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -36,33 +41,134 @@ class Equipment(models.Model):
         Preschool,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='equipment_items'
     )
 
     classroom = models.ForeignKey(
         Classroom,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='equipment_items'
     )
 
     teacher = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name='equipment_items',
+        limit_choices_to={'role': 'teacher'}
     )
 
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active'
+    )
+
+    notes = models.TextField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'equipments'
+        ordering = ['-created_at']
 
-class EquipmentHistory(models.Model):
+    def __str__(self):
+        return f"{self.get_equipment_type_display()} - {self.serial_number}"
+
+
+class EquipmentAssignmentHistory(models.Model):
+    """Track all equipment assignment changes with timestamp and previous assignment"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
     equipment = models.ForeignKey(
         Equipment,
         on_delete=models.CASCADE,
-        related_name='history'
+        related_name='assignment_history'
+    )
+
+    # Previous assignment details
+    old_preschool = models.ForeignKey(
+        Preschool,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='old_equipment_assignments'
+    )
+
+    old_classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='old_equipment_assignments'
+    )
+
+    old_teacher = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='old_equipment_assignments',
+        limit_choices_to={'role': 'teacher'}
+    )
+
+    # New assignment details
+    new_preschool = models.ForeignKey(
+        Preschool,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='new_equipment_assignments'
+    )
+
+    new_classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='new_equipment_assignments'
+    )
+
+    new_teacher = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='new_equipment_assignments',
+        limit_choices_to={'role': 'teacher'}
+    )
+
+    # Admin who made the change
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='equipment_assignment_changes'
+    )
+
+    change_reason = models.TextField(blank=True, null=True)
+    changed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'equipment_assignment_history'
+        ordering = ['-changed_at']
+
+    def __str__(self):
+        return f"{self.equipment} - Changed at {self.changed_at}"
+
+
+class EquipmentHistory(models.Model):
+    """Legacy model - keeping for backward compatibility"""
+    equipment = models.ForeignKey(
+        Equipment,
+        on_delete=models.CASCADE,
+        related_name='history_legacy'
     )
 
     old_preschool = models.ForeignKey(
@@ -70,7 +176,7 @@ class EquipmentHistory(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='old_equipment_history'
+        related_name='old_equipment_history_legacy'
     )
 
     new_preschool = models.ForeignKey(
@@ -78,7 +184,7 @@ class EquipmentHistory(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='new_equipment_history'
+        related_name='new_equipment_history_legacy'
     )
 
     changed_at = models.DateTimeField(auto_now_add=True)

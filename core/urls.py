@@ -29,6 +29,11 @@ urlpatterns = [
     path("dashboard/register/user/", register_user, name="register_user"),
 
     path("dashboard/logs/", AppUsageLogListView, name="logs"),
+    path(
+        "dashboard/reports/class-associations/",
+        ClassAssociationReportView.as_view(),
+        name="class_association_report"
+    ),
    # path("reports/activities/", ActivityReportView.as_view(), name="activity_report"),
 
     path("export/parents/", export_parents_pdf, name="export_parents_pdf"),
@@ -41,7 +46,7 @@ urlpatterns = [
     path("dashboard/profile/change-password/", change_password, name="change_password"),
 
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),
-    path('dashboard/teacher/', teacher_dashboard, name='teacher_dashboard'),
+    #path('dashboard/teacher/', teacher_dashboard, name='teacher_dashboard'),
 
     path('dashboard/apk/', apk_list, name='apk_list'),
     path('dashboard/apk/upload/', upload_apk, name='upload_apk'),

@@ -17,7 +17,7 @@ class ChildCodeEnrollmentForm(forms.Form):
         max_length=50,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter Child Code'
+            'placeholder': 'Hatama Kodigu Aluno'
         })
     )
 
@@ -28,7 +28,7 @@ class ChildCodeEnrollmentForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter Child Code (e.g. CHD-000123)',
+            'placeholder': 'Hatama Kodigu Aluno (e.g. CHD-000123)',
             'autocomplete': 'off'
         })
     )

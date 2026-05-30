@@ -1,0 +1,122 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Tiket Suporta {{ ticket.ticket_number }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0">Tiket Suporta: {{ ticket.ticket_number }}</h4>
+            <small>Kria: {{ ticket.created_at|date:"d/m/Y H:i" }}</small>
+          </div>
+          <div>
+            <span class="badge bg-{% if ticket.status == 'open' %}danger{% elif ticket.status == 'in_progress' %}warning{% else %}success{% endif %}">
+              {{ ticket.get_status_display }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6>Informasaun Mestri</h6>
+              <p class="mb-2">
+                <strong>Naran:</strong> {{ ticket.teacher.first_name }} {{ ticket.teacher.last_name }}
+              </p>
+              <p class="mb-2">
+                <strong>Pre-Escolar:</strong> {{ ticket.preschool.name }}
+              </p>
+              {% if ticket.classroom %}
+                <p class="mb-2">
+                  <strong>Sala Aula:</strong> {{ ticket.classroom.name }}
+                </p>
+              {% endif %}
+            </p>
+            </div>
+            <div class="col-md-6">
+              <h6>Informasaun Tiket</h6>
+              <p class="mb-2">
+                <strong>Tipu:</strong>
+                {% if ticket.is_equipment_request and ticket.is_training_request %}
+                  Ekipamentu no Formasaun
+                {% elif ticket.is_equipment_request %}
+                  Ekipamentu
+                {% else %}
+                  Formasaun
+                {% endif %}
+              </p>
+              <p class="mb-2">
+                <strong>Prioridade:</strong>
+                <span class="badge bg-{% if ticket.priority == 'urgent' %}danger{% elif ticket.priority == 'high' %}warning{% else %}info{% endif %}">
+                  {{ ticket.get_priority_display }}
+                </span>
+              </p>
+              <p class="mb-2">
+                <strong>Status:</strong>
+                <span class="badge bg-{% if ticket.status == 'open' %}danger{% elif ticket.status == 'in_progress' %}warning{% else %}success{% endif %}">
+                  {{ ticket.get_status_display }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <hr>
+
+          <h5 class="mb-3">Itens Husu</h5>
+          <div class="items-list">
+            {% for item in items %}
+              <div class="card mb-3">
+                <div class="card-body">
+                  <h6 class="card-title">{{ item.get_item_type_display }}</h6>
+                  {% if item.details %}
+                    <p class="card-text text-muted">
+                      <strong>Detalhes:</strong><br>
+                      {{ item.details|linebreaks }}
+                    </p>
+                  {% endif %}
+                  {% if item.preferred_format %}
+                    <p class="card-text text-muted">
+                      <strong>Formatu Preferidu:</strong><br>
+                      {{ item.preferred_format }}
+                    </p>
+                  {% endif %}
+                  {% if item.app_features_to_learn %}
+                    <p class="card-text text-muted">
+                      <strong>Karaterístika Aplicasaun:</strong><br>
+                      {{ item.app_features_to_learn|linebreaks }}
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          {% if ticket.resolution_note %}
+            <hr>
+            <div class="alert alert-success">
+              <h6>Nota Resolusaun</h6>
+              {{ ticket.resolution_note|linebreaks }}
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-2">
+            {% if user.role == 'moe_admin' %}
+              <a href="{% url 'support-ticket-update' ticket.pk %}" class="btn btn-primary">
+                Hadia Status
+              </a>
+            {% endif %}
+            <a href="{% url 'support-ticket-list' %}" class="btn btn-secondary">
+              Halo Hili
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

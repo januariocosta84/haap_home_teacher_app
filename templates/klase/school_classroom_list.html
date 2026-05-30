@@ -79,19 +79,21 @@
                                 <div class="card-body">
                                     <!-- Student Count -->
                                     <div class="mb-3 p-2 bg-light rounded text-center">
-                                        <small class="text-muted d-block">Total alunos</small>
+                                        <small class="text-muted d-block">Total Alunus</small>
                                         <h4 class="mb-0">{{ classroom.student_count }}</h4>
                                     </div>
 
                                     <!-- Enrolled Students Preview -->
                                     {% if classroom.students %}
                                         <div class="mb-3">
-                                            <small class="text-muted d-block mb-2"><i class="bi bi-people-fill"></i> alunos</small>
+                                            <small class="text-muted d-block mb-2"><i class="bi bi-people-fill"></i> Alunus</small>
                                             <div class="list-group list-group-sm">
                                                 {% for student in classroom.students|slice:":3" %}
                                                     <div class="list-group-item px-0 py-1">
                                                         <small>
-                                                            <strong>{{ student.child__first_name }}</strong> 
+                                                            <a href="{% url 'core:child-activity' student.child__id %}" class="text-decoration-none fw-semibold">
+                                                                {{ student.child__first_name }}
+                                                            </a>
                                                             <span class="badge bg-secondary">{{ student.child__user_id }}</span>
                                                         </small>
                                                     </div>
@@ -105,7 +107,7 @@
                                         </div>
                                     {% else %}
                                         <div class="alert alert-sm alert-info mb-3 p-2">
-                                            No students enrolled yet
+                                            Laiha alunu iha klase ida ne'e.
                                         </div>
                                     {% endif %}
                                 </div>
@@ -123,7 +125,7 @@
                 </div>
             {% else %}
                 <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> No classes found for this school.
+                    <i class="bi bi-exclamation-triangle"></i> Laiha klase iha eskola ida ne'e.
                 </div>
             {% endif %}
         </div>

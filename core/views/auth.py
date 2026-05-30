@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from core.forms import LoginForm
+from preschools.models import Preschool, PreschoolTeacher
 from klase.models import Classroom
 
 User = get_user_model()
@@ -24,10 +25,17 @@ def user_login(request):
                 elif user.role == "municipality_analyst":
                     return redirect("core:municipality_dashboard")
                 elif user.role == "teacher":
-                    classroom = Classroom.objects.filter(teacher=user).order_by('created_at').first()
-                    if classroom:
-                        print(f"ID: {classroom.id}")
-                        return redirect("preschools:classroom_detail", id=classroom.id)
+                    # approved_relation = PreschoolTeacher.objects.filter(
+                    #     teacher=user,
+                    #     is_active=True,
+                    #     is_approved=True
+                    # ).select_related('preschool').first()
+
+                    # if approved_relation:
+                    #     return redirect(
+                    #         "preschools:preschool_detail",
+                    #         pk=approved_relation.preschool.id
+                    #     )
                     return redirect("preschools:preschool_list_claim")
                 else:
                     messages.error(request, "Unknown role. Contact admin.")

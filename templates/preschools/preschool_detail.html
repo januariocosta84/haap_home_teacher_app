@@ -131,7 +131,7 @@
 
                             <div class="mb-3">
                                 <h5 class="fw-bold mb-1">
-                                    <a href="{% url 'preschools:classroom_detail' id=classroom.id %}"
+                                    <a href="{% url 'klase:classroom-detail' classroom.id %}"
                                        class="text-decoration-none text-dark">
                                         {{ classroom.name }}
                                     </a>
@@ -160,7 +160,7 @@
                             <!-- ACTIONS -->
                             <div class="mt-auto d-flex gap-2">
 
-                                <a href="{% url 'preschools:classroom_detail' id=classroom.id %}"
+                                <a href="{% url 'klase:classroom-detail' classroom.id %}"
                                    class="btn btn-outline-primary btn-sm rounded-pill flex-fill">
                                     Haree
                                 </a>

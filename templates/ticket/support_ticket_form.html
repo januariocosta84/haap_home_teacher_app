@@ -1,0 +1,141 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Husu Suporta - HAAP Klase
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-10 offset-md-1">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Husu Ajuda - HAAP Klase Tablet no Ekipamentu AV</h4>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            Favor marka kaixa ne'ebé bele aplika no hateten detalhes iha fatin ne'ebé fornese.
+          </p>
+
+          <form method="post" id="supportTicketForm">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label for="{{ form.classroom.id_for_label }}" class="form-label">{{ form.classroom.label }}</label>
+              {{ form.classroom }}
+              {% if form.classroom.errors %}
+                <div class="alert alert-danger mt-2">{{ form.classroom.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="{{ form.priority.id_for_label }}" class="form-label">{{ form.priority.label }}</label>
+              {{ form.priority }}
+              {% if form.priority.errors %}
+                <div class="alert alert-danger mt-2">{{ form.priority.errors }}</div>
+              {% endif %}
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Ekipamentu - Suporta Tekniku</h5>
+            <div class="equipment-section mb-4">
+              {% for item_key, item_label in equipment_items %}
+                <div class="card mb-2">
+                  <div class="card-body">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input equipment-item-checkbox" type="checkbox" name="equipment_items" value="{{ item_key }}" id="item_{{ item_key }}">
+                      <label class="form-check-label" for="item_{{ item_key }}">
+                        {{ item_label }}
+                      </label>
+                    </div>
+                    <div class="details-input" id="details_{{ item_key }}_container" style="display: none;">
+                      <textarea name="details_{{ item_key }}" class="form-control form-control-sm" rows="3" placeholder="Detalhes..."></textarea>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <hr>
+
+            <h5 class="mb-3">Formasaun no Dezenvolvimentu Profisionál</h5>
+            <div class="training-section mb-4">
+              {% for item_key, item_label in training_items %}
+                <div class="card mb-2">
+                  <div class="card-body">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input training-item-checkbox" type="checkbox" name="training_items" value="{{ item_key }}" id="item_{{ item_key }}">
+                      <label class="form-check-label" for="item_{{ item_key }}">
+                        {{ item_label }}
+                      </label>
+                    </div>
+                    <div class="training-inputs" id="training_{{ item_key }}_container" style="display: none;">
+                      <div class="mb-2">
+                        <label class="form-label form-label-sm">Formatu ne'ebé prefere</label>
+                        <input type="text" name="preferred_format_{{ item_key }}" class="form-control form-control-sm" placeholder="Ex: hadau hadap malu, vídeo guia, workshop ho grupu, 1:1">
+                      </div>
+                      <div>
+                        <label class="form-label form-label-sm">Karaterístika aplikasaun nian ne'ebé hakarak aprende</label>
+                        <textarea name="app_features_{{ item_key }}" class="form-control form-control-sm" rows="3" placeholder="Ex: navigasaun, konfigurasaun, jestaun klase"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">
+                Kontinua ba Husu
+              </button>
+              <a href="{% url 'support-ticket-list' %}" class="btn btn-secondary">Kansela</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Handle equipment item checkbox visibility
+  document.querySelectorAll('.equipment-item-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const container = document.getElementById(`details_${this.value}_container`);
+      if (container) {
+        container.style.display = this.checked ? 'block' : 'none';
+      }
+    });
+  });
+
+  // Handle training item checkbox visibility
+  document.querySelectorAll('.training-item-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const container = document.getElementById(`training_${this.value}_container`);
+      if (container) {
+        container.style.display = this.checked ? 'block' : 'none';
+      }
+    });
+  });
+
+  // Form validation
+  document.getElementById('supportTicketForm').addEventListener('submit', function(e) {
+    const equipmentChecked = document.querySelectorAll('.equipment-item-checkbox:checked').length;
+    const trainingChecked = document.querySelectorAll('.training-item-checkbox:checked').length;
+
+    if (equipmentChecked === 0 && trainingChecked === 0) {
+      e.preventDefault();
+      alert('Favor hili pelomenu ida item.');
+      return false;
+    }
+  });
+</script>
+{% endblock %}

@@ -15,7 +15,7 @@
 
   <h3>Altera APK: {{ apk.version_name }}</h3>
 
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="mb-3">
@@ -24,8 +24,19 @@
     </div>
 
     <div class="mb-3">
+      <label class="form-label">Upload APK File</label>
+      {{ form.apk_file }}
+      <small class="form-text text-muted">
+        Opcional. Se file boot liu, uza Download URL iha kraik.
+      </small>
+    </div>
+
+    <div class="mb-3">
       <label class="form-label">Download URL</label>
       {{ form.download_url }}
+      <small class="form-text text-muted">
+        Link direta ba APK hosi storage externo. Ida ne'e mak rekomendadu ba APK boot.
+      </small>
     </div>
 
     <div class="form-check mb-3">

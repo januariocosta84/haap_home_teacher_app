@@ -355,18 +355,36 @@ class ChildRegistrationForm(forms.ModelForm):
 class ApkVersionForm(forms.ModelForm):
     class Meta:
         model = ApkVersion
-        fields = ['version_name', 'apk_file', 'is_latest']
+        fields = ['version_name', 'apk_file', 'download_url', 'is_latest']
         widgets = {
             'version_name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'e.g. 1.0.3'}
             ),
             'apk_file': forms.ClearableFileInput(
-                attrs={'class': 'form-control'}
+                attrs={'class': 'form-control', 'accept': '.apk,application/vnd.android.package-archive'}
+            ),
+            'download_url': forms.URLInput(
+                attrs={'class': 'form-control', 'placeholder': 'https://example.com/haap.apk'}
             ),
             'is_latest': forms.CheckboxInput(
                 attrs={'class': 'form-check-input'}
             ),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        apk_file = cleaned_data.get('apk_file')
+        download_url = cleaned_data.get('download_url')
+
+        if not apk_file and not download_url:
+            raise forms.ValidationError(
+                "Upload APK file ka hatama download URL ida."
+            )
+
+        if apk_file and not apk_file.name.lower().endswith('.apk'):
+            self.add_error('apk_file', "File tenke ho formatu .apk.")
+
+        return cleaned_data
 
 class ProfileImageForm(forms.ModelForm):
     class Meta:

@@ -2,9 +2,14 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <h3>Upload APK Foun</h3>
+  <p class="text-muted mb-4">
+    Ba APK boot, dalan diak liu mak upload file ba Google Drive, S3, ka storage seluk, depois hatama link iha Download URL.
+    Upload direta bele uza, maibe presiza internet/server suporta file boot.
+  </p>
 
   <form id="apkUploadForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <div id="uploadErrors" class="alert alert-danger d-none" role="alert"></div>
 
     <div class="mb-3">
       <label class="form-label">Versaun APK</label>
@@ -14,6 +19,17 @@
     <div class="mb-3">
       <label class="form-label">Upload APK File</label>
       {{ form.apk_file }}
+      <small class="form-text text-muted">
+        Opcional. Se file boot liu, uza Download URL iha kraik.
+      </small>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Download URL</label>
+      {{ form.download_url }}
+      <small class="form-text text-muted">
+        Link direta ba APK hosi storage externo. Ida ne'e mak rekomendadu ba APK boot.
+      </small>
     </div>
 
     <div class="form-check mb-3">
@@ -37,6 +53,15 @@ document.getElementById('apkUploadForm').addEventListener('submit', function(eve
 
     const formData = new FormData(this);
     const xhr = new XMLHttpRequest();
+    const submitButton = this.querySelector('button[type="submit"]');
+    const progressBar = document.getElementById('uploadProgress');
+    const errorBox = document.getElementById('uploadErrors');
+
+    errorBox.classList.add('d-none');
+    errorBox.innerHTML = '';
+    submitButton.disabled = true;
+    submitButton.textContent = 'Upload hela...';
+    progressBar.classList.add('progress-bar-animated');
 
     xhr.open('POST', '', true);
 
@@ -44,7 +69,6 @@ document.getElementById('apkUploadForm').addEventListener('submit', function(eve
     xhr.upload.addEventListener('progress', function(e) {
         if (e.lengthComputable) {
             const percentComplete = Math.round((e.loaded / e.total) * 100);
-            const progressBar = document.getElementById('uploadProgress');
             progressBar.style.width = percentComplete + '%';
             progressBar.textContent = percentComplete + '%';
         }
@@ -52,12 +76,35 @@ document.getElementById('apkUploadForm').addEventListener('submit', function(eve
 
     // ⭐ AFTER UPLOAD FINISHED
     xhr.onload = function() {
-        if (xhr.status === 200 || xhr.status === 302) {
-            alert("APK version uploaded successfully.");
-            window.location.href = "{% url 'core:apk_list' %}";
-        } else {
-            alert("Upload failed.");
+        submitButton.disabled = false;
+        submitButton.textContent = 'Hatudu / Upload';
+        progressBar.classList.remove('progress-bar-animated');
+
+        let response = null;
+        try {
+            response = JSON.parse(xhr.responseText);
+        } catch (error) {
+            response = null;
         }
+
+        if ((xhr.status === 200 || xhr.status === 302) && response && response.success) {
+            window.location.href = "{% url 'core:apk_list' %}";
+            return;
+        }
+
+        const errors = response && response.errors ? response.errors : { upload: ['Upload la konsege. Haree koneksaun ka tamanho file.'] };
+        errorBox.innerHTML = Object.entries(errors)
+            .map(([field, messages]) => `<div><strong>${field}</strong>: ${messages.join ? messages.join(', ') : messages}</div>`)
+            .join('');
+        errorBox.classList.remove('d-none');
+    };
+
+    xhr.onerror = function() {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Hatudu / Upload';
+        progressBar.classList.remove('progress-bar-animated');
+        errorBox.textContent = 'Upload la konsege. Se APK boot, uza Download URL ka aumenta limite upload iha server.';
+        errorBox.classList.remove('d-none');
     };
 
     xhr.send(formData);

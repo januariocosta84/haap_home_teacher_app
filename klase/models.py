@@ -34,7 +34,8 @@ class Classroom(models.Model):
     group = models.CharField(
         max_length=1,
         choices=GROUP_CHOICES,
-        default='A'
+        default='A',
+      
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

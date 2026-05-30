@@ -94,7 +94,7 @@ urlpatterns = [
     path("profile/", profile_view, name="profile_view"),
 
     # APK downloads
-    path("apk/download/<int:apk_id>/", download_apk, name="download_apk"),
+    path("apk/download/<uuid:apk_id>/", download_apk, name="download_apk"),
 
     # AJAX endpoints
     path("ajax/children_by_parent/", get_children_by_parent, name="ajax_children_by_parent"),
@@ -105,8 +105,7 @@ urlpatterns = [
     path('preschool/', include('preschools.urls')),
     path('equipment/', include('equipment.urls')),
     path('classroom/', include('klase.urls')),
-   
-    
+    path('ticket/', include('ticket.urls')),
 ]
 
 # ----------------------------

@@ -118,9 +118,9 @@
 
                             {% elif preschool.is_approved %}
                                 {% if preschool.target_classroom %}
-                                    <a href="{% url 'preschools:classroom_detail' id=preschool.target_classroom.id %}"
+                                    <a href="{% url 'klase:school-classrooms' preschool_id=preschool.id%}"
                                        class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
-                                        Loke Klas
+                                        Detalhes Pre scolar
                                     </a>
                                 {% else %}
                                     <button class="btn btn-sm btn-light border rounded-pill px-3"

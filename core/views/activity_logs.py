@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 
 from core.models import ActivityResult, User, Child
+from klase.models import ClassroomChild
 
 def is_valid_uuid(value):
     try:
@@ -42,11 +43,8 @@ def AppUsageLogListView(request):
             student__parent__municipality=user.municipality
         )
 
-    elif user.role == "teacher":
-        queryset = queryset.filter(
-            student__classroom_history__classroom__teacher=user,
-            student__classroom_history__is_active=True
-        ).distinct()
+    elif user.role == "teacher": 
+        queryset = queryset.filter( student__classroom_history__classroom__teacher=user, student__classroom_history__is_active=True ).distinct()
 
     elif user.role == "moe_admin":
         pass
@@ -59,7 +57,6 @@ def AppUsageLogListView(request):
         student__parent__isnull=False
     )
     
-
     # 🎯 Parent filter
     parent_id = request.GET.get("parent")
     if parent_id and is_valid_uuid(parent_id):
@@ -101,8 +98,8 @@ def AppUsageLogListView(request):
             request=request
         )
         return JsonResponse({"html": html})
-
     return render(request, "dashboards/logs.html", context)
+
 class ChildActivityView(LoginRequiredMixin, ListView):
     model = ActivityResult
     template_name = "dashboards/child_activity.html"
@@ -117,16 +114,26 @@ class ChildActivityView(LoginRequiredMixin, ListView):
 
         self.child = get_object_or_404(Child, id=child_id)
 
-        # 🔐 ownership check
-        if self.child.parent != request.user:
-            raise PermissionDenied("You are not allowed to view this child.")
+        is_parent = self.child.parent == request.user
+        is_connected_teacher = (
+            request.user.role == "teacher"
+            and ClassroomChild.objects.filter(
+                child=self.child,
+                classroom__teacher=request.user,
+                is_active=True
+            ).exists()
+        )
+        is_moe_admin = request.user.role == "moe_admin"
+
+        if not (is_parent or is_connected_teacher or is_moe_admin):
+            raise PermissionDenied("Ita la iha permisaun atu haree labarik ida ne'e.")
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = ActivityResult.objects.filter(
             student=self.child,
-            parent=self.request.user
+            parent=self.child.parent
         ).order_by("-created_at")
 
         # Split category1 into two attributes
