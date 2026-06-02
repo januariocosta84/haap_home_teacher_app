@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
   <div class="row">
     <div class="col-md-10 offset-md-1">
       <div class="card shadow">
@@ -96,7 +96,7 @@
               <button type="submit" class="btn btn-primary">
                 Kontinua ba Husu
               </button>
-              <a href="{% url 'support-ticket-list' %}" class="btn btn-secondary">Kansela</a>
+              <a href="{% url 'ticket:support-ticket-list' %}" class="btn btn-secondary">Kansela</a>
             </div>
           </form>
         </div>

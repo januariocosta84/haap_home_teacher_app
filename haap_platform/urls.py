@@ -21,6 +21,7 @@ from core.views.user_management import user_list, add_user, edit_user, delete_us
 from core.views.profile import profile_view
 from core.views.apk import download_apk
 from core.views.ajax_loads import get_children_by_parent, get_parents_by_municipality
+from preschools.views import TeacherPreschoolListView
 
 # project/urls.py
 handler404 = 'haap_app.core.views.custom_404'
@@ -70,8 +71,8 @@ urlpatterns = [
     # Dashboards
     path("dashboard/moe/", moe_admin_dashboard, name="moe_admin_dashboard"),
     path("dashboard/municipality/", municipality_dashboard, name="municipality_dashboard"),
-    path("dashboard/teacher/", teacher_dashboard, name="teacher_dashboard"),
-
+    path("dashboard/teacher/",  TeacherPreschoolListView.as_view(), name="teacher_dashboard"),
+   # path('list_claim/', TeacherPreschoolListView.as_view(), name='preschool_list_claim'),
     # Activity logs
   #  path("logs/", AppUsageLogListView.as_view(), name="logs"),
 
@@ -105,7 +106,7 @@ urlpatterns = [
     path('preschool/', include('preschools.urls')),
     path('equipment/', include('equipment.urls')),
     path('classroom/', include('klase.urls')),
-    path('ticket/', include('ticket.urls')),
+    path('ticket/', include(('ticket.urls', 'ticket'), namespace='ticket')),
 ]
 
 # ----------------------------

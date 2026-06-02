@@ -13,7 +13,7 @@
     </div>
     <div class="col-md-4 text-end">
       {% if user.role == 'teacher' %}
-        <a href="{% url 'support-ticket-create' %}" class="btn btn-primary">
+        <a href="{% url 'ticket:support-ticket-create' %}" class="btn btn-primary">
           Kria Tiket Foun
         </a>
       {% endif %}
@@ -85,15 +85,15 @@
               </td>
               <td>{{ ticket.created_at|date:"d/m/Y" }}</td>
               <td>
-                <a href="{% url 'support-ticket-detail' ticket.pk %}" class="btn btn-sm btn-info">
-                  Tamba
+                <a href="{% url 'ticket:support-ticket-detail' ticket.pk %}" class="btn btn-sm btn-info">
+                  Detalhes
                 </a>
               </td>
             </tr>
           {% empty %}
             <tr>
               <td colspan="7" class="text-center text-muted py-4">
-                Nenhum tiket encontrado.
+              Laiha tiket suporta iha sistema. Klik "Kria Tiket Foun" hodi buka ajuda.
               </td>
             </tr>
           {% endfor %}
@@ -105,13 +105,13 @@
     {% if is_paginated %}
       <div class="card-footer bg-light d-flex justify-content-between align-items-center">
         <div class="text-muted">
-          Pahina {{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
+          Pajina{{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
         </div>
         <nav>
           <ul class="pagination mb-0">
             {% if page_obj.has_previous %}
               <li class="page-item">
-                <a class="page-link" href="?page=1">Uluk</a>
+                <a class="page-link" href="?page=1">Inisiu</a>
               </li>
               <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
@@ -132,10 +132,10 @@
 
             {% if page_obj.has_next %}
               <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Tuir Nian</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Tuir mai</a>
               </li>
               <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Tapos</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Ikus</a>
               </li>
             {% endif %}
           </ul>

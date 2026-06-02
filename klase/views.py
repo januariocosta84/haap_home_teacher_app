@@ -277,14 +277,14 @@ class ClassroomDetailView(View):
             print("Child age group:", child.age_group if child else "N/A")
 
             if not child:
-                messages.error(request, f"Kodigu ida ne '{child_code}' laiha rejistadu iha sistema.")
+                messages.error(request, f" Kodigu  '{child_code}' ida ne'e la existe iha sistema Halo favor tau kodigu ho los")
                 return redirect('klase:classroom-detail', classroom_id=classroom.id)
 
             # Validate child group against classroom group based on child registration age group
             if child.age_group != classroom.group:
                 messages.error(
                     request,
-                    f"Labarik group '{child.age_group}' la iha group ida ne'e '{classroom.group}'. Favor usa kodigu labarik grupu korreta."
+                    f"Labarik group '{child.age_group}' labele rejista iha group '{classroom.group}'. Favor usa kodigu labarik ne ho koreta."
                 )
                 return redirect('klase:classroom-detail', classroom_id=classroom.id)
 

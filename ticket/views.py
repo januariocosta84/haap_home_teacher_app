@@ -9,9 +9,14 @@ from django.forms import inlineformset_factory
 from django.db.models import Q
 
 from ticket.models import SupportTicket, SupportTicketItem
-from ticket.forms import SupportTicketForm, SupportTicketItemForm
+from ticket.forms import (
+    SupportTicketForm,
+    SupportTicketItemForm,
+    SupportTicketUpdateForm,
+)
 from preschools.models import Preschool
 
+app_name = 'ticket'
 
 class TeacherOnlyMixin(UserPassesTestMixin):
     """Mixin to restrict access to teacher users"""
@@ -50,10 +55,10 @@ class SupportTicketCreateView(TeacherOnlyMixin, LoginRequiredMixin, CreateView):
             messages.error(self.request, 'Mestri nee nao iha klase asosiadu.')
             return self.form_invalid(form)
 
-        response = super().form_valid(form)
+        self.object = form.save()
 
         # Redirect to add items
-        return redirect('support-ticket-add-items', pk=self.object.pk)
+        return redirect('ticket:support-ticket-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -134,7 +139,7 @@ class SupportTicketAddItemsView(TeacherOnlyMixin, LoginRequiredMixin, UpdateView
             request,
             f'Husu suporta konsege kria ho susesu. Tiket numeru: {self.object.ticket_number}'
         )
-        return redirect('support-ticket-detail', pk=self.object.pk)
+        return redirect('ticket:support-ticket-detail', pk=self.object.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -221,11 +226,11 @@ class SupportTicketUpdateView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
     """Admin view for updating support ticket status"""
 
     model = SupportTicket
-    fields = ['status', 'priority', 'resolution_note']
+    form_class = SupportTicketUpdateForm
     template_name = 'ticket/support_ticket_update.html'
 
     def get_success_url(self):
-        return reverse_lazy('support-ticket-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('ticket:support-ticket-detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
         if form.cleaned_data.get('status') == 'resolved':

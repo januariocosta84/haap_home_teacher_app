@@ -1,0 +1,306 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}
+  Ataualiza Tiket Suporta {{ object.ticket_number }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Ticket Header -->
+    <div class="card border-0 shadow-lg mb-4 ticket-header">
+        <div class="card-body">
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+                    <h3 class="fw-bold mb-1">
+                        #{{ object.ticket_number }}
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Kria iha {{ object.created_at|date:"d M Y • H:i" }}
+                    </p>
+                </div>
+
+                <div class="col-md-4 text-md-end">
+
+                    <span class="badge rounded-pill fs-6 px-3 py-2
+                    {% if object.status == 'open' %}
+                        bg-danger
+                    {% elif object.status == 'in_progress' %}
+                        bg-warning text-dark
+                    {% elif object.status == 'resolved' %}
+                        bg-success
+                    {% else %}
+                        bg-secondary
+                    {% endif %}">
+                        {{ object.get_status_display }}
+                    </span>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- LEFT COLUMN -->
+        <div class="col-lg-4">
+
+            <!-- Teacher Info -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+
+                    <h6 class="fw-bold text-primary mb-3">
+                        Informasaun Mestri
+                    </h6>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Naran</small>
+                        <strong>
+                            {{ object.teacher.first_name }}
+                            {{ object.teacher.last_name }}
+                        </strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Pre-Escolar</small>
+                        <strong>{{ object.preschool.name }}</strong>
+                    </div>
+
+                    {% if object.classroom %}
+                    <div>
+                        <small class="text-muted d-block">Sala Aula</small>
+                        <strong>{{ object.classroom.name }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ticket Info -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+
+                    <h6 class="fw-bold text-primary mb-3">
+                        Informasaun Tiket
+                    </h6>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Tipu Pedidu</small>
+
+                        {% if object.is_equipment_request and object.is_training_request %}
+                            <span class="badge bg-primary">
+                                Ekipamentu + Formasaun
+                            </span>
+                        {% elif object.is_equipment_request %}
+                            <span class="badge bg-info">
+                                Ekipamentu
+                            </span>
+                        {% else %}
+                            <span class="badge bg-success">
+                                Formasaun
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <small class="text-muted d-block">Prioridade</small>
+
+                        <span class="badge
+                        {% if object.priority == 'urgent' %}
+                            bg-danger
+                        {% elif object.priority == 'high' %}
+                            bg-warning text-dark
+                        {% else %}
+                            bg-info
+                        {% endif %}">
+                            {{ object.get_priority_display }}
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="col-lg-8">
+
+            <!-- Update Form -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        Atualiza Tiket
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                {{ form.status.label }}
+                            </label>
+                            {{ form.status }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                {{ form.priority.label }}
+                            </label>
+                            {{ form.priority }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                {{ form.resolution_note.label }}
+                            </label>
+                            {{ form.resolution_note }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+
+                            <button class="btn btn-primary px-4">
+                                Atualiza Tiket
+                            </button>
+
+                            <a href="{% url 'ticket:support-ticket-detail' object.pk %}"
+                               class="btn btn-outline-secondary">
+                                Kansela
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- Ticket Items -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-bold">
+                        Itens Husu
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    {% for item in object.items.all %}
+
+                    <div class="ticket-item">
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0">
+                                {{ item.get_item_type_display }}
+                            </h6>
+                        </div>
+
+                        {% if item.details %}
+                        <p class="text-muted mb-2">
+                            {{ item.details|linebreaks }}
+                        </p>
+                        {% endif %}
+
+                        {% if item.preferred_format %}
+                        <div class="alert alert-light border">
+                            <strong>Formatu:</strong>
+                            {{ item.preferred_format }}
+                        </div>
+                        {% endif %}
+
+                        {% if item.app_features_to_learn %}
+                        <div class="alert alert-info">
+                            <strong>Karaterístika Aprende:</strong><br>
+                            {{ item.app_features_to_learn|linebreaks }}
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
+
+                    {% empty %}
+                        <p class="text-muted">
+                            Nenhum item rejistadu.
+                        </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            {% if object.resolution_note %}
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        Nota Solusaun
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    {{ object.resolution_note|linebreaks }}
+
+                    {% if object.resolved_at %}
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Rezolve iha
+                            {{ object.resolved_at|date:"d/m/Y H:i" }}
+                        </small>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+</div>
+<style>
+.ticket-header{
+    border-radius:16px;
+    background:linear-gradient(135deg,#0d6efd,#4f8cff);
+    color:white;
+}
+
+.ticket-item{
+    padding:1rem;
+    border-radius:12px;
+    background:#f8f9fa;
+    transition:all .2s ease;
+}
+
+.ticket-item:hover{
+    background:#ffffff;
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.card{
+    border-radius:16px;
+}
+
+.form-control,
+.form-select{
+    border-radius:10px;
+    min-height:48px;
+}
+
+textarea.form-control{
+    min-height:120px;
+}
+
+.btn{
+    border-radius:10px;
+}
+</style>
+{% endblock %}
