@@ -1,37 +1,217 @@
 {% extends "core/base.html" %}
- <title>HAAP | {% block title %}Rejista labarik sira{% endblock %}</title>
 {% load static %}
 
+{% block title %}Rejista Oan Foun{% endblock %}
+
+{% block extra_css %}
+<style>
+.year-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+  background: #fff;
+}
+.year-card:hover { border-color: #93c5fd; background: #eff6ff; }
+.year-card.selected { border-color: #16a34a; background: #f0fdf4; }
+.year-card .year-num { font-size: 1.2rem; font-weight: 700; color: #1e293b; line-height: 1; }
+.year-card .year-age { font-size: 0.72rem; color: #64748b; margin-top: 3px; }
+.year-card.selected .year-num { color: #15803d; }
+.year-card.selected .year-age { color: #16a34a; }
+
+.group-preview {
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+.group-preview.group-a { background: #ede9fe; border: 1px solid #c4b5fd; }
+.group-preview.group-b { background: #dbeafe; border: 1px solid #93c5fd; }
+.group-preview.group-none { background: #f8fafc; border: 1px dashed #cbd5e1; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-  <h3>Rejista ita nia oan sira</h3>
-  <form method="post">
-    {% csrf_token %}
-    <div class="mb-3">
-      {{ form.first_name.label_tag }}  
-      {{ form.first_name }}
-      {% if form.first_name.errors %}
-        <div class="text-danger">{{ form.first_name.errors }}</div>
-      {% endif %}
-    </div>
+<div class="container-fluid py-4">
 
-    <div class="mb-3">
-      {{ form.year_of_birth.label_tag }}
-      {{ form.year_of_birth }}
-      {% if form.year_of_birth.errors %}
-        <div class="text-danger">{{ form.year_of_birth.errors }}</div>
-      {% endif %}
+  <!-- ═══ BACK + HEADER ═══ -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'core:children_list' %}"
+       class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Rejista Oan Foun</h4>
+      <p class="text-muted small mb-0">Tama informasaun oan ita nian hodi rejista</p>
     </div>
+  </div>
 
-    <div class="mb-3">
-      {{ form.age_group.label_tag }}
-      {{ form.age_group }}
-      {% if form.age_group.errors %}
-        <div class="text-danger">{{ form.age_group.errors }}</div>
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+
+      <!-- Errors -->
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger rounded-3 mb-4">
+        <i class="bi bi-exclamation-circle me-1"></i>{{ form.non_field_errors }}
+      </div>
       {% endif %}
-    </div>
 
-    <button type="submit" class="btn btn-primary">Rejista oan</button>
-  </form>
+      <form method="post" id="childForm">
+        {% csrf_token %}
+
+        <!-- Hidden year select (still submitted) -->
+        <div class="d-none">{{ form.year_of_birth }}</div>
+
+        <!-- ── CARD 1: Naran ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #f1f5f9;margin-bottom:1.25rem;">
+              <i class="bi bi-person-fill me-1"></i>Informasaun Oan
+            </div>
+
+            <div>
+              <label class="form-label fw-semibold small">
+                Naran Kompletu <span class="text-danger">*</span>
+              </label>
+              <div style="position:relative;">
+                <i class="bi bi-person" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.85rem;pointer-events:none;z-index:4;"></i>
+                {{ form.first_name }}
+              </div>
+              {% if form.first_name.errors %}
+              <div class="text-danger small mt-1">
+                <i class="bi bi-exclamation-circle me-1"></i>{{ form.first_name.errors.0 }}
+              </div>
+              {% endif %}
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>Uza naran kompletu oan nian
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── CARD 2: Tinan Moris ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #f1f5f9;margin-bottom:1.25rem;">
+              <i class="bi bi-calendar3 me-1"></i>Tinan Moris
+            </div>
+
+            <label class="form-label fw-semibold small mb-3">
+              Hili Tinan Moris <span class="text-danger">*</span>
+            </label>
+
+            <!-- Visual year picker -->
+            <div class="row g-2 mb-4" id="yearPicker">
+              {% for value, label in form.year_of_birth.field.choices %}
+              {% with current_year=2026 %}
+              <div class="col-6 col-sm-3">
+                <div class="year-card {% if form.year_of_birth.value == value|stringformat:'s' %}selected{% endif %}"
+                     data-year="{{ value }}"
+                     onclick="selectYear({{ value }}, this)">
+                  <div class="year-num">{{ value }}</div>
+                  <div class="year-age">Tinan {{ current_year|add:"-"|add:value|add:"0" }}</div>
+                </div>
+              </div>
+              {% endwith %}
+              {% endfor %}
+            </div>
+
+            <!-- Age group preview -->
+            <div id="groupPreview" class="group-preview group-none">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:36px;height:36px;background:rgba(255,255,255,0.6);">
+                <i class="bi bi-stars" id="groupIcon" style="color:#94a3b8;"></i>
+              </div>
+              <div>
+                <div class="fw-semibold small" id="groupName" style="color:#64748b;">Hili tinan moris uluk</div>
+                <div class="text-muted" style="font-size:0.75rem;" id="groupDesc">Grupu sei kalkuladu automatikamente</div>
+              </div>
+            </div>
+
+            {% if form.year_of_birth.errors %}
+            <div class="text-danger small mt-2">
+              <i class="bi bi-exclamation-circle me-1"></i>{{ form.year_of_birth.errors.0 }}
+            </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+        <!-- ── ACTION BUTTONS ── -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold">
+            <i class="bi bi-check-circle-fill me-1"></i>Rejista Oan
+          </button>
+          <a href="{% url 'core:children_list' %}"
+             class="btn btn-outline-secondary rounded-pill px-4">
+            Kansela
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </div>
 </div>
+
+<script>
+const CURRENT_YEAR = new Date().getFullYear();
+
+function selectYear(year, card) {
+  document.querySelectorAll('.year-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+
+  // Sync hidden select
+  const sel = document.getElementById('id_year_of_birth');
+  if (sel) sel.value = year;
+
+  // Compute age
+  const age = CURRENT_YEAR - year;
+  const preview = document.getElementById('groupPreview');
+  const groupName = document.getElementById('groupName');
+  const groupDesc = document.getElementById('groupDesc');
+  const groupIcon = document.getElementById('groupIcon');
+
+  preview.classList.remove('group-a', 'group-b', 'group-none');
+
+  if (age >= 3 && age <= 4) {
+    preview.classList.add('group-a');
+    groupIcon.style.color = '#7c3aed';
+    groupName.style.color = '#6d28d9';
+    groupName.textContent = 'Grupu A — Tinan 3–4';
+    groupDesc.textContent = `Oan nian idade: ${age} tinan. Grupu A nian.`;
+  } else if (age >= 5 && age <= 6) {
+    preview.classList.add('group-b');
+    groupIcon.style.color = '#1d4ed8';
+    groupName.style.color = '#1d4ed8';
+    groupName.textContent = 'Grupu B — Tinan 5–6';
+    groupDesc.textContent = `Oan nian idade: ${age} tinan. Grupu B nian.`;
+  } else {
+    preview.classList.add('group-none');
+    groupIcon.style.color = '#ef4444';
+    groupName.style.color = '#dc2626';
+    groupName.textContent = 'Tinan la válidu';
+    groupDesc.textContent = 'Oan tenke iha tinan 3–6 hodi rejista.';
+  }
+}
+
+// Apply initial icon padding for name field
+document.addEventListener('DOMContentLoaded', () => {
+  const nameInput = document.getElementById('id_first_name');
+  if (nameInput) nameInput.style.paddingLeft = '2.4rem';
+
+  // Trigger preview for pre-selected year (on error re-render)
+  const sel = document.getElementById('id_year_of_birth');
+  if (sel && sel.value) {
+    const card = document.querySelector(`.year-card[data-year="${sel.value}"]`);
+    if (card) selectYear(parseInt(sel.value), card);
+  }
+});
+</script>
 {% endblock %}

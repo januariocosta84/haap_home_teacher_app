@@ -1,0 +1,188 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="mb-4">
+    <h4 class="mb-0 fw-500">Actividades Professores</h4>
+    <!-- <small class="text-muted">Login, logout and activity history for teachers.</small> -->
+  </div>
+
+  <!-- Filters Card -->
+  <div class="card shadow-sm mb-3" style="border-radius:12px;">
+    <div class="card-header bg-light px-4 py-3">
+      <h6 class="mb-0">Filtros</h6>
+    </div>
+    <div class="card-body p-4">
+      <form method="get" class="row g-3">
+        {% if teachers %}
+        <div class="col-md-3">
+          <label class="form-label small">Formador</label>
+          <select name="teacher" class="form-select form-select-sm">
+            <option value="">Hotu</option>
+            {% for teacher in teachers %}
+            <option value="{{ teacher.id }}" {% if filter_teacher == teacher.id|stringformat:"s" %}selected{% endif %}>
+              {{ teacher.get_full_name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        {% if preschools %}
+        <div class="col-md-3">
+          <label class="form-label small">Eskola</label>
+          <select name="preschool" class="form-select form-select-sm">
+            <option value="">Hotu</option>
+            {% for preschool in preschools %}
+            <option value="{{ preschool.id }}" {% if filter_preschool == preschool.id|stringformat:"s" %}selected{% endif %}>
+              {{ preschool.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+
+        <div class="col-md-2">
+          <label class="form-label small">Status</label>
+          <select name="status" class="form-select form-select-sm">
+            <option value="">Hotu</option>
+            <option value="success" {% if filter_status == "success" %}selected{% endif %}>Success</option>
+            <option value="failed" {% if filter_status == "failed" %}selected{% endif %}>Failed</option>
+            <option value="pending" {% if filter_status == "pending" %}selected{% endif %}>Pending</option>
+            <option value="started" {% if filter_status == "started" %}selected{% endif %}>Started</option>
+            <option value="completed" {% if filter_status == "completed" %}selected{% endif %}>Completed</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small">Data Husi</label>
+          <input type="date" name="date_from" class="form-control form-control-sm" value="{{ filter_date_from }}">
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label small">Data to'o</label>
+          <input type="date" name="date_to" class="form-control form-control-sm" value="{{ filter_date_to }}">
+        </div>
+
+        <div class="col-md-12">
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fas fa-filter me-1"></i> Aplika Filtro
+          </button>
+          <a href="{% url 'core:teacher_logs' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-redo me-1"></i> Limpa
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Export Buttons -->
+  <div class="mb-3 d-flex gap-2 align-items-center">
+    <a href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=csv" class="btn btn-success btn-sm">
+      <i class="fas fa-file-csv me-1"></i> Export ba CSV
+    </a>
+    <a href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=pdf" class="btn btn-danger btn-sm">
+      <i class="fas fa-file-pdf me-1"></i> Export ba PDF
+    </a>
+    <button id="manualRefresh" type="button" class="btn btn-outline-secondary btn-sm ms-auto">
+      <i class="fas fa-sync-alt me-1"></i> Atualiza Rejistu
+    </button>
+  </div>
+
+  <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="teacherLogsTable" class="table table-hover mb-0" style="font-size:13px;">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-3 py-2">Data</th>
+              <th class="px-3 py-2">Formador</th>
+              <th class="px-3 py-2">Eskola</th>
+              <th class="px-3 py-2">Tema</th>
+              <th class="px-3 py-2">Sub Tema</th>
+              <th class="px-3 py-2">Atividade</th>
+              <th class="px-3 py-2">Status</th>
+            </tr>
+          </thead>
+          <tbody id="logs-body">
+            {% include "partials/teacher_logs_body.html" %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let teacherLogsTable;
+
+    function initializeTeacherLogsTable() {
+      if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
+        teacherLogsTable = $('#teacherLogsTable').DataTable();
+        return;
+      }
+
+      teacherLogsTable = $('#teacherLogsTable').DataTable({
+        order: [[0, 'desc']],
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        language: {
+          search: 'Pesquisa:',
+          lengthMenu: 'Haree _MENU_ rejistu',
+          info: 'Hatudu _START_ to _END_ husi _TOTAL_ rejistu',
+          infoEmpty: 'Laiha rejistu',
+          infoFiltered: '(filtra husi _MAX_ total rejistu)',
+          zeroRecords: 'La hetan dadus',
+          paginate: { first: 'Uluk', last: 'Ikus', next: 'Tuir Mai', previous: 'Antes' }
+        }
+      });
+    }
+
+    function refreshTeacherLogs() {
+      fetch(window.location.href, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+      .then(response => response.json())
+      .then(data => {
+        let searchValue = '';
+        let pageLength = 10;
+        let order = [[0, 'desc']];
+
+        if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
+          teacherLogsTable = $('#teacherLogsTable').DataTable();
+          searchValue = teacherLogsTable.search();
+          pageLength = teacherLogsTable.page.len();
+          order = teacherLogsTable.order();
+          teacherLogsTable.destroy();
+        }
+
+        document.getElementById('logs-body').innerHTML = data.html;
+        initializeTeacherLogsTable();
+
+        if (searchValue) {
+          teacherLogsTable.search(searchValue).draw();
+        }
+
+        if (order && order.length) {
+          teacherLogsTable.order(order).draw();
+        }
+
+        teacherLogsTable.page.len(pageLength).draw(false);
+      })
+      .catch(() => {
+        console.warn('Failed to refresh teacher logs.');
+      });
+    }
+
+    initializeTeacherLogsTable();
+
+    document.getElementById('manualRefresh').addEventListener('click', function() {
+      refreshTeacherLogs();
+    });
+  });
+</script>
+{% endblock %}

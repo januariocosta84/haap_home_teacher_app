@@ -1,255 +1,503 @@
 {% extends "core/base.html" %}
 {% load static %}
 
+{% block title %}Jestaun Utilizador{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Page layout ── */
+.um-tabs .nav-link {
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  border: none;
+  background: transparent;
+  transition: all 0.18s;
+}
+.um-tabs .nav-link:hover  { background: #f1f5f9; color: #1e293b; }
+.um-tabs .nav-link.active { background: #1d4ed8; color: #fff; }
+.um-tabs .nav-link .badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  margin-left: 5px;
+}
+.um-tabs .nav-link.active .badge { background: rgba(255,255,255,0.25); color: #fff; }
+.um-tabs .nav-link:not(.active) .badge { background: #e2e8f0; color: #475569; }
+
+/* ── Table ── */
+.um-table thead th {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #64748b;
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  white-space: nowrap;
+}
+.um-table tbody td { padding: 0.6rem 1rem; vertical-align: middle; font-size: 0.84rem; }
+.um-table tbody tr { border-top: 1px solid #f1f5f9; transition: background 0.12s; }
+.um-table tbody tr:hover { background: #f8fafc; }
+
+/* ── Action buttons ── */
+.action-pill {
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  line-height: 1.6;
+  border: 1px solid transparent;
+}
+
+/* ── Chart card ── */
+.chart-card {
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+.chart-type-btn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  border-radius: 8px;
+  padding: 3px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.6;
+}
+.chart-type-btn.active {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+.chart-total-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+
+/* ── Search ── */
+.um-search {
+  border-radius: 10px !important;
+  border-color: #e2e8f0 !important;
+  font-size: 0.83rem;
+  padding-left: 2.4rem !important;
+}
+.um-search-wrap { position: relative; }
+.um-search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ── Status badges ── */
+.badge-approved { background: #dcfce7; color: #166534; }
+.badge-pending  { background: #fef9c3; color: #854d0e; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-5">
-  <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body d-flex justify-content-between align-items-center py-3 px-4">
-      <h3 class="mb-0 fw-bold text-primary"> Jestaun Utilizador</h3>
-      <a href="{% url 'core:register_user' %}" class="btn btn-success btn-sm">
-        <i class="bi bi-plus-circle"></i> Kria Utilizador Foun
-      </a>
+<div class="container-fluid py-4">
+
+  <!-- ═══ HERO HEADER ═══ -->
+  <div class="card border-0 mb-4"
+       style="border-radius:20px; background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 60%,#0284c7 100%);">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center g-3">
+        <div class="col">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.65);" class="mb-2">
+            <i class="bi bi-people me-1"></i>Jestaun
+          </div>
+          <h3 class="fw-bold text-white mb-1">Jestaun Utilizador</h3>
+          <p class="text-white mb-0" style="opacity:0.75;font-size:0.88rem;">
+            Haree no jere utilizador sira hotu nebe rejistadu iha plataforma HAAP.
+          </p>
+        </div>
+        <div class="col-auto">
+          <a href="{% url 'core:register_user' %}"
+             class="btn btn-light fw-semibold rounded-pill px-4"
+             style="color:#1d4ed8;">
+            <i class="bi bi-person-plus-fill me-1"></i>Kria Utilizador Foun
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick stats row -->
+      <div class="row g-2 mt-3">
+        <div class="col-6 col-sm-4 col-md-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.12);">
+            <i class="bi bi-person-hearts text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">{{ parents|length }}</div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Parentes</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.12);">
+            <i class="bi bi-emoji-smile text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">{{ children|length }}</div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Oan sira</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.12);">
+            <i class="bi bi-person-workspace text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">{{ teachers|length }}</div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Professores</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.12);">
+            <i class="bi bi-bar-chart-line text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">{{ analysts|length }}</div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Analistas</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Tabs for roles -->
-  <ul class="nav nav-tabs" id="userTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab">Parentes ({{ parents|length }})</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="children-tab" data-bs-toggle="tab" data-bs-target="#children" type="button" role="tab">Oan sira ({{ children|length }})</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button" role="tab">Formadores ({{ teachers|length }})</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="analysts-tab" data-bs-toggle="tab" data-bs-target="#analysts" type="button" role="tab">Analistas ({{ analysts|length }})</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab">Admins ({{ admins|length }})</button>
-    </li>
-  </ul>
+  <!-- ═══ TABS ═══ -->
+  <div class="card border-0 shadow-sm" style="border-radius:16px; overflow:hidden;">
 
-  <div class="tab-content mt-3" id="userTabsContent">
-    {% comment %} Parents Tab {% endcomment %}
-    <div class="tab-pane fade show active" id="parents" role="tabpanel">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="input-group w-50">
-              <span class="input-group-text">🔎</span>
-              <input class="form-control" id="searchParents" placeholder="Filtra naran/telefone..." />
+    <!-- Tab nav -->
+    <div class="px-4 pt-4 pb-0 border-bottom" style="background:#fff;">
+      <ul class="nav um-tabs gap-1 flex-wrap" id="userTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="parents-tab"
+                  data-bs-toggle="tab" data-bs-target="#parents"
+                  type="button" role="tab">
+            <i class="bi bi-person-hearts me-1"></i>Parentes
+            <span class="badge">{{ parents|length }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="children-tab"
+                  data-bs-toggle="tab" data-bs-target="#children"
+                  type="button" role="tab">
+            <i class="bi bi-emoji-smile me-1"></i>Oan sira
+            <span class="badge">{{ children|length }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="teachers-tab"
+                  data-bs-toggle="tab" data-bs-target="#teachers"
+                  type="button" role="tab">
+            <i class="bi bi-person-workspace me-1"></i>Professores
+            <span class="badge">{{ teachers|length }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="analysts-tab"
+                  data-bs-toggle="tab" data-bs-target="#analysts"
+                  type="button" role="tab">
+            <i class="bi bi-bar-chart-line me-1"></i>Analistas
+            <span class="badge">{{ analysts|length }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="admins-tab"
+                  data-bs-toggle="tab" data-bs-target="#admins"
+                  type="button" role="tab">
+            <i class="bi bi-shield-check me-1"></i>Admins
+            <span class="badge">{{ admins|length }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab panes -->
+    <div class="tab-content" id="userTabsContent">
+
+      <!-- ── PARENTS TAB ── -->
+      <div class="tab-pane fade show active" id="parents" role="tabpanel">
+        <div class="p-4">
+
+          <!-- Toolbar -->
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="um-search-wrap" style="width:280px; max-width:100%;">
+              <i class="bi bi-search um-search-icon"></i>
+              <input class="form-control um-search" id="searchParents"
+                     placeholder="Filtra naran, telefone…">
             </div>
-            <small class="text-muted align-self-center mb-0">
-              Total: <span id="parentsVisibleCount">{{ parents|length }}</span> / {{ parents|length }}
-            </small>
+            <div class="d-flex align-items-center gap-2">
+              <span class="text-muted small">
+                Hatudu: <strong><span id="parentsVisibleCount">{{ parents|length }}</span></strong>
+                / {{ parents|length }}
+              </span>
+            </div>
           </div>
 
-          <div class="card border-0 shadow-sm mb-4" style="background:#f8fbff;">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+          <!-- Chart card -->
+          <div class="chart-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+              <div>
+                <div class="fw-semibold mb-1" style="font-size:0.85rem;">Grafiku Rejistu Parentes</div>
+                <span class="chart-total-badge" id="parentsTotalBadge">Total: —</span>
+              </div>
+              <div class="d-flex gap-2 flex-wrap align-items-end">
+                <!-- Chart type toggle -->
+                <div class="d-flex gap-1 align-items-end me-2">
+                  <button class="chart-type-btn active" id="parentsChartLine"
+                          onclick="setParentsChartType('line')">
+                    <i class="bi bi-graph-up me-1"></i>Linha
+                  </button>
+                  <button class="chart-type-btn" id="parentsChartBar"
+                          onclick="setParentsChartType('bar')">
+                    <i class="bi bi-bar-chart me-1"></i>Barra
+                  </button>
+                </div>
                 <div>
-                  <h6 class="mb-1">Grafiku Rejistu Parentes</h6>
-                  <!-- <small class="text-muted">X axis: Data, Y axis: Total rejistu</small> -->
+                  <label for="parentsGroupBy" class="form-label small text-muted mb-1">Periodu</label>
+                  <select id="parentsGroupBy" class="form-select form-select-sm" style="width:auto;">
+                    <option value="daily">Loron</option>
+                    <option value="monthly" selected>Fulan</option>
+                    <option value="yearly">Tinan</option>
+                  </select>
                 </div>
-                <div class="d-flex gap-2 align-items-end flex-wrap">
-                  <div>
-                    <label for="parentsGroupBy" class="form-label small text-muted mb-1">Filtra Periodu</label>
-                    <select id="parentsGroupBy" class="form-select form-select-sm" style="width:auto;">
-                      <option value="daily">Loron</option>
-                      <option value="monthly" selected>Fulan</option>
-                      <option value="yearly">Tinan</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="parentsYearSelect" class="form-label small text-muted mb-1">Tinan</label>
-                    <select id="parentsYearSelect" class="form-select form-select-sm" style="width:auto;">
-                      <option value="">Hotu</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="parentsMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
-                    <select id="parentsMonthSelect" class="form-select form-select-sm" style="width:auto;">
-                      <option value="">Hotu</option>
-                      <option value="01">Jan</option>
-                      <option value="02">Feb</option>
-                      <option value="03">Mar</option>
-                      <option value="04">Abr</option>
-                      <option value="05">Mai</option>
-                      <option value="06">Jun</option>
-                      <option value="07">Jul</option>
-                      <option value="08">Ago</option>
-                      <option value="09">Set</option>
-                      <option value="10">Out</option>
-                      <option value="11">Nov</option>
-                      <option value="12">Dec</option>
-                    </select>
-                  </div>
+                <div>
+                  <label for="parentsYearSelect" class="form-label small text-muted mb-1">Tinan</label>
+                  <select id="parentsYearSelect" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">Hotu</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="parentsMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
+                  <select id="parentsMonthSelect" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">Hotu</option>
+                    <option value="01">Jan</option><option value="02">Feb</option>
+                    <option value="03">Mar</option><option value="04">Abr</option>
+                    <option value="05">Mai</option><option value="06">Jun</option>
+                    <option value="07">Jul</option><option value="08">Ago</option>
+                    <option value="09">Set</option><option value="10">Out</option>
+                    <option value="11">Nov</option><option value="12">Dec</option>
+                  </select>
                 </div>
               </div>
-              <div style="position:relative; height:280px; width:100%;">
-                <canvas id="parentsRegistrationChart"></canvas>
-              </div>
+            </div>
+            <div style="position:relative;height:240px;width:100%;">
+              <canvas id="parentsRegistrationChart"></canvas>
             </div>
           </div>
 
+          <!-- Table -->
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
-              <thead class="table-light">
+            <table class="table um-table align-middle mb-0">
+              <thead>
                 <tr>
-                  
                   <th>Naran</th>
                   <th>WhatsApp</th>
                   <th>Email</th>
-                  <th id="parentsMunicipalityHeader" style="cursor:pointer; white-space:nowrap;">
-                    Munisipiu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-                    <span id="parentsMunicipalityActive" class="badge bg-light text-dark ms-1" style="display:none;"></span>
+                  <th id="parentsMunicipalityHeader" style="cursor:pointer;">
+                    Munisipiu
+                    <i class="bi bi-funnel ms-1" style="font-size:0.7rem;"></i>
+                    <span id="parentsMunicipalityActive" class="badge bg-primary ms-1 d-none"></span>
                   </th>
-                   <th>Rejistu</th>
+                  <th>Rejistu</th>
                   <th class="text-end">Aksaun</th>
                 </tr>
               </thead>
               <tbody id="parentsTable">
                 {% for parent in parents %}
-                <tr
-                  data-municipality="{{ parent.municipality.name|default_if_none:'' }}"
-                  data-created-date="{{ parent.created_at|date:'Y-m-d' }}"
-                  data-created-label="{{ parent.created_at|date:'d M Y' }}"
-                >
-                
-                  <td>{{ parent.first_name }} {{ parent.last_name }}</td>
-                  <td>{{ parent.whatsapp_number }}</td>
-                  <td>{{ parent.email }}</td>
-                  <td>{{ parent.municipality }}</td>
-                  <td>{{ parent.created_at|date:"d M Y " }}</td>
-                  <td class="text-end">
-                    <a href="{% url 'core:view_user' parent.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
-                    <a href="{% url 'core:edit_user' parent.id %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'core:delete_user' parent.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                <tr data-municipality="{{ parent.municipality.name|default_if_none:'' }}"
+                    data-created-date="{{ parent.created_at|date:'Y-m-d' }}"
+                    data-created-label="{{ parent.created_at|date:'d M Y' }}">
+                  <td>
+                    <div class="fw-semibold">{{ parent.first_name }} {{ parent.last_name }}</div>
+                  </td>
+                  <td class="text-muted">{{ parent.whatsapp_number }}</td>
+                  <td class="text-muted">{{ parent.email|default:"—" }}</td>
+                  <td>
+                    {% if parent.municipality %}
+                    <span class="badge rounded-pill" style="background:#eff6ff;color:#1d4ed8;font-size:0.75rem;">
+                      {{ parent.municipality }}
+                    </span>
+                    {% else %}—{% endif %}
+                  </td>
+                  <td class="text-muted" style="white-space:nowrap;font-size:0.8rem;">
+                    {{ parent.created_at|date:"d M Y" }}
+                  </td>
+                  <td class="text-end" style="white-space:nowrap;">
+                    <a href="{% url 'core:view_user' parent.id %}"
+                       class="btn btn-outline-secondary action-pill me-1">
+                      <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    <a href="{% url 'core:edit_user' parent.id %}"
+                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                      <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                    <a href="{% url 'core:delete_user' parent.id %}"
+                       class="btn btn-danger action-pill">
+                      <i class="bi bi-trash me-1"></i>Eliminar
+                    </a>
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6">No parents found</td></tr>
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="bi bi-person-x d-block mb-2" style="font-size:1.5rem;opacity:0.4;"></i>
+                    Seidauk iha parentes
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-    {% comment %} Children Tab {% endcomment %}
-    <div class="tab-pane fade" id="children" role="tabpanel">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="input-group w-50">
-              <span class="input-group-text">🔎</span>
-              <input class="form-control" id="searchChildren" placeholder="Filtra naran/parent/..." />
+      <!-- ── CHILDREN TAB ── -->
+      <div class="tab-pane fade" id="children" role="tabpanel">
+        <div class="p-4">
+
+          <!-- Toolbar -->
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="um-search-wrap" style="width:280px;max-width:100%;">
+              <i class="bi bi-search um-search-icon"></i>
+              <input class="form-control um-search" id="searchChildren"
+                     placeholder="Filtra naran, parente…">
             </div>
-            <small class="text-muted align-self-center">Total: {{ children|length }}</small>
+            <span class="text-muted small">
+              Total: <strong>{{ children|length }}</strong>
+            </span>
           </div>
 
-          <div class="card border-0 shadow-sm mb-4" style="background:#f8fbff;">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
+          <!-- Chart card -->
+          <div class="chart-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+              <div>
+                <div class="fw-semibold mb-1" style="font-size:0.85rem;">Grafiku Rejistu Oan sira</div>
+                <span class="chart-total-badge" id="childrenTotalBadge">Total: —</span>
+              </div>
+              <div class="d-flex gap-2 flex-wrap align-items-end">
+                <!-- Chart type toggle -->
+                <div class="d-flex gap-1 align-items-end me-2">
+                  <button class="chart-type-btn active" id="childrenChartLine"
+                          onclick="setChildrenChartType('line')">
+                    <i class="bi bi-graph-up me-1"></i>Linha
+                  </button>
+                  <button class="chart-type-btn" id="childrenChartBar"
+                          onclick="setChildrenChartType('bar')">
+                    <i class="bi bi-bar-chart me-1"></i>Barra
+                  </button>
+                </div>
                 <div>
-                  <h6 class="mb-1">Grafiku Rejistu Oan sira</h6>
+                  <label for="childrenGroupBy" class="form-label small text-muted mb-1">Periodu</label>
+                  <select id="childrenGroupBy" class="form-select form-select-sm" style="width:auto;">
+                    <option value="daily">Loron</option>
+                    <option value="monthly" selected>Fulan</option>
+                    <option value="yearly">Tinan</option>
+                  </select>
                 </div>
-                <div class="d-flex gap-2 align-items-end flex-wrap">
-                  <div>
-                    <label for="childrenGroupBy" class="form-label small text-muted mb-1">Filtra Periodu</label>
-                    <select id="childrenGroupBy" class="form-select form-select-sm" style="width:auto;">
-                      <option value="daily">Loron</option>
-                      <option value="monthly" selected>Fulan</option>
-                      <option value="yearly">Tinan</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="childrenYearSelect" class="form-label small text-muted mb-1">Tinan</label>
-                    <select id="childrenYearSelect" class="form-select form-select-sm" style="width:auto;">
-                      <option value="">Hotu</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="childrenMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
-                    <select id="childrenMonthSelect" class="form-select form-select-sm" style="width:auto;">
-                      <option value="">Hotu</option>
-                      <option value="01">Jan</option>
-                      <option value="02">Feb</option>
-                      <option value="03">Mar</option>
-                      <option value="04">Abr</option>
-                      <option value="05">Mai</option>
-                      <option value="06">Jun</option>
-                      <option value="07">Jul</option>
-                      <option value="08">Ago</option>
-                      <option value="09">Set</option>
-                      <option value="10">Out</option>
-                      <option value="11">Nov</option>
-                      <option value="12">Dec</option>
-                    </select>
-                  </div>
+                <div>
+                  <label for="childrenYearSelect" class="form-label small text-muted mb-1">Tinan</label>
+                  <select id="childrenYearSelect" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">Hotu</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="childrenMonthSelect" class="form-label small text-muted mb-1">Fulan</label>
+                  <select id="childrenMonthSelect" class="form-select form-select-sm" style="width:auto;">
+                    <option value="">Hotu</option>
+                    <option value="01">Jan</option><option value="02">Feb</option>
+                    <option value="03">Mar</option><option value="04">Abr</option>
+                    <option value="05">Mai</option><option value="06">Jun</option>
+                    <option value="07">Jul</option><option value="08">Ago</option>
+                    <option value="09">Set</option><option value="10">Out</option>
+                    <option value="11">Nov</option><option value="12">Dec</option>
+                  </select>
                 </div>
               </div>
-              <div style="position:relative; height:280px; width:100%;">
-                <canvas id="childrenRegistrationChart"></canvas>
-              </div>
+            </div>
+            <div style="position:relative;height:240px;width:100%;">
+              <canvas id="childrenRegistrationChart"></canvas>
             </div>
           </div>
 
+          <!-- Table -->
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle" style="font-size:0.88rem; --bs-table-cell-padding: .35rem .5rem;">
-              <thead class="table-light">
+            <table class="table um-table align-middle mb-0">
+              <thead>
                 <tr>
-                  
                   <th>Naran</th>
-                  <th>Parent</th>
-                  <th>Tinan</th>
-                  <th>Rejistu</th>
+                  <th>Parente</th>
+                  <th>Tinan Moris</th>
                   <th>Group Idade</th>
-                  <!-- <th class="text-end">Aksaun</th> -->
+                  <th>Rejistu</th>
                 </tr>
               </thead>
               <tbody id="childrenTable">
                 {% for child in children %}
-                <tr data-created-date="{{ child.created_at|date:'Y-m-d' }}" data-created-label="{{ child.created_at|date:'d M Y' }}">
-                  
-                  <td>{{ child.first_name }}</td>
-                  <td>{{ child.parent.first_name }} {{ child.parent.last_name }}</td>
-                  <td>{{ child.year_of_birth }}</td>
-                  <td>{{ child.created_at|date:'d M Y' }}</td>
-                  <td>{{ child.get_age_group_display }}</td>
-                  <!-- <td class="text-end">
-                    <a href="{% url 'core:edit_child' child.id %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'core:delete_child' child.id %}" class="btn btn-sm btn-danger">Eliminar</a>
-                  </td> -->
+                <tr data-created-date="{{ child.created_at|date:'Y-m-d' }}"
+                    data-created-label="{{ child.created_at|date:'d M Y' }}">
+                  <td><div class="fw-semibold">{{ child.first_name }}</div></td>
+                  <td class="text-muted">{{ child.parent.first_name }} {{ child.parent.last_name }}</td>
+                  <td class="text-muted">{{ child.year_of_birth }}</td>
+                  <td>
+                    <span class="badge rounded-pill"
+                          style="background:#f0fdf4;color:#166534;font-size:0.75rem;">
+                      {{ child.get_age_group_display }}
+                    </span>
+                  </td>
+                  <td class="text-muted" style="font-size:0.8rem;">{{ child.created_at|date:'d M Y' }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6">No children found</td></tr>
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-muted">
+                    <i class="bi bi-emoji-neutral d-block mb-2" style="font-size:1.5rem;opacity:0.4;"></i>
+                    Seidauk iha oan sira
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-    {% comment %} Teachers Tab {% endcomment %}
-    <div class="tab-pane fade" id="teachers" role="tabpanel">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="input-group w-50">
-              <span class="input-group-text">🔎</span>
-              <input class="form-control" id="searchTeachers" placeholder="Filtra naran/telefone..." />
+      <!-- ── TEACHERS TAB ── -->
+      <div class="tab-pane fade" id="teachers" role="tabpanel">
+        <div class="p-4">
+
+          <!-- Toolbar -->
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="um-search-wrap" style="width:280px;max-width:100%;">
+              <i class="bi bi-search um-search-icon"></i>
+              <input class="form-control um-search" id="searchTeachers"
+                     placeholder="Filtra naran, telefone…">
             </div>
-            <small class="text-muted align-self-center">Total: {{ teachers|length }}</small>
+            <span class="text-muted small">Total: <strong>{{ teachers|length }}</strong></span>
           </div>
 
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
-              <thead class="table-light">
+            <table class="table um-table align-middle mb-0">
+              <thead>
                 <tr>
                   <th>Naran</th>
                   <th>WhatsApp</th>
@@ -260,51 +508,72 @@
               <tbody id="teachersTable">
                 {% for teacher in teachers %}
                 <tr>
-                  <td>{{ teacher.first_name }} {{ teacher.last_name }}</td>
-                  <td>{{ teacher.whatsapp_number }}</td>
+                  <td><div class="fw-semibold">{{ teacher.first_name }} {{ teacher.last_name }}</div></td>
+                  <td class="text-muted">{{ teacher.whatsapp_number }}</td>
                   <td>
                     {% if teacher.is_active %}
-                      <span class="badge bg-success">Aprovadu</span>
+                    <span class="badge rounded-pill badge-approved px-3" style="font-size:0.75rem;">
+                      <i class="bi bi-check-circle-fill me-1"></i>Aprovadu
+                    </span>
                     {% else %}
-                      <span class="badge bg-warning text-dark">Pendende</span>
+                    <span class="badge rounded-pill badge-pending px-3" style="font-size:0.75rem;">
+                      <i class="bi bi-clock-fill me-1"></i>Pendente
+                    </span>
                     {% endif %}
                   </td>
-                  <td class="text-end">
-                    <a href="{% url 'core:view_user' teacher.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
-                    <a href="{% url 'core:edit_user' teacher.id %}" class="btn btn-sm btn-warning">Editar</a>
+                  <td class="text-end" style="white-space:nowrap;">
+                    <a href="{% url 'core:view_user' teacher.id %}"
+                       class="btn btn-outline-secondary action-pill me-1">
+                      <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    <a href="{% url 'core:edit_user' teacher.id %}"
+                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                      <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
                     {% if not teacher.is_active %}
-                      <a href="{% url 'core:approve_teacher' teacher.id %}" class="btn btn-sm btn-success">Aprova</a>
+                    <a href="{% url 'core:approve_teacher' teacher.id %}"
+                       class="btn btn-success action-pill me-1">
+                      <i class="bi bi-check-lg me-1"></i>Aprova
+                    </a>
                     {% endif %}
-                    <a href="{% url 'core:delete_user' teacher.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                    <a href="{% url 'core:delete_user' teacher.id %}"
+                       class="btn btn-danger action-pill">
+                      <i class="bi bi-trash me-1"></i>Eliminar
+                    </a>
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4">No teachers found</td></tr>
+                <tr>
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i class="bi bi-person-video d-block mb-2" style="font-size:1.5rem;opacity:0.4;"></i>
+                    Seidauk iha professores
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-    {% comment %} Analysts Tab {% endcomment %}
-    <div class="tab-pane fade" id="analysts" role="tabpanel">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="input-group w-50">
-              <span class="input-group-text">🔎</span>
-              <input class="form-control" id="searchAnalysts" placeholder="Filtra naran/telefone/munisipiu..." />
+      <!-- ── ANALYSTS TAB ── -->
+      <div class="tab-pane fade" id="analysts" role="tabpanel">
+        <div class="p-4">
+
+          <!-- Toolbar -->
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="um-search-wrap" style="width:280px;max-width:100%;">
+              <i class="bi bi-search um-search-icon"></i>
+              <input class="form-control um-search" id="searchAnalysts"
+                     placeholder="Filtra naran, munisipiu…">
             </div>
-            <small class="text-muted align-self-center">Total: {{ analysts|length }}</small>
+            <span class="text-muted small">Total: <strong>{{ analysts|length }}</strong></span>
           </div>
 
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
-              <thead class="table-light">
+            <table class="table um-table align-middle mb-0">
+              <thead>
                 <tr>
-                  
                   <th>Naran</th>
                   <th>WhatsApp</th>
                   <th>Munisipiu</th>
@@ -314,43 +583,62 @@
               <tbody id="analystsTable">
                 {% for analyst in analysts %}
                 <tr>
-                  
-                  <td>{{ analyst.first_name }} {{ analyst.last_name }}</td>
-                  <td>{{ analyst.whatsapp_number }}</td>
-                  <td>{{ analyst.municipality.name }}</td>
-                  <td class="text-end">
-                    <a href="{% url 'core:view_user' analyst.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
-                    <a href="{% url 'core:edit_user' analyst.id %}" class="btn btn-sm btn-warning">Editar</a>
-                    <a href="{% url 'core:delete_user' analyst.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                  <td><div class="fw-semibold">{{ analyst.first_name }} {{ analyst.last_name }}</div></td>
+                  <td class="text-muted">{{ analyst.whatsapp_number }}</td>
+                  <td>
+                    {% if analyst.municipality %}
+                    <span class="badge rounded-pill" style="background:#eff6ff;color:#1d4ed8;font-size:0.75rem;">
+                      {{ analyst.municipality.name }}
+                    </span>
+                    {% else %}—{% endif %}
+                  </td>
+                  <td class="text-end" style="white-space:nowrap;">
+                    <a href="{% url 'core:view_user' analyst.id %}"
+                       class="btn btn-outline-secondary action-pill me-1">
+                      <i class="bi bi-eye me-1"></i>Ver
+                    </a>
+                    <a href="{% url 'core:edit_user' analyst.id %}"
+                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                      <i class="bi bi-pencil me-1"></i>Editar
+                    </a>
+                    <a href="{% url 'core:delete_user' analyst.id %}"
+                       class="btn btn-danger action-pill">
+                      <i class="bi bi-trash me-1"></i>Eliminar
+                    </a>
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5">No analysts found</td></tr>
+                <tr>
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i class="bi bi-bar-chart d-block mb-2" style="font-size:1.5rem;opacity:0.4;"></i>
+                    Seidauk iha analistas
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-    {% comment %} Admins Tab {% endcomment %}
-    <div class="tab-pane fade" id="admins" role="tabpanel">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between mb-3">
-            <div class="input-group w-50">
-              <span class="input-group-text">🔎</span>
-              <input class="form-control" id="searchAdmins" placeholder="Filtra naran..." />
+      <!-- ── ADMINS TAB ── -->
+      <div class="tab-pane fade" id="admins" role="tabpanel">
+        <div class="p-4">
+
+          <!-- Toolbar -->
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+            <div class="um-search-wrap" style="width:280px;max-width:100%;">
+              <i class="bi bi-search um-search-icon"></i>
+              <input class="form-control um-search" id="searchAdmins"
+                     placeholder="Filtra naran…">
             </div>
-            <small class="text-muted align-self-center">Total: {{ admins|length }}</small>
+            <span class="text-muted small">Total: <strong>{{ admins|length }}</strong></span>
           </div>
 
           <div class="table-responsive">
-            <table class="table table-hover table-sm align-middle">
-              <thead class="table-light">
+            <table class="table um-table align-middle mb-0">
+              <thead>
                 <tr>
-                  
                   <th>Naran</th>
                   <th>Funsaun</th>
                   <th class="text-end">Aksaun</th>
@@ -359,403 +647,442 @@
               <tbody id="adminsTable">
                 {% for admin in admins %}
                 <tr>
-                 
-                  <td>{{ admin.first_name }} {{ admin.last_name }}</td>
-                  <td>{{ admin.get_role_display }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                           style="width:32px;height:32px;background:#eff6ff;color:#1d4ed8;font-size:0.78rem;font-weight:700;">
+                        {{ admin.first_name|slice:":1"|upper }}{{ admin.last_name|slice:":1"|upper }}
+                      </div>
+                      <div class="fw-semibold">{{ admin.first_name }} {{ admin.last_name }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill px-3"
+                          style="background:#eff6ff;color:#1d4ed8;font-size:0.75rem;">
+                      {{ admin.get_role_display }}
+                    </span>
+                  </td>
                   <td class="text-end">
-                    <a href="{% url 'core:view_user' admin.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    <a href="{% url 'core:view_user' admin.id %}"
+                       class="btn btn-outline-secondary action-pill">
+                      <i class="bi bi-eye me-1"></i>Ver
+                    </a>
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4">No admins found</td></tr>
+                <tr>
+                  <td colspan="3" class="text-center py-5 text-muted">
+                    <i class="bi bi-shield d-block mb-2" style="font-size:1.5rem;opacity:0.4;"></i>
+                    Seidauk iha admins
+                  </td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
       </div>
-    </div>
 
-  </div>
+    </div><!-- /tab-content -->
+  </div><!-- /card -->
 
 </div>
 
+<!-- Municipality filter modal (parents) -->
 <div class="modal fade" id="parentsMunicipalityModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm">
-    <div class="modal-content" style="border-radius:12px;">
-      <div class="modal-header">
-        <h6 class="modal-title mb-0">Filtra Munisipiu</h6>
-        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+    <div class="modal-content" style="border-radius:14px;">
+      <div class="modal-header border-0 pb-0">
+        <h6 class="modal-title fw-bold">Filtra Munisipiu</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <select id="parentsMunicipalityFilter" class="form-select form-select-sm">
-          <option value="">Hotu</option>
+          <option value="">Munisipiu hotu</option>
         </select>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary btn-sm" id="clearParentsMunicipalityFilter">Reset</button>
-        <button type="button" class="btn btn-primary btn-sm" id="applyParentsMunicipalityFilter">Aplika</button>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                id="clearParentsMunicipalityFilter">Reset</button>
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3"
+                id="applyParentsMunicipalityFilter">Aplika</button>
       </div>
     </div>
   </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
 <script>
-  // Generic table filter helper
-  function setupTableFilter(inputId, tableBodyId) {
-    const input = document.getElementById(inputId);
-    const tbody = document.getElementById(tableBodyId);
-    if (!input || !tbody) return;
-
-    input.addEventListener('input', function () {
-      const q = this.value.trim().toLowerCase();
-      const rows = tbody.querySelectorAll('tr');
-      rows.forEach(row => {
-        // skip empty placeholder rows
-        if (row.querySelectorAll('td').length === 0) return;
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.indexOf(q) !== -1 ? '' : 'none';
-      });
+/* ══════════════════════════════════════════════
+   TABLE SEARCH
+══════════════════════════════════════════════ */
+function setupTableFilter(inputId, tableBodyId) {
+  const input = document.getElementById(inputId);
+  const tbody = document.getElementById(tableBodyId);
+  if (!input || !tbody) return;
+  input.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    tbody.querySelectorAll('tr').forEach(row => {
+      if (!row.querySelectorAll('td').length) return;
+      row.style.display = row.innerText.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
     });
-  }
+  });
+}
 
-  const registrationMonthNames = ['Jan', 'Feb', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dec'];
+/* ══════════════════════════════════════════════
+   CHART HELPERS
+══════════════════════════════════════════════ */
+const MONTH_NAMES = ['Jan','Feb','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dec'];
 
-  function getRegistrationControls(prefix) {
-    return {
-      groupBy: document.getElementById(`${prefix}GroupBy`),
-      year: document.getElementById(`${prefix}YearSelect`),
-      month: document.getElementById(`${prefix}MonthSelect`)
-    };
-  }
+// Chart type state per prefix
+const chartTypeState = { parents: 'line', children: 'line' };
 
-  function getRegistrationFilterValues(prefix) {
-    const controls = getRegistrationControls(prefix);
-    return {
-      groupBy: controls.groupBy?.value || 'monthly',
-      year: controls.year?.value || '',
-      month: controls.month?.value || ''
-    };
-  }
+function getRegistrationControls(prefix) {
+  return {
+    groupBy: document.getElementById(`${prefix}GroupBy`),
+    year:    document.getElementById(`${prefix}YearSelect`),
+    month:   document.getElementById(`${prefix}MonthSelect`)
+  };
+}
 
-  function populateRegistrationYearSelector(prefix, visibleRows) {
-    const yearSelect = getRegistrationControls(prefix).year;
-    if (!yearSelect) return;
+function getRegistrationFilterValues(prefix) {
+  const c = getRegistrationControls(prefix);
+  return {
+    groupBy: c.groupBy?.value || 'monthly',
+    year:    c.year?.value    || '',
+    month:   c.month?.value   || ''
+  };
+}
 
-    const selectedYear = yearSelect.value;
-    const uniqueYears = new Set();
+function populateRegistrationYearSelector(prefix, visibleRows) {
+  const yearSelect = getRegistrationControls(prefix).year;
+  if (!yearSelect) return;
+  const prev = yearSelect.value;
+  const years = new Set();
+  visibleRows.forEach(r => { if (r.dataset.createdDate) years.add(r.dataset.createdDate.split('-')[0]); });
+  yearSelect.innerHTML = '<option value="">Hotu</option>';
+  Array.from(years).sort().reverse().forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearSelect.appendChild(o);
+  });
+  if (prev && years.has(prev)) yearSelect.value = prev;
+}
 
-    visibleRows.forEach(row => {
-      const dateKey = row.dataset.createdDate;
-      if (!dateKey) return;
-      uniqueYears.add(dateKey.split('-')[0]);
+function updateRegistrationControls(prefix) {
+  const { groupBy, month } = getRegistrationControls(prefix);
+  if (month) month.disabled = groupBy?.value === 'yearly';
+}
+
+function buildRegistrationSeries(visibleRows, prefix) {
+  const { groupBy, year: selY, month: selM } = getRegistrationFilterValues(prefix);
+  const grouped = {};
+  visibleRows.forEach(row => {
+    const d = row.dataset.createdDate;
+    if (!d) return;
+    const [y, m, day] = d.split('-');
+    if (selY && y !== selY) return;
+    if (selM && m !== selM) return;
+    let key, label;
+    if      (groupBy === 'yearly')  { key = y;       label = y; }
+    else if (groupBy === 'monthly') { key = `${y}-${m}`; label = `${MONTH_NAMES[parseInt(m,10)-1]} ${y}`; }
+    else                            { key = d;        label = day; }
+    if (!grouped[key]) grouped[key] = { label, total: 0 };
+    grouped[key].total++;
+  });
+
+  if (groupBy === 'daily' && selY && selM) {
+    const days = new Date(+selY, +selM, 0).getDate();
+    const entries = Array.from({ length: days }, (_, i) => {
+      const k = `${selY}-${selM}-${String(i+1).padStart(2,'0')}`;
+      return grouped[k] || { label: String(i+1).padStart(2,'0'), total: 0 };
     });
-
-    yearSelect.innerHTML = '<option value="">Hotu</option>';
-    Array.from(uniqueYears).sort().reverse().forEach(year => {
-      const option = document.createElement('option');
-      option.value = year;
-      option.textContent = year;
-      yearSelect.appendChild(option);
-    });
-
-    if (selectedYear && uniqueYears.has(selectedYear)) {
-      yearSelect.value = selectedYear;
-    }
+    return { labels: entries.map(e => e.label), totals: entries.map(e => e.total) };
   }
 
-  function updateRegistrationControls(prefix) {
-    const { groupBy, month } = getRegistrationControls(prefix);
-    if (month) {
-      month.disabled = groupBy?.value === 'yearly';
-    }
-  }
+  const keys = Object.keys(grouped).sort((a,b) => a.localeCompare(b));
+  return { labels: keys.map(k => grouped[k].label), totals: keys.map(k => grouped[k].total) };
+}
 
-  function buildRegistrationSeries(visibleRows, prefix) {
-    const { groupBy, year: selectedYear, month: selectedMonth } = getRegistrationFilterValues(prefix);
-    const grouped = {};
+/* Build a vertical gradient fill on a canvas */
+function makeGradient(ctx, height, r, g, b) {
+  const grad = ctx.createLinearGradient(0, 0, 0, height);
+  grad.addColorStop(0,   `rgba(${r},${g},${b},0.35)`);
+  grad.addColorStop(0.6, `rgba(${r},${g},${b},0.08)`);
+  grad.addColorStop(1,   `rgba(${r},${g},${b},0.00)`);
+  return grad;
+}
 
-    visibleRows.forEach(row => {
-      const dateKey = row.dataset.createdDate;
-      if (!dateKey) return;
+function renderPeriodRegistrationChart(canvas, visibleRows, labelText, prefix) {
+  if (!canvas || typeof Chart === 'undefined') return;
+  updateRegistrationControls(prefix);
 
-      const [year, month, day] = dateKey.split('-');
-      if (selectedYear && year !== selectedYear) return;
-      if (selectedMonth && month !== selectedMonth) return;
+  const { labels, totals } = buildRegistrationSeries(visibleRows, prefix);
+  const hasData  = totals.some(v => v > 0);
+  const total    = totals.reduce((a, b) => a + b, 0);
 
-      let key = dateKey;
-      let label = day;
+  // Update total badge
+  const badge = document.getElementById(`${prefix}TotalBadge`);
+  if (badge) badge.textContent = `Total: ${total}`;
 
-      if (groupBy === 'yearly') {
-        key = year;
-        label = year;
-      } else if (groupBy === 'monthly') {
-        key = `${year}-${month}`;
-        label = `${registrationMonthNames[parseInt(month, 10) - 1]} ${year}`;
-      }
+  if (canvas.chartInstance) { canvas.chartInstance.destroy(); }
 
-      if (!grouped[key]) {
-        grouped[key] = { label, total: 0 };
-      }
-      grouped[key].total += 1;
-    });
+  const ctx      = canvas.getContext('2d');
+  const chartH   = canvas.parentElement.offsetHeight || 240;
+  const chartType = chartTypeState[prefix] || 'line';
 
-    if (groupBy === 'daily' && selectedYear && selectedMonth) {
-      const daysInMonth = new Date(parseInt(selectedYear, 10), parseInt(selectedMonth, 10), 0).getDate();
-      const completeEntries = [];
+  // Color: parents = blue, children = emerald
+  const isChildren = prefix === 'children';
+  const [r, g, b]  = isChildren ? [16, 185, 129] : [29, 78, 216];
+  const solidColor  = `rgb(${r},${g},${b})`;
+  const barColor    = `rgba(${r},${g},${b},0.75)`;
+  const gradient    = makeGradient(ctx, chartH, r, g, b);
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const key = `${selectedYear}-${selectedMonth}-${String(day).padStart(2, '0')}`;
-        completeEntries.push(grouped[key] || {
-          label: String(day).padStart(2, '0'),
-          total: 0
-        });
-      }
+  const isLine = chartType === 'line';
 
-      return {
-        labels: completeEntries.map(item => item.label),
-        totals: completeEntries.map(item => item.total)
-      };
-    }
+  canvas.chartInstance = new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels: labels.length ? labels : ['Laiha dadus'],
+      datasets: [{
+        label: labelText,
+        data:  totals.length ? totals : [0],
 
-    const sortedKeys = Object.keys(grouped).sort((a, b) => a.localeCompare(b));
-    return {
-      labels: sortedKeys.map(key => grouped[key].label),
-      totals: sortedKeys.map(key => grouped[key].total)
-    };
-  }
+        // Line style
+        borderColor:           solidColor,
+        backgroundColor:       isLine ? gradient : barColor,
+        borderWidth:           isLine ? 2.5 : 0,
+        pointBackgroundColor:  solidColor,
+        pointBorderColor:      '#fff',
+        pointBorderWidth:      2,
+        pointRadius:           hasData && labels.length <= 24 ? 5 : 0,
+        pointHoverRadius:      7,
+        pointHoverBackgroundColor: solidColor,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2,
+        lineTension:           0.3,
+        fill:                  isLine,
 
-  function renderPeriodRegistrationChart(chartCanvas, visibleRows, labelText, prefix) {
-    if (!chartCanvas || typeof Chart === 'undefined') return;
-
-    updateRegistrationControls(prefix);
-    const { labels, totals } = buildRegistrationSeries(visibleRows, prefix);
-
-    if (chartCanvas.chartInstance) {
-      chartCanvas.chartInstance.destroy();
-    }
-
-    chartCanvas.chartInstance = new Chart(chartCanvas.getContext('2d'), {
-      type: 'line',
-      data: {
-        labels: labels.length ? labels : ['Laiha dadus'],
-        datasets: [{
-          label: labelText,
-          data: totals.length ? totals : [0],
-          borderColor: '#198754',
-          backgroundColor: 'rgba(25, 135, 84, 0.18)',
-          borderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 5,
-          lineTension: 0.25,
-          fill: true
+        // Bar style
+        borderRadius:          isLine ? 0 : 6,
+        hoverBackgroundColor:  solidColor,
+      }]
+    },
+    options: {
+      responsive:                   true,
+      maintainAspectRatio:          false,
+      animation:                    { duration: 400, easing: 'easeOutQuart' },
+      hover:                        { animationDuration: 120 },
+      responsiveAnimationDuration:  0,
+      legend:                       { display: false },
+      scales: {
+        xAxes: [{
+          gridLines: {
+            display:    false,
+            drawBorder: false,
+          },
+          ticks: {
+            fontColor:    '#94a3b8',
+            fontSize:     11,
+            maxRotation:  35,
+            minRotation:  0,
+            autoSkip:     true,
+            maxTicksLimit: 12,
+            padding:       6,
+          }
+        }],
+        yAxes: [{
+          gridLines: {
+            color:       'rgba(148,163,184,0.15)',
+            drawBorder:  false,
+            borderDash:  [4, 4],
+          },
+          ticks: {
+            fontColor:    '#94a3b8',
+            fontSize:     11,
+            beginAtZero:  true,
+            precision:    0,
+            padding:      8,
+            maxTicksLimit: 6,
+          }
         }]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: { duration: 0 },
-        hover: { animationDuration: 0 },
-        responsiveAnimationDuration: 0,
-        legend: { display: false },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              precision: 0
-            }
-          }]
-        },
-        tooltips: {
-          callbacks: {
-            label: function(tooltipItem) {
-              return 'Total rejistu: ' + tooltipItem.yLabel;
-            }
-          }
+      tooltips: {
+        mode:          'index',
+        intersect:     false,
+        backgroundColor: 'rgba(15,23,42,0.88)',
+        titleFontSize:   12,
+        titleFontColor:  '#e2e8f0',
+        bodyFontSize:    13,
+        bodyFontColor:   '#fff',
+        cornerRadius:    8,
+        xPadding:        12,
+        yPadding:        10,
+        displayColors:   false,
+        callbacks: {
+          title: items => items[0].xLabel,
+          label: item  => `  Rejistu: ${item.yLabel}`
         }
-      }
-    });
-  }
-
-  function setDefaultRegistrationPeriod(prefix, rows) {
-    const controls = getRegistrationControls(prefix);
-    if (!controls.year || !controls.month) return;
-
-    populateRegistrationYearSelector(prefix, rows);
-
-    const now = new Date();
-    const currentYear = String(now.getFullYear());
-    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-
-    if ([...controls.year.options].some(option => option.value === currentYear)) {
-      controls.year.value = currentYear;
-    }
-    controls.month.value = currentMonth;
-  }
-
-  function setupParentsMunicipalityFilter() {
-    const searchInput = document.getElementById('searchParents');
-    const municipalityFilter = document.getElementById('parentsMunicipalityFilter');
-    const municipalityHeader = document.getElementById('parentsMunicipalityHeader');
-    const municipalityActive = document.getElementById('parentsMunicipalityActive');
-    const tbody = document.getElementById('parentsTable');
-    const visibleCount = document.getElementById('parentsVisibleCount');
-    const applyButton = document.getElementById('applyParentsMunicipalityFilter');
-    const clearButton = document.getElementById('clearParentsMunicipalityFilter');
-
-    if (!searchInput || !municipalityFilter || !municipalityHeader || !tbody || !visibleCount || !applyButton || !clearButton) return;
-
-    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length > 1);
-    const municipalityModalElement = document.getElementById('parentsMunicipalityModal');
-    const municipalityModal = municipalityModalElement ? new bootstrap.Modal(municipalityModalElement) : null;
-    const chartCanvas = document.getElementById('parentsRegistrationChart');
-    let selectedMunicipality = '';
-    const municipalityValues = [...new Set(
-      rows
-        .map(row => (row.dataset.municipality || '').trim())
-        .filter(Boolean)
-    )].sort((a, b) => a.localeCompare(b));
-
-    municipalityValues.forEach(value => {
-      const option = document.createElement('option');
-      option.value = value.toLowerCase();
-      option.textContent = value;
-      municipalityFilter.appendChild(option);
-    });
-
-    function renderRegistrationChart(visibleRows) {
-      renderPeriodRegistrationChart(chartCanvas, visibleRows, 'Total rejistu parentes', 'parents');
-    }
-
-    // Update month select enable/disable based on group by
-    function updateParentsControls() {
-      updateRegistrationControls('parents');
-    }
-
-    function applyParentsFilters() {
-      const query = searchInput.value.trim().toLowerCase();
-      let count = 0;
-      const visibleRows = [];
-
-      rows.forEach(row => {
-        const rowText = row.innerText.toLowerCase();
-        const rowMunicipality = (row.dataset.municipality || '').trim().toLowerCase();
-        const matchesSearch = !query || rowText.includes(query);
-        const matchesMunicipality = !selectedMunicipality || rowMunicipality === selectedMunicipality;
-        const isVisible = matchesSearch && matchesMunicipality;
-
-        row.style.display = isVisible ? '' : 'none';
-        if (isVisible) {
-          count += 1;
-          visibleRows.push(row);
-        }
-      });
-
-      visibleCount.textContent = count;
-      populateRegistrationYearSelector('parents', visibleRows);
-      renderRegistrationChart(visibleRows);
-      if (selectedMunicipality) {
-        municipalityActive.textContent = municipalityFilter.options[municipalityFilter.selectedIndex].text;
-        municipalityActive.style.display = 'inline-block';
-      } else {
-        municipalityActive.textContent = '';
-        municipalityActive.style.display = 'none';
-      }
-    }
-
-    searchInput.addEventListener('input', applyParentsFilters);
-    municipalityHeader.addEventListener('click', function () {
-      municipalityFilter.value = selectedMunicipality;
-      if (municipalityModal) {
-        municipalityModal.show();
-      }
-    });
-    applyButton.addEventListener('click', function () {
-      selectedMunicipality = municipalityFilter.value;
-      applyParentsFilters();
-      if (municipalityModal) {
-        municipalityModal.hide();
-      }
-    });
-    clearButton.addEventListener('click', function () {
-      municipalityFilter.value = '';
-      selectedMunicipality = '';
-      applyParentsFilters();
-      if (municipalityModal) {
-        municipalityModal.hide();
-      }
-    });
-    
-    // Add event listeners for chart filters
-    document.getElementById('parentsGroupBy')?.addEventListener('change', function() {
-      updateParentsControls();
-      applyParentsFilters();
-    });
-    document.getElementById('parentsYearSelect')?.addEventListener('change', applyParentsFilters);
-    document.getElementById('parentsMonthSelect')?.addEventListener('change', applyParentsFilters);
-    
-    setDefaultRegistrationPeriod('parents', rows);
-    
-    applyParentsFilters();
-  }
-
-  function setupChildrenRegistrationChart() {
-    const searchInput = document.getElementById('searchChildren');
-    const tbody = document.getElementById('childrenTable');
-    const chartCanvas = document.getElementById('childrenRegistrationChart');
-    if (!searchInput || !tbody || !chartCanvas) return;
-
-    const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.querySelectorAll('td').length > 0);
-
-    function updateChildrenChart() {
-      const visibleRows = rows.filter(row => row.style.display !== 'none');
-      populateRegistrationYearSelector('children', visibleRows);
-      renderPeriodRegistrationChart(chartCanvas, visibleRows, 'Total rejistu oan sira', 'children');
-    }
-
-    searchInput.addEventListener('input', updateChildrenChart);
-    document.getElementById('childrenGroupBy')?.addEventListener('change', function() {
-      updateRegistrationControls('children');
-      updateChildrenChart();
-    });
-    document.getElementById('childrenYearSelect')?.addEventListener('change', updateChildrenChart);
-    document.getElementById('childrenMonthSelect')?.addEventListener('change', updateChildrenChart);
-
-    setDefaultRegistrationPeriod('children', rows);
-    updateChildrenChart();
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    setupTableFilter('searchTeachers', 'teachersTable');
-    setupTableFilter('searchAnalysts', 'analystsTable');
-    // admins do not have a search input but we keep function available
-    setupTableFilter('searchAdmins', 'adminsTable');
-    setupTableFilter('searchChildren', 'childrenTable');
-    setupParentsMunicipalityFilter();
-    setupChildrenRegistrationChart();
-
-      // Activate a specific tab if `?tab=` is present in the URL
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const requested = params.get('tab');
-      const allowed = ['parents', 'children', 'teachers', 'analysts', 'admins'];
-      if (requested && allowed.includes(requested)) {
-        const trigger = document.querySelector(`#${requested}-tab`);
-        if (trigger) {
-          // Bootstrap 5 Tab show
-          const tab = new bootstrap.Tab(trigger);
-          tab.show();
-          // Scroll into view a bit for better UX
-          setTimeout(() => { document.getElementById(requested).scrollIntoView({behavior: 'smooth', block: 'start'}); }, 100);
-        }
-      }
-    } catch (e) {
-      // ignore if URLSearchParams or bootstrap not available
+      },
+      layout: { padding: { top: 10, right: 4, bottom: 4, left: 4 } }
     }
   });
+}
+
+/* ══════════════════════════════════════════════
+   CHART TYPE TOGGLES
+══════════════════════════════════════════════ */
+let _parentsApplyFilters = null;
+let _childrenUpdateChart = null;
+
+function setParentsChartType(type) {
+  chartTypeState.parents = type;
+  document.getElementById('parentsChartLine').classList.toggle('active', type === 'line');
+  document.getElementById('parentsChartBar').classList.toggle('active',  type === 'bar');
+  if (_parentsApplyFilters) _parentsApplyFilters();
+}
+
+function setChildrenChartType(type) {
+  chartTypeState.children = type;
+  document.getElementById('childrenChartLine').classList.toggle('active', type === 'line');
+  document.getElementById('childrenChartBar').classList.toggle('active',  type === 'bar');
+  if (_childrenUpdateChart) _childrenUpdateChart();
+}
+
+/* ══════════════════════════════════════════════
+   DEFAULT PERIOD
+══════════════════════════════════════════════ */
+function setDefaultRegistrationPeriod(prefix, rows) {
+  const c = getRegistrationControls(prefix);
+  if (!c.year || !c.month) return;
+  populateRegistrationYearSelector(prefix, rows);
+  const now  = new Date();
+  const curY = String(now.getFullYear());
+  const curM = String(now.getMonth() + 1).padStart(2,'0');
+  if ([...c.year.options].some(o => o.value === curY)) c.year.value = curY;
+  c.month.value = curM;
+}
+
+/* ══════════════════════════════════════════════
+   PARENTS SETUP (with municipality filter)
+══════════════════════════════════════════════ */
+function setupParentsMunicipalityFilter() {
+  const searchInput        = document.getElementById('searchParents');
+  const municipalityFilter = document.getElementById('parentsMunicipalityFilter');
+  const municipalityHeader = document.getElementById('parentsMunicipalityHeader');
+  const municipalityActive = document.getElementById('parentsMunicipalityActive');
+  const tbody              = document.getElementById('parentsTable');
+  const visibleCount       = document.getElementById('parentsVisibleCount');
+  const applyButton        = document.getElementById('applyParentsMunicipalityFilter');
+  const clearButton        = document.getElementById('clearParentsMunicipalityFilter');
+  if (!searchInput || !municipalityFilter || !tbody || !visibleCount) return;
+
+  const rows    = Array.from(tbody.querySelectorAll('tr')).filter(r => r.querySelectorAll('td').length > 1);
+  const modalEl = document.getElementById('parentsMunicipalityModal');
+  const modal   = modalEl ? new bootstrap.Modal(modalEl) : null;
+  const chart   = document.getElementById('parentsRegistrationChart');
+  let selectedMunicipality = '';
+
+  // Populate municipality dropdown
+  const munis = [...new Set(rows.map(r => (r.dataset.municipality||'').trim()).filter(Boolean))].sort();
+  munis.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v.toLowerCase(); o.textContent = v;
+    municipalityFilter.appendChild(o);
+  });
+
+  function applyFilters() {
+    const q = searchInput.value.trim().toLowerCase();
+    let count = 0;
+    const vis = [];
+    rows.forEach(row => {
+      const ok = (!q || row.innerText.toLowerCase().includes(q))
+              && (!selectedMunicipality || (row.dataset.municipality||'').trim().toLowerCase() === selectedMunicipality);
+      row.style.display = ok ? '' : 'none';
+      if (ok) { count++; vis.push(row); }
+    });
+    visibleCount.textContent = count;
+    populateRegistrationYearSelector('parents', vis);
+    renderPeriodRegistrationChart(chart, vis, 'Total rejistu parentes', 'parents');
+    if (selectedMunicipality) {
+      municipalityActive.textContent = municipalityFilter.options[municipalityFilter.selectedIndex].text;
+      municipalityActive.classList.remove('d-none');
+    } else {
+      municipalityActive.textContent = '';
+      municipalityActive.classList.add('d-none');
+    }
+  }
+
+  _parentsApplyFilters = applyFilters;
+
+  searchInput.addEventListener('input', applyFilters);
+  municipalityHeader?.addEventListener('click', () => { municipalityFilter.value = selectedMunicipality; modal?.show(); });
+  applyButton?.addEventListener('click',  () => { selectedMunicipality = municipalityFilter.value; applyFilters(); modal?.hide(); });
+  clearButton?.addEventListener('click',  () => { municipalityFilter.value = ''; selectedMunicipality = ''; applyFilters(); modal?.hide(); });
+  document.getElementById('parentsGroupBy')?.addEventListener('change',     () => { updateRegistrationControls('parents'); applyFilters(); });
+  document.getElementById('parentsYearSelect')?.addEventListener('change',  applyFilters);
+  document.getElementById('parentsMonthSelect')?.addEventListener('change', applyFilters);
+
+  setDefaultRegistrationPeriod('parents', rows);
+  applyFilters();
+}
+
+/* ══════════════════════════════════════════════
+   CHILDREN SETUP
+══════════════════════════════════════════════ */
+function setupChildrenRegistrationChart() {
+  const searchInput = document.getElementById('searchChildren');
+  const tbody       = document.getElementById('childrenTable');
+  const chart       = document.getElementById('childrenRegistrationChart');
+  if (!searchInput || !tbody || !chart) return;
+
+  const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.querySelectorAll('td').length > 0);
+
+  function updateChart() {
+    const vis = rows.filter(r => r.style.display !== 'none');
+    populateRegistrationYearSelector('children', vis);
+    renderPeriodRegistrationChart(chart, vis, 'Total rejistu oan sira', 'children');
+  }
+
+  _childrenUpdateChart = updateChart;
+
+  searchInput.addEventListener('input', updateChart);
+  document.getElementById('childrenGroupBy')?.addEventListener('change',     () => { updateRegistrationControls('children'); updateChart(); });
+  document.getElementById('childrenYearSelect')?.addEventListener('change',  updateChart);
+  document.getElementById('childrenMonthSelect')?.addEventListener('change', updateChart);
+
+  setDefaultRegistrationPeriod('children', rows);
+  updateChart();
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function () {
+  setupTableFilter('searchTeachers', 'teachersTable');
+  setupTableFilter('searchAnalysts', 'analystsTable');
+  setupTableFilter('searchAdmins',   'adminsTable');
+  setupTableFilter('searchChildren', 'childrenTable');
+  setupParentsMunicipalityFilter();
+  setupChildrenRegistrationChart();
+
+  // Re-render chart when tab becomes visible (canvas size is 0 when hidden)
+  document.getElementById('children-tab')?.addEventListener('shown.bs.tab', () => {
+    if (_childrenUpdateChart) _childrenUpdateChart();
+  });
+
+  // Activate tab from ?tab= URL param
+  try {
+    const params    = new URLSearchParams(window.location.search);
+    const requested = params.get('tab');
+    const allowed   = ['parents','children','teachers','analysts','admins'];
+    if (requested && allowed.includes(requested)) {
+      const trigger = document.querySelector(`#${requested}-tab`);
+      if (trigger) new bootstrap.Tab(trigger).show();
+    }
+  } catch (e) {}
+});
 </script>
 {% endblock %}

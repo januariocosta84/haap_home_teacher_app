@@ -1,0 +1,649 @@
+/* ============================================================
+   HAAP Platform — Global Shared Admin Styles
+   Loaded via base.html for all admin / dashboard pages.
+   ============================================================ */
+
+/* === CSS Variables === */
+:root {
+  --haap-primary: #2563eb;
+  --haap-success: #10b981;
+  --haap-warning: #f59e0b;
+  --haap-danger: #ef4444;
+  --haap-light-bg: #f8fafc;
+  --haap-border: #e2e8f0;
+  --haap-text-secondary: #64748b;
+  --haap-text-primary: #1e293b;
+}
+
+/* === Layout === */
+.card {
+  overflow: hidden;
+}
+
+/* === Typography === */
+h2, h3, h4, h5 {
+  letter-spacing: -0.3px;
+}
+
+/* === Forms === */
+.form-control,
+.form-select {
+  border-color: #d9e2ec;
+  border-radius: 10px;
+  min-height: 44px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--haap-primary);
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.12);
+}
+
+textarea.form-control {
+  min-height: 120px;
+}
+
+.input-group-text {
+  border-color: #d9e2ec;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  min-height: 42px;
+}
+
+.input-group .form-control {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+/* === Tables === */
+.table td {
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* === Buttons === */
+.btn {
+  font-weight: 500;
+}
+
+/* === Badges === */
+.badge {
+  font-weight: 500;
+}
+
+/* === Pagination === */
+.page-link {
+  border-radius: 50px !important;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  transform: translateY(-2px);
+}
+
+/* === Hover Cards === */
+.hover-card {
+  transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+/* === Alerts === */
+.alert {
+  transition: opacity 0.1s ease-out;
+}
+
+.alert-sm {
+  font-size: 0.875rem;
+  margin-bottom: 0 !important;
+  padding: 0.5rem 0.75rem !important;
+}
+
+/* === Action Buttons === */
+.action-btn {
+  align-items: center;
+  display: flex;
+  height: 38px;
+  justify-content: center;
+  transition: all 0.25s ease;
+  width: 38px;
+}
+
+.action-btn:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* === Icon Boxes === */
+.row-icon {
+  align-items: center;
+  border-radius: 10px;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.empty-icon {
+  align-items: center;
+  border-radius: 14px;
+  display: inline-flex;
+  font-size: 1.25rem;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+/* === Empty States === */
+.empty-state {
+  max-width: 320px;
+}
+
+/* === Status Badges === */
+.status-badge {
+  font-weight: 600;
+  padding: 0.42rem 0.68rem;
+}
+
+/* === Dashboard Cards === */
+.small-box-card {
+  transition: all 0.3s ease;
+}
+
+.small-box-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+/* === Header / Topbar === */
+.app-header {
+  height: 60px;
+}
+
+.sidebar-toggle-btn {
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: #f3f4f6;
+}
+
+.user-nav {
+  border-radius: 12px;
+  padding: 6px 10px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.user-nav:hover {
+  background: #f9fafb;
+}
+
+.user-avatar {
+  border: 2px solid #eef0f4;
+  border-radius: 50%;
+  height: 36px;
+  object-fit: cover;
+  width: 36px;
+}
+
+.user-name {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.user-role {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.user-dropdown {
+  border-radius: 14px;
+  overflow: hidden;
+  width: 280px;
+}
+
+.user-card {
+  background: #f9fafb;
+  padding: 16px;
+}
+
+.user-card-avatar {
+  border-radius: 50%;
+  height: 60px;
+  object-fit: cover;
+  width: 60px;
+}
+
+.modern-item {
+  border-radius: 10px;
+  font-size: 14px;
+  padding: 8px 10px;
+  transition: 0.2s;
+}
+
+.modern-item:hover {
+  background: #f3f4f6;
+}
+
+.btn-danger {
+  border-radius: 12px;
+}
+
+/* ════════════════════════════════════════════
+   HAAP Sidebar — Unified Design System
+   ════════════════════════════════════════════ */
+
+/* ── CSS tokens ── */
+.app-sidebar {
+  --sb-bg:           #0f172a;
+  --sb-brand-bg:     #080f1e;
+  --sb-border:       rgba(255,255,255,0.06);
+  --sb-text:         rgba(255,255,255,0.78);
+  --sb-text-dim:     rgba(255,255,255,0.38);
+  --sb-hover-bg:     rgba(255,255,255,0.07);
+  --sb-active-bg:    rgba(59,130,246,0.18);
+  --sb-active-text:  #93c5fd;
+  --sb-active-bar:   #3b82f6;
+  --sb-icon:         rgba(255,255,255,0.48);
+  --sb-icon-active:  #60a5fa;
+  --sb-header:       rgba(255,255,255,0.28);
+  --sb-sub-bg:       rgba(0,0,0,0.22);
+}
+
+/* Role-specific accent colours */
+.haap-role-teacher {
+  --sb-active-bg:   rgba(13,148,136,0.18);
+  --sb-active-text: #5eead4;
+  --sb-active-bar:  #0d9488;
+  --sb-icon-active: #2dd4bf;
+}
+.haap-role-parent {
+  --sb-active-bg:   rgba(34,197,94,0.16);
+  --sb-active-text: #86efac;
+  --sb-active-bar:  #22c55e;
+  --sb-icon-active: #4ade80;
+}
+.haap-role-municipality_analyst {
+  --sb-active-bg:   rgba(245,158,11,0.16);
+  --sb-active-text: #fcd34d;
+  --sb-active-bar:  #f59e0b;
+  --sb-icon-active: #fbbf24;
+}
+
+/* ── Sidebar shell ── */
+.app-sidebar,
+.app-sidebar[data-bs-theme="dark"] {
+  background: var(--sb-bg) !important;
+  border-right: 1px solid var(--sb-border) !important;
+  width: 260px;
+}
+
+/* ── Brand ── */
+.app-sidebar .sidebar-brand {
+  background: var(--sb-brand-bg) !important;
+  border-bottom: 1px solid var(--sb-border) !important;
+  height: 64px !important;
+  flex-shrink: 0;
+}
+.app-sidebar .sidebar-brand .brand-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 1.1rem !important;
+  text-decoration: none !important;
+  height: 100%;
+}
+.app-sidebar .sidebar-brand .brand-image {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px;
+  object-fit: contain;
+  opacity: 1 !important;
+  flex-shrink: 0;
+}
+.app-sidebar .sidebar-brand .brand-text {
+  color: #fff !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.app-sidebar .sidebar-brand .brand-version {
+  font-size: 0.65rem;
+  color: var(--sb-text-dim);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* ── User strip ── */
+.sb-user-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sb-border);
+  background: rgba(0,0,0,0.15);
+}
+.sb-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+.sb-user-name {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-user-role {
+  font-size: 0.68rem;
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 1px 7px;
+  display: inline-block;
+  margin-top: 2px;
+}
+.sb-role-moe_admin         { background: rgba(59,130,246,0.25);  color: #93c5fd; }
+.sb-role-teacher           { background: rgba(13,148,136,0.25);  color: #5eead4; }
+.sb-role-parent            { background: rgba(34,197,94,0.22);   color: #86efac; }
+.sb-role-municipality_analyst { background: rgba(245,158,11,0.22); color: #fcd34d; }
+
+/* ── Wrapper scrollbar ── */
+.app-sidebar .sidebar-wrapper {
+  background: transparent !important;
+}
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar { width: 3px; }
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar-track { background: transparent; }
+.app-sidebar .sidebar-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+/* ── Section headers ── */
+.app-sidebar .nav-header {
+  color: var(--sb-header) !important;
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  padding: 1rem 1.25rem 0.35rem !important;
+}
+
+/* ── First-level nav items ── */
+.app-sidebar .sidebar-menu > .nav-item {
+  margin: 1px 8px !important;
+}
+.app-sidebar .sidebar-menu > .nav-item > .nav-link {
+  align-items: center !important;
+  border-radius: 10px !important;
+  color: var(--sb-text) !important;
+  display: flex !important;
+  font-size: 0.83rem !important;
+  font-weight: 500 !important;
+  padding: 9px 12px !important;
+  position: relative !important;
+  transition: background 0.18s, color 0.18s !important;
+  gap: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.app-sidebar .sidebar-menu > .nav-item > .nav-link:hover {
+  background: var(--sb-hover-bg) !important;
+  color: #fff !important;
+}
+.app-sidebar .sidebar-menu > .nav-item > .nav-link.active {
+  background: var(--sb-active-bg) !important;
+  color: var(--sb-active-text) !important;
+}
+/* Active left accent bar */
+.app-sidebar .sidebar-menu > .nav-item > .nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--sb-active-bar);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── Nav icon ── */
+.app-sidebar .sidebar-menu .nav-icon {
+  color: var(--sb-icon) !important;
+  font-size: 1rem !important;
+  flex-shrink: 0;
+  width: 20px !important;
+  margin-right: 10px !important;
+  text-align: center;
+  transition: color 0.18s;
+}
+.app-sidebar .sidebar-menu .nav-link:hover .nav-icon {
+  color: rgba(255,255,255,0.85) !important;
+}
+.app-sidebar .sidebar-menu .nav-link.active .nav-icon {
+  color: var(--sb-icon-active) !important;
+}
+
+/* ── Treeview arrow ── */
+.app-sidebar .sidebar-menu .nav-arrow {
+  margin-left: auto !important;
+  font-size: 0.68rem !important;
+  color: var(--sb-text-dim) !important;
+  transition: transform 0.22s, color 0.18s !important;
+  flex-shrink: 0;
+}
+.app-sidebar .sidebar-menu .nav-link:hover .nav-arrow {
+  color: var(--sb-text) !important;
+}
+.app-sidebar .sidebar-menu .nav-item.menu-open > .nav-link > .nav-arrow {
+  transform: rotate(90deg) !important;
+}
+
+/* ── Treeview submenu ── */
+.app-sidebar .nav-treeview {
+  background: var(--sb-sub-bg) !important;
+  border-radius: 8px !important;
+  margin: 0 8px 4px 8px !important;
+  padding: 4px 0 !important;
+}
+.app-sidebar .nav-treeview > .nav-item {
+  margin: 0 !important;
+}
+.app-sidebar .nav-treeview > .nav-item > .nav-link {
+  align-items: center !important;
+  border-radius: 8px !important;
+  color: var(--sb-text-dim) !important;
+  display: flex !important;
+  font-size: 0.79rem !important;
+  font-weight: 400 !important;
+  gap: 0 !important;
+  margin: 1px 6px !important;
+  padding: 7px 10px !important;
+  transition: background 0.15s, color 0.15s !important;
+  position: relative;
+}
+.app-sidebar .nav-treeview > .nav-item > .nav-link:hover {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--sb-text) !important;
+}
+.app-sidebar .nav-treeview > .nav-item > .nav-link.active {
+  background: rgba(59,130,246,0.14) !important;
+  color: var(--sb-active-text) !important;
+}
+.app-sidebar .nav-treeview .nav-icon {
+  color: var(--sb-text-dim) !important;
+  font-size: 0.82rem !important;
+  width: 18px !important;
+  margin-right: 8px !important;
+  flex-shrink: 0;
+}
+.app-sidebar .nav-treeview .nav-link:hover .nav-icon {
+  color: var(--sb-text) !important;
+}
+.app-sidebar .nav-treeview .nav-link.active .nav-icon {
+  color: var(--sb-icon-active) !important;
+}
+
+/* ── Logout item ── */
+.app-sidebar .sb-logout-link {
+  margin: 4px 8px !important;
+  border-radius: 10px !important;
+  background: rgba(239,68,68,0.10) !important;
+  color: rgba(252,165,165,0.85) !important;
+}
+.app-sidebar .sb-logout-link:hover {
+  background: rgba(239,68,68,0.20) !important;
+  color: #fca5a5 !important;
+}
+.app-sidebar .sb-logout-link .nav-icon {
+  color: rgba(252,165,165,0.7) !important;
+}
+.app-sidebar .sb-logout-link:hover .nav-icon {
+  color: #fca5a5 !important;
+}
+
+/* ── Separator ── */
+.sb-sep {
+  border: none;
+  border-top: 1px solid var(--sb-border);
+  margin: 8px 16px;
+}
+
+/* ── Responsive: collapsed sidebar ── */
+@media (max-width: 991.98px) {
+  .app-sidebar .sb-user-strip { padding: 10px 12px; }
+}
+
+/* ════════════════════════════════════════════
+   HAAP Teacher Content Sidebar (klase pages)
+   ════════════════════════════════════════════ */
+.haap-content-sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #0f172a;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  min-height: calc(100vh - 64px);
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.haap-content-sidebar::-webkit-scrollbar { width: 3px; }
+.haap-content-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+.haap-cs-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.2);
+}
+.haap-cs-title {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.haap-cs-sub {
+  color: rgba(255,255,255,0.38);
+  font-size: 0.7rem;
+}
+
+.haap-cs-section-label {
+  color: rgba(255,255,255,0.28);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 16px 4px;
+}
+
+.haap-cs-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 1px 8px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.haap-cs-link i {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+  transition: color 0.15s;
+}
+.haap-cs-link:hover {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+}
+.haap-cs-link:hover i { color: rgba(255,255,255,0.8); }
+.haap-cs-link.active {
+  background: rgba(13,148,136,0.2);
+  color: #5eead4;
+}
+.haap-cs-link.active i { color: #2dd4bf; }
+
+.haap-cs-school-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.haap-cs-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.55);
+  border-radius: 10px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+.haap-cs-link.active .haap-cs-badge {
+  background: rgba(13,148,136,0.3);
+  color: #5eead4;
+}
+
+.haap-cs-stat {
+  margin: 8px 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.25);
+  border-left: 3px solid rgba(13,148,136,0.5);
+}
+.haap-cs-stat-label { color: rgba(255,255,255,0.4); font-size: 0.7rem; }
+.haap-cs-stat-value { color: rgba(255,255,255,0.9); font-size: 1.15rem; font-weight: 700; line-height: 1.1; }
+
+@media (max-width: 768px) {
+  .haap-content-sidebar {
+    display: none;
+  }
+}

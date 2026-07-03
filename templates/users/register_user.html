@@ -1,168 +1,478 @@
 {% extends "core/base.html" %}
 {% load static %}
 
+{% block title %}Kria Utilizador Foun{% endblock %}
+
+{% block extra_css %}
+<style>
+.section-divider {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1.25rem;
+}
+.field-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 4;
+}
+.field-wrap { position: relative; }
+.field-wrap .form-control,
+.field-wrap .form-select { padding-left: 2.4rem; }
+
+.role-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: #fff;
+}
+.role-card:hover { border-color: #93c5fd; background: #f0f9ff; }
+.role-card.selected { border-color: #1d4ed8; background: #eff6ff; }
+.role-card .role-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* phone feedback states */
+.phone-valid   .form-control { border-color: #22c55e !important; }
+.phone-invalid .form-control { border-color: #ef4444 !important; }
+.phone-valid   .field-icon   { color: #22c55e; }
+.phone-invalid .field-icon   { color: #ef4444; }
+
+/* password toggle */
+.pw-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  z-index: 5;
+}
+.pw-toggle:hover { color: #475569; }
+.pw-wrap .form-control { padding-left: 2.4rem; padding-right: 2.4rem; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
 
-  <h3>Kria Utilizador Foun</h3>
-  <hr>
-  <form method="post" class="mt-3">
-     {% csrf_token %}
-   <div class="row">
-          <div class="col-md-6 mb-2">
-            <label for="id_first_name" class="form-label">Naran Uluk*</label>
-            {{ form.first_name }}
+  <!-- ═══ HERO HEADER ═══ -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'core:user_management' %}"
+       class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Kria Utilizador Foun</h4>
+      <p class="text-muted small mb-0">Adisiona utilizador foun ba plataforma HAAP</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+
+      {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 mb-4">
+        <i class="bi bi-check-circle me-1"></i>{{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      <form method="post" id="registerForm">
+        {% csrf_token %}
+
+        <!-- ── CARD 1: Informasaun Pessoal ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-person-fill me-1"></i>Informasaun Pessoal
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">
+                  Naran Uluk <span class="text-danger">*</span>
+                </label>
+                <div class="field-wrap">
+                  <i class="bi bi-person field-icon"></i>
+                  {{ form.first_name }}
+                </div>
+                {% for e in form.first_name.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Naran Ikus</label>
+                <div class="field-wrap">
+                  <i class="bi bi-person field-icon"></i>
+                  {{ form.last_name }}
+                </div>
+                {% for e in form.last_name.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
-          <div class="col-md-6 mb-2">
-            <label for="id_last_name" class="form-label">Naran Ikus</label>
-            {{ form.last_name }}
+        </div>
+
+        <!-- ── CARD 2: Kontaktu ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-telephone-fill me-1"></i>Kontaktu
+            </div>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-semibold small">
+                  Numeru WhatsApp <span class="text-danger">*</span>
+                </label>
+                <div class="field-wrap" id="phoneWrap">
+                  <i class="bi bi-whatsapp field-icon" id="phoneIcon"></i>
+                  {{ form.whatsapp_number }}
+                </div>
+                <div id="phone-error" class="text-danger small mt-1 d-none">
+                  <i class="bi bi-exclamation-circle me-1"></i><span id="phone-error-text"></span>
+                </div>
+                <div id="phone-ok" class="text-success small mt-1 d-none">
+                  <i class="bi bi-check-circle me-1"></i>Numeru válidu
+                </div>
+                <div class="form-text mt-1">
+                  <i class="bi bi-info-circle me-1"></i>Formatu: +6707XXXXXXX
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Email <span class="text-muted fw-normal">(Opsional)</span></label>
+                <div class="field-wrap">
+                  <i class="bi bi-envelope field-icon"></i>
+                  {{ form.email }}
+                </div>
+                {% for e in form.email.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Hela Fatin</label>
+                <div class="field-wrap">
+                  <i class="bi bi-geo-alt field-icon"></i>
+                  {{ form.address }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="mb-2">
-          <label for="id_whatsapp_number" class="form-label">Numeru WhatsApp</label>
-          {{ form.whatsapp_number }}
-          <small id="phone-error" class="text-danger d-none"></small>
-        </div>
-
-        <div class="mb-2">
-          <label for="id_email" class="form-label">Email (Opsional)</label>
-          {{ form.email }}
-        </div>
-
-        <div class="mb-2">
-          <label for="id_address" class="form-label">Hela Fatin</label>
-          {{ form.address }}
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-2">
-            <label for="id_municipality" class="form-label">Munisípiu</label>
-            {{ form.municipality }}
+        <!-- ── CARD 3: Lokalizasaun ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-map-fill me-1"></i>Lokalizasaun
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Munisípiu</label>
+                <div class="field-wrap">
+                  <i class="bi bi-building field-icon"></i>
+                  {{ form.municipality }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Postu Administrativu</label>
+                <div class="field-wrap">
+                  <i class="bi bi-pin-map field-icon"></i>
+                  {{ form.administrative_post }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Suku</label>
+                <div class="field-wrap">
+                  <i class="bi bi-signpost field-icon"></i>
+                  {{ form.suco }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">Aldeia</label>
+                <div class="field-wrap">
+                  <i class="bi bi-house field-icon"></i>
+                  {{ form.aldeia }}
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="col-md-6 mb-2">
-            <label for="id_administrative_post" class="form-label">Postu Administrativu</label>
-            {{ form.administrative_post }}
+        </div>
+
+        <!-- ── CARD 4: Funsaun (Role) ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-shield-fill me-1"></i>Funsaun Utilizador
+            </div>
+
+            <!-- Hidden real select (still submitted) -->
+            <div class="d-none">{{ form.role }}</div>
+
+            <!-- Visual role picker -->
+            <div class="row g-3" id="rolePicker">
+
+              <div class="col-12 col-sm-6">
+                <div class="role-card d-flex align-items-center gap-3"
+                     data-role="parent" onclick="selectRole('parent', this)">
+                  <div class="role-icon" style="background:#f0fdf4;">
+                    <i class="bi bi-person-hearts" style="color:#16a34a;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:0.85rem;">Parente</div>
+                    <div class="text-muted" style="font-size:0.75rem;">Inan-aman ka guardião</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6">
+                <div class="role-card d-flex align-items-center gap-3"
+                     data-role="teacher" onclick="selectRole('teacher', this)">
+                  <div class="role-icon" style="background:#eff6ff;">
+                    <i class="bi bi-person-workspace" style="color:#1d4ed8;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:0.85rem;">Professor</div>
+                    <div class="text-muted" style="font-size:0.75rem;">Formador / mestre</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6">
+                <div class="role-card d-flex align-items-center gap-3"
+                     data-role="municipality_analyst" onclick="selectRole('municipality_analyst', this)">
+                  <div class="role-icon" style="background:#fefce8;">
+                    <i class="bi bi-bar-chart-line-fill" style="color:#ca8a04;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:0.85rem;">Analista Munisípiu</div>
+                    <div class="text-muted" style="font-size:0.75rem;">Analista nivel munisípiu</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-6">
+                <div class="role-card d-flex align-items-center gap-3"
+                     data-role="moe_admin" onclick="selectRole('moe_admin', this)">
+                  <div class="role-icon" style="background:#fdf2f8;">
+                    <i class="bi bi-shield-check" style="color:#9333ea;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:0.85rem;">MoE Admin</div>
+                    <div class="text-muted" style="font-size:0.75rem;">Administrador Ministeriu</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            {% for e in form.role.errors %}
+            <div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+            {% endfor %}
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-6 mb-2">
-            <label for="id_suco" class="form-label">Suku</label>
-            {{ form.suco }}
+        <!-- ── CARD 5: Password ── -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-lock-fill me-1"></i>Seguransa
+            </div>
+            <div>
+              <label class="form-label fw-semibold small">
+                Password <span class="text-muted fw-normal">(Opsional)</span>
+              </label>
+              <div class="field-wrap pw-wrap" style="position:relative;">
+                <i class="bi bi-lock field-icon"></i>
+                {{ form.password }}
+                <button type="button" class="pw-toggle" id="pwToggle"
+                        onclick="togglePassword()">
+                  <i class="bi bi-eye" id="pwEyeIcon"></i>
+                </button>
+              </div>
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Labele hatama karik hakarak haruka link konfigurasaun via WhatsApp.
+              </div>
+            </div>
           </div>
-          <div class="col-md-6 mb-2">
-            <label for="id_aldeia" class="form-label">Aldeia</label>
-            {{ form.aldeia }}
-          </div>
-        </div>
-        <div class="mb-2">
-          <label for="id_role" class="form-label">Role</label>
-          {{ form.role }}
         </div>
 
-        <div class="mb-3">
-          <label for="id_password" class="form-label">Password</label>
-          {{ form.password }}
+        <!-- ── ACTION BUTTONS ── -->
+        <div class="d-flex gap-2">
+          <button type="submit" id="submit-button"
+                  class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-person-plus-fill me-1"></i>Kria Utilizador
+          </button>
+          <a href="{% url 'core:user_management' %}"
+             class="btn btn-outline-secondary rounded-pill px-4">
+            Kansela
+          </a>
         </div>
-   <button type="submit" id="submit-button" class="btn btn-primary">  <i class="fas fa-save me-1"></i>Kria Utilizador</button>
 
-  </form>
+      </form>
+    </div>
+  </div>
 </div>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Phone validation script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+/* ── Role picker ── */
+function selectRole(value, card) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('id_role').value = value;
+}
+
+// Sync visual state on page load (e.g. form re-render after error)
+(function () {
+  const currentRole = document.getElementById('id_role').value;
+  if (currentRole) {
+    const card = document.querySelector(`.role-card[data-role="${currentRole}"]`);
+    if (card) card.classList.add('selected');
+  }
+})();
+
+/* ── Password toggle ── */
+function togglePassword() {
+  const input = document.getElementById('id_password');
+  const icon  = document.getElementById('pwEyeIcon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+}
+
+/* ── Location cascades ── */
 $(document).ready(function () {
-  // Load Administrative Posts when municipality changes
   $("#id_municipality").change(function () {
-    var municipalityId = $(this).val();
+    const id = $(this).val();
     $("#id_administrative_post").html('<option value="">Hili Postu Administrativu</option>');
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (municipalityId) {
+    if (id) {
       $.ajax({
         url: "{% url 'core:ajax_load_admin_posts' %}",
-        data: { municipality_id: municipalityId },
-        success: function(data) {
-          data.forEach(p => $("#id_administrative_post").append(new Option(p.name, p.id)));
-        }
+        data: { municipality_id: id },
+        success: data => data.forEach(p => $("#id_administrative_post").append(new Option(p.name, p.id)))
       });
     }
   });
 
-  // Load Sucos when administrative post changes
   $("#id_administrative_post").change(function () {
-    var postId = $(this).val();
+    const id = $(this).val();
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (postId) {
+    if (id) {
       $.ajax({
         url: "{% url 'core:ajax_load_sucos' %}",
-        data: { administrative_post_id: postId },
-        success: function(data) {
-          data.forEach(s => $("#id_suco").append(new Option(s.name, s.id)));
-        }
+        data: { administrative_post_id: id },
+        success: data => data.forEach(s => $("#id_suco").append(new Option(s.name, s.id)))
       });
     }
   });
 
-  // Load Aldeias when suco changes
   $("#id_suco").change(function () {
-    var sucoId = $(this).val();
+    const id = $(this).val();
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (sucoId) {
+    if (id) {
       $.ajax({
         url: "{% url 'core:ajax_load_aldeias' %}",
-        data: { suco_id: sucoId },
-        success: function(data) {
-          data.forEach(a => $("#id_aldeia").append(new Option(a.name, a.id)));
-        }
+        data: { suco_id: id },
+        success: data => data.forEach(a => $("#id_aldeia").append(new Option(a.name, a.id)))
       });
-    }
-  });
-
-  // WhatsApp validation
-  const phoneInput = document.getElementById("id_whatsapp_number");
-  const errorDisplay = document.getElementById("phone-error");
-  const submitButton = document.getElementById("submit-button");
-  const timorPhoneRegex = /^\+6707\d{7}$/;
-
-  phoneInput.addEventListener("input", () => {
-    let phone = phoneInput.value.trim();
-    if (phone.startsWith("7")) phone = "+670" + phone;
-    else if (phone.startsWith("670")) phone = "+" + phone;
-    phoneInput.value = phone;
-
-    errorDisplay.classList.add("d-none");
-    submitButton.disabled = false;
-
-    if (phone && !timorPhoneRegex.test(phone)) {
-      errorDisplay.textContent = "Numeru WhatsApp tenke komesa ho +6707...";
-      errorDisplay.classList.remove("d-none");
-      //alert("Numeru WhatsApp la loos! Tenke komesa ho +6707..."); // ✅ ALERT ADDED
-      submitButton.disabled = true;
-      return;
-    }
-
-    if (timorPhoneRegex.test(phone)) {
-      fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.exists) {
-            errorDisplay.textContent = "Numeru WhatsApp ida ne’e rejistadu ona.";
-            errorDisplay.classList.remove("d-none");
-            alert("Numeru WhatsApp ida ne’e rejistadu ona!"); // ✅ ALERT ADDED
-            submitButton.disabled = true;
-          }
-        }).catch(err => console.error("Error checking WhatsApp:", err));
     }
   });
 });
 
+/* ── WhatsApp validation ── */
+(function () {
+  const phoneInput   = document.getElementById('id_whatsapp_number');
+  const errorBox     = document.getElementById('phone-error');
+  const errorText    = document.getElementById('phone-error-text');
+  const okBox        = document.getElementById('phone-ok');
+  const phoneWrap    = document.getElementById('phoneWrap');
+  const submitButton = document.getElementById('submit-button');
+  const regex        = /^\+6707\d{7}$/;
+  let checkTimer     = null;
+
+  function showError(msg) {
+    errorText.textContent = msg;
+    errorBox.classList.remove('d-none');
+    okBox.classList.add('d-none');
+    phoneWrap.classList.remove('phone-valid');
+    phoneWrap.classList.add('phone-invalid');
+    submitButton.disabled = true;
+  }
+
+  function showOk() {
+    errorBox.classList.add('d-none');
+    okBox.classList.remove('d-none');
+    phoneWrap.classList.remove('phone-invalid');
+    phoneWrap.classList.add('phone-valid');
+    submitButton.disabled = false;
+  }
+
+  function clearState() {
+    errorBox.classList.add('d-none');
+    okBox.classList.add('d-none');
+    phoneWrap.classList.remove('phone-valid', 'phone-invalid');
+    submitButton.disabled = false;
+  }
+
+  phoneInput.addEventListener('input', function () {
+    let phone = this.value.trim();
+    if (phone.startsWith('7'))   phone = '+670' + phone;
+    else if (phone.startsWith('670')) phone = '+' + phone;
+    this.value = phone;
+
+    clearState();
+    clearTimeout(checkTimer);
+
+    if (!phone) return;
+
+    if (!regex.test(phone)) {
+      showError('Numeru WhatsApp tenke komesa ho +6707XXXXXXX');
+      return;
+    }
+
+    // Debounce duplicate check
+    checkTimer = setTimeout(() => {
+      fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.exists) {
+            showError("Numeru WhatsApp ida ne'e rejistadu ona.");
+          } else {
+            showOk();
+          }
+        })
+        .catch(() => clearState());
+    }, 500);
+  });
+})();
 </script>
 {% endblock %}

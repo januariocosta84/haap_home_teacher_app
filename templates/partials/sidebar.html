@@ -1,9 +1,11 @@
 {% load static %}
-<!-- partials/sidebar.html -->
-<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-  <!-- Sidebar Brand -->
+{% with url_name=request.resolver_match.url_name ns=request.resolver_match.namespace %}
+
+<aside class="app-sidebar shadow haap-role-{{ user.role }}" data-bs-theme="dark">
+
+  <!-- ── Brand ── -->
   <div class="sidebar-brand">
-    {%if user.role == "moe_admin" %}
+    {% if user.role == "moe_admin" %}
     <a href="{% url 'core:moe_admin_dashboard' %}" class="brand-link">
     {% elif user.role == "parent" %}
     <a href="{% url 'core:children_list' %}" class="brand-link">
@@ -14,259 +16,288 @@
     {% else %}
     <a href="#" class="brand-link">
     {% endif %}
-      <img
-        src="{% static 'img/logo-ori.png' %}"
-        alt="HAAP Logo"
-        class="brand-image opacity-75 shadow"
-      />
-      <span class="brand-text fw-light">HAAP Dashboard</span>
+      <img src="{% static 'img/logo-ori.png' %}" class="brand-image" alt="HAAP">
+      <div>
+        <div class="brand-text">HAAP</div>
+        <div class="brand-version">Platform Dashboard</div>
+      </div>
     </a>
   </div>
 
-  <!-- Sidebar Wrapper -->
+  <!-- ── Sidebar Wrapper ── -->
   <div class="sidebar-wrapper">
     <nav class="mt-2">
-      <ul
-        class="nav sidebar-menu flex-column"
-        data-lte-toggle="treeview"
-        role="navigation"
-        aria-label="Main navigation"
-        data-accordion="false"
-        id="navigation"
-      >
+      <ul class="nav sidebar-menu flex-column"
+          data-lte-toggle="treeview"
+          role="navigation"
+          data-accordion="false"
+          id="navigation">
 
-        <!-- Dashboard -->
-      {% if user.role == "moe_admin" %}
-        <li class="nav-item">
-          <a href="{% url 'core:moe_admin_dashboard' %}" class="nav-link active">
-            <i class="nav-icon bi bi-speedometer2"></i>
-            <p>Admin Dashboard </p>
-          </a>
-        </li>
-        {% elif user.role == "parent" %}
-        <li class="nav-item">
-          <a href="{% url 'core:children_list' %}" class="nav-link active">
-            <i class="nav-icon bi bi-speedometer2"></i>
-            <p>Dashboard ba Pais</p>
-          </a>
-        </li>
-      {% elif user.role == "municipality_analyst" %}
-        <li class="nav-item">
-          <a href="{% url 'core:municipality_dashboard' %}" class="nav-link active">
-              <i class="nav-icon bi bi-speedometer2"></i>
-            <p>Dashboard ba Munisipalidade</p>
-          </a>
-        </li>
-      {% elif user.role == "teacher" %}
-        <li class="nav-item">
-          <a href="{% url 'preschools:preschool_list_claim' %}" class="nav-link active">
-            <i class="nav-icon bi bi-journal-text"></i>
-            <p>Lista Eskola Sira.</p>
-          </a>
-        </li>
-      {% endif %}
-
+        <!-- ════════════════ MOE ADMIN ════════════════ -->
         {% if user.role == "moe_admin" %}
-          <!-- User Management (Admin only) -->
+
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'core:moe_admin_dashboard' %}"
+               class="nav-link {% if url_name == 'moe_admin_dashboard' %}active{% endif %}">
+              <i class="nav-icon bi bi-speedometer2"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+
+          <!-- Users group -->
+          <li class="nav-item {% if '/dashboard/users' in request.path or url_name == 'register_user' or url_name == 'view_user' or url_name == 'edit_user' %}menu-open{% endif %}">
+            <a href="#"
+               class="nav-link {% if '/dashboard/users' in request.path or url_name == 'register_user' or url_name == 'view_user' or url_name == 'edit_user' %}active{% endif %}">
               <i class="nav-icon bi bi-people-fill"></i>
-              <p>
-                Utilizadores
-                <i class="nav-arrow bi bi-chevron-right"></i>
-              </p>
+              <p>Utilizadores <i class="nav-arrow bi bi-chevron-right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'core:user_management'%}" class="nav-link">
-                  <i class="nav-icon bi bi-people-fill"></i>
-                  <p>Utilizadores </p>
+                <a href="{% url 'core:user_management' %}"
+                   class="nav-link {% if url_name == 'user_management' %}active{% endif %}">
+                  <i class="nav-icon bi bi-grid-3x3-gap"></i>
+                  <p>Hotu</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'core:user_management' %}?tab=parents" class="nav-link">
-                  <i class="nav-icon bi-house-door"></i>
+                  <i class="nav-icon bi bi-person-hearts"></i>
                   <p>Inan aman</p>
                 </a>
-                
               </li>
               <li class="nav-item">
                 <a href="{% url 'core:user_management' %}?tab=teachers" class="nav-link">
-                  <i class="nav-icon bi bi-person-raised-hand"></i>
-                  <p>Formadores</p>
+                  <i class="nav-icon bi bi-person-workspace"></i>
+                  <p>Professores</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{% url 'core:user_management' %}?tab=analysts" class="nav-link">
-                 <i class="nav-icon bi bi-person-arms-up"></i>
-                  <p>Analista munisipal</p>
+                  <i class="nav-icon bi bi-bar-chart-line"></i>
+                  <p>Analistas</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'core:register_user' %}"
+                   class="nav-link {% if url_name == 'register_user' %}active{% endif %}">
+                  <i class="nav-icon bi bi-person-plus"></i>
+                  <p>Kria Foun</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- Equipment Management -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon bi bi-laptop"></i>
-              <p>
-                Ekipamentu
-                <i class="nav-arrow bi bi-chevron-right"></i>
-              </p>
+          <!-- Equipment group -->
+          <li class="nav-item {% if '/equipment' in request.path %}menu-open{% endif %}">
+            <a href="#"
+               class="nav-link {% if '/equipment' in request.path %}active{% endif %}">
+              <i class="nav-icon bi bi-box-seam"></i>
+              <p>Ekipamentu <i class="nav-arrow bi bi-chevron-right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'equipment-list' %}" class="nav-link">
-                  <i class="nav-icon bi bi-list"></i>
-                  <p>Lista Ekipamentu</p>
+                <a href="{% url 'equipment-list' %}"
+                   class="nav-link {% if url_name == 'equipment-list' %}active{% endif %}">
+                  <i class="nav-icon bi bi-list-ul"></i>
+                  <p>Lista</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'equipment-add' %}" class="nav-link">
+                <a href="{% url 'equipment-add' %}"
+                   class="nav-link {% if url_name == 'equipment-add' %}active{% endif %}">
                   <i class="nav-icon bi bi-plus-circle"></i>
-                  <p>Adisiona Ekipamentu</p>
+                  <p>Adisiona</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- Support Tickets Management -->
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon bi bi-ticket"></i>
-              <p>
-                Tiket Suporta
-                <i class="nav-arrow bi bi-chevron-right"></i>
-              </p>
+          <!-- Tickets group -->
+          <li class="nav-item {% if ns == 'ticket' %}menu-open{% endif %}">
+            <a href="#"
+               class="nav-link {% if ns == 'ticket' %}active{% endif %}">
+              <i class="nav-icon bi bi-ticket-perforated"></i>
+              <p>Suporte Tickets <i class="nav-arrow bi bi-chevron-right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-list' %}" class="nav-link">
-                  <i class="nav-icon bi bi-list"></i>
+                <a href="{% url 'ticket:support-ticket-list' %}"
+                   class="nav-link {% if url_name == 'support-ticket-list' %}active{% endif %}">
+                  <i class="nav-icon bi bi-list-ul"></i>
                   <p>Lista Tiket</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- APK Versions -->
+          <!-- APK -->
           <li class="nav-item">
-            <a href="{% url 'core:apk_list' %}" class="nav-link">
-              <i class="nav-icon bi bi-phone"></i>
+            <a href="{% url 'core:apk_list' %}"
+               class="nav-link {% if url_name == 'apk_list' or url_name == 'upload_apk' or url_name == 'edit_apk' %}active{% endif %}">
+              <i class="nav-icon bi bi-android2"></i>
               <p>Versoes APK</p>
             </a>
           </li>
 
-          <!-- System Settings -->
-          <li class="nav-header">SISTEMA</li>
-          <!-- <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon bi bi-gear-fill"></i>
-              <p>Settings</p>
-            </a>
-          </li> -->
-                  <!-- Logs (all roles can see) -->
-        <li class="nav-item">
-          <a href="{% url 'core:logs' %}" class="nav-link">
-            <i class="nav-icon bi bi-activity"></i>
-            <p>Atividades</p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="{% url 'core:class_association_report' %}" class="nav-link">
-            <i class="nav-icon bi bi-diagram-3"></i>
-            <p>Klase Asosiasaun</p>
-          </a>
-        </li>
-        {% elif user.role == "parent" %}
-          <!-- Children for Parents -->
+          <!-- Preschools -->
           <li class="nav-item">
-            <a href="{% url 'core:children_list' %}" class="nav-link">
-              <i class="nav-icon bi bi-person-badge"></i>
-              <p>Hau nia oan</p>
+            <a href="{% url 'preschools:preschool_list' %}"
+               class="nav-link {% if ns == 'preschools' and url_name != 'preschool_list_claim' %}active{% endif %}">
+              <i class="nav-icon bi bi-buildings"></i>
+              <p>Pre-Eskolares</p>
             </a>
-          </li>
-           <!-- APK Versions -->
-          <li class="nav-item">
-              <a href="{% url 'core:latest_apk' %}" class="nav-link">
-                  <i class="nav-icon bi bi-phone"></i>
-                  <p>
-                      Download HAAP
-                      {% if versions %}
-                          <span class="badge bg-danger ms-1">Foun</span>
-                      {% endif %}
-                  </p>
-              </a>
           </li>
 
-        {% elif user.role == "municipality_analyst" %}
-          <!-- Municipality Dashboard -->
+          <hr class="sb-sep">
+          <li class="nav-header">Relatórios</li>
+
           <li class="nav-item">
-            <a href="{% url 'core:municipality_dashboard' %}" class="nav-link">
-              <i class="nav-icon bi bi-bar-chart"></i>
+            <a href="{% url 'core:teacher_logs' %}"
+               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-journal-text"></i>
+              <p>Atividade Professores</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'core:logs' %}"
+               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-activity"></i>
+              <p>Atividades Alunos</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'core:class_association_report' %}"
+               class="nav-link {% if url_name == 'class_association_report' %}active{% endif %}">
+              <i class="nav-icon bi bi-diagram-3"></i>
+              <p>Asosiasaun Klase</p>
+            </a>
+          </li>
+
+        <!-- ════════════════ PARENT ════════════════ -->
+        {% elif user.role == "parent" %}
+
+          <li class="nav-item">
+            <a href="{% url 'core:children_list' %}"
+               class="nav-link {% if url_name == 'children_list' %}active{% endif %}">
+              <i class="nav-icon bi bi-speedometer2"></i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item">
-          <a href="{% url 'core:logs' %}" class="nav-link">
-            <i class="nav-icon bi bi-activity"></i>
-            <p>Atividades</p>
-          </a>
-        </li>
-        {% elif user.role == "teacher" %}
-        
-          <!-- Teacher Dashboard -->
+            <a href="{% url 'core:children_list' %}"
+               class="nav-link {% if url_name == 'children_list' %}active{% endif %}">
+              <i class="nav-icon bi bi-emoji-smile"></i>
+              <p>Hau nia Oan</p>
+            </a>
+          </li>
           <li class="nav-item">
-            <a href="{% url 'klase:teacher-schools' %}" class="nav-link">
-              <i class="nav-icon bi bi-person-badge"></i>
-              <p>Lista Eskola ho Klase sira.</p>
+            <a href="{% url 'core:latest_apk' %}"
+               class="nav-link {% if url_name == 'latest_apk' %}active{% endif %}">
+              <i class="nav-icon bi bi-android2"></i>
+              <p>
+                Download HAAP
+                {% if versions %}
+                <span class="badge ms-1 rounded-pill"
+                      style="background:rgba(239,68,68,0.8);color:#fff;font-size:0.65rem;">Foun</span>
+                {% endif %}
+              </p>
             </a>
           </li>
 
-          <!-- Support Tickets for Teachers -->
+        <!-- ════════════════ MUNICIPALITY ANALYST ════════════════ -->
+        {% elif user.role == "municipality_analyst" %}
+
           <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nav-icon bi bi-ticket"></i>
-              <p>
-                Tiket Suporta
-                <i class="nav-arrow bi bi-chevron-right"></i>
-              </p>
+            <a href="{% url 'core:municipality_dashboard' %}"
+               class="nav-link {% if url_name == 'municipality_dashboard' %}active{% endif %}">
+              <i class="nav-icon bi bi-speedometer2"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'core:logs' %}"
+               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-activity"></i>
+              <p>Atividades</p>
+            </a>
+          </li>
+
+        <!-- ════════════════ TEACHER ════════════════ -->
+        {% elif user.role == "teacher" %}
+
+          <li class="nav-item">
+            <a href="{% url 'preschools:preschool_list_claim' %}"
+               class="nav-link {% if url_name == 'preschool_list_claim' %}active{% endif %}">
+              <i class="nav-icon bi bi-speedometer2"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'klase:teacher-schools' %}"
+               class="nav-link {% if url_name == 'teacher-schools' or url_name == 'school-classrooms' or url_name == 'classroom-detail' %}active{% endif %}">
+              <i class="nav-icon bi bi-buildings"></i>
+              <p>Eskola &amp; Klase</p>
+            </a>
+          </li>
+
+          <!-- Tickets group for teacher -->
+          <li class="nav-item {% if ns == 'ticket' %}menu-open{% endif %}">
+            <a href="#"
+               class="nav-link {% if ns == 'ticket' %}active{% endif %}">
+              <i class="nav-icon bi bi-ticket-perforated"></i>
+              <p>Suporte Ticket <i class="nav-arrow bi bi-chevron-right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-create' %}" class="nav-link">
+                <a href="{% url 'ticket:support-ticket-create' %}"
+                   class="nav-link {% if url_name == 'support-ticket-create' %}active{% endif %}">
                   <i class="nav-icon bi bi-plus-circle"></i>
-                  <p>Kria Tiket Foun</p>
+                  <p>Kria Tiket</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-list' %}" class="nav-link">
-                  <i class="nav-icon bi bi-list"></i>
+                <a href="{% url 'ticket:support-ticket-list' %}"
+                   class="nav-link {% if url_name == 'support-ticket-list' %}active{% endif %}">
+                  <i class="nav-icon bi bi-list-ul"></i>
                   <p>Hau nia Tiket</p>
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- Logs (all roles can see) -->
-        <li class="nav-item">
-          <a href="{% url 'core:logs' %}" class="nav-link ">
-            <i class="nav-icon bi bi-activity"></i>
-            <p>Atividades</p>
-          </a>
-        </li>
+          <hr class="sb-sep">
+          <li class="nav-header">Relatórios</li>
+
+          <li class="nav-item">
+            <a href="{% url 'core:teacher_logs' %}"
+               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-journal-text"></i>
+              <p>Atividade Professores</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'core:logs' %}"
+               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-activity"></i>
+              <p>Atividades Alunos</p>
+            </a>
+          </li>
+
         {% endif %}
 
-
-
-        <!-- Logout -->
+        <!-- ── Logout (all roles) ── -->
+        <hr class="sb-sep">
         <li class="nav-item">
-          <a href="{% url 'core:logout' %}" class="nav-link">
+          <a href="{% url 'core:logout' %}" class="nav-link sb-logout-link">
             <i class="nav-icon bi bi-box-arrow-right"></i>
             <p>Sair</p>
           </a>
         </li>
+
       </ul>
     </nav>
   </div>
+
 </aside>
+
+{% endwith %}

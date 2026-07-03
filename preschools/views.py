@@ -197,33 +197,37 @@ class TeacherPreschoolListView(LoginRequiredMixin, TemplateView):
         return context
     
 @login_required
-def join_view(request, preschool_id):  # <-- Must match urls.py exactly
-    preschool = get_object_or_404(Preschool, id=preschool_id)
-
+def join_view(request, preschool_id):
     if request.user.role != 'teacher':
-        messages.error(request, 'Only teachers can request access to a preschool.')
+        messages.error(request, 'Deit mestri mak bele husu aksesu ba pre-eskolár.')
         return redirect('core:login')
 
-    relation, created = PreschoolTeacher.objects.get_or_create(
-        teacher=request.user,
-        preschool=preschool,
-        defaults={
-            'is_active': True,
-            'is_approved': False
-        }
-    )
+    preschool = get_object_or_404(Preschool, id=preschool_id)
+
+    try:
+        relation, created = PreschoolTeacher.objects.get_or_create(
+            teacher=request.user,
+            preschool=preschool,
+            defaults={
+                'is_active': True,
+                'is_approved': False
+            }
+        )
+    except Exception:
+        messages.error(request, 'Akontese erru ikus ba pedidu ida ne\'e. Favor koko fali.')
+        return redirect('preschools:preschool_list_claim')
 
     if not created:
         if not relation.is_active:
             relation.is_active = True
             relation.save()
-            messages.success(request, "Your request has been reactivated and is pending admin approval.")
+            messages.success(request, "Ita nia pedidu ativu fali no hein aprovasaun admin nian.")
         elif not relation.is_approved:
-            messages.info(request, "Your request is already pending admin approval.")
+            messages.info(request, "Ita nia pedidu hein aprovasaun admin nian.")
         else:
-            messages.info(request, "You are already approved for this preschool.")
+            messages.info(request, "Ita aprova ona ba pre-eskolár ida ne'e.")
     else:
-        messages.success(request, "Request submitted. Your preschool claim is pending admin approval.")
+        messages.success(request, "Pedidu haruka ona. Hein aprovasaun admin nian.")
 
     return redirect('preschools:preschool_list_claim')
 
@@ -474,6 +478,11 @@ class ClassroomUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "Klass update ho susesu.")
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['preschool'] = self.object.preschool
+        return context
 
     def get_success_url(self):
         return reverse_lazy(

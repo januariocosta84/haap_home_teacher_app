@@ -1,13 +1,71 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Hamos {{ child.first_name }}{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-  <h3>Delete Child</h3>
-  <p>Are you sure you want to delete <strong>{{ child.first_name }}</strong> ({{ child.get_age_group_display }})?</p>
-  
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Yes, Delete</button>
-    <a href="{% url 'core:children_list' %}" class="btn btn-secondary">Cancel</a>
-  </form>
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-sm-10 col-md-7 col-lg-5">
+
+      <div class="card border-0 shadow-sm text-center" style="border-radius:20px;overflow:hidden;">
+
+        <!-- Red top accent -->
+        <div style="height:6px;background:linear-gradient(90deg,#dc2626,#f87171);"></div>
+
+        <div class="card-body p-5">
+
+          <!-- Danger icon -->
+          <div class="mx-auto mb-4 d-flex align-items-center justify-content-center"
+               style="width:72px;height:72px;border-radius:50%;background:#fef2f2;border:2px solid #fecaca;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size:1.8rem;color:#dc2626;"></i>
+          </div>
+
+          <h5 class="fw-bold mb-2">Konfirma Hamos</h5>
+
+          <p class="text-muted mb-4" style="font-size:0.9rem;">
+            Ita hakarak hamos
+            <strong class="text-dark">{{ child.first_name }}</strong>?
+            <br>
+            <span style="font-size:0.82rem;">Aksaun ne'e labele desfaz. Dadus hotu sei hamos hosi sistema.</span>
+          </p>
+
+          <!-- Child info card -->
+          <div class="rounded-3 p-3 mb-4 text-start"
+               style="background:#f8fafc;border:1px solid #e2e8f0;">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width:42px;height:42px;background:{% if child.age_group == 'A' %}#ede9fe{% else %}#dbeafe{% endif %};font-size:1rem;font-weight:700;color:{% if child.age_group == 'A' %}#6d28d9{% else %}#1d4ed8{% endif %};">
+                {{ child.first_name|slice:":1"|upper }}
+              </div>
+              <div>
+                <div class="fw-semibold">{{ child.first_name }}</div>
+                <div class="text-muted small">
+                  {{ child.get_age_group_display }} · {{ child.age }} tinan · {{ child.user_id }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2 justify-content-center">
+              <a href="{% url 'core:children_list' %}"
+                 class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">
+                <i class="bi bi-arrow-left me-1"></i>Kansela
+              </a>
+              <button type="submit"
+                      class="btn btn-danger rounded-pill px-4 fw-semibold">
+                <i class="bi bi-trash-fill me-1"></i>Hamos
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 {% endblock %}

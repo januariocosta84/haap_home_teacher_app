@@ -1,117 +1,150 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}
-  Adisiona Itens - Husu Suporta
+{% block title %}Adisiona Itens — {{ ticket.ticket_number }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.item-toggle-card { border:2px solid #e2e8f0;border-radius:12px;padding:14px 16px;cursor:pointer;transition:all 0.18s;background:#fff;margin-bottom:10px; }
+.item-toggle-card:hover { border-color:#93c5fd;background:#f8fbff; }
+.item-toggle-card.selected { border-color:#2563eb;background:#eff6ff; }
+.item-toggle-card.selected .item-label { color:#1d4ed8;font-weight:600; }
+.item-details-panel { background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-top:10px;display:none; }
+.section-label { font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #f1f5f9;margin-bottom:1.25rem; }
+#formValidationAlert { display:none;border-radius:12px;border-left:4px solid #dc2626;background:#fef2f2;color:#dc2626;padding:12px 16px;font-size:0.85rem;margin-bottom:1rem; }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-10 offset-md-1">
-      <div class="card shadow">
-        <div class="card-header bg-success text-white">
-          <h4 class="mb-0">Adisiona Itens - Husu Suporta</h4>
+<div class="container-fluid py-4">
+
+  <!-- ═══ BACK + HEADER ═══ -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'ticket:support-ticket-list' %}"
+       class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Adisiona Itens Husu</h4>
+      <p class="text-muted small mb-0">Tiket: <strong>{{ ticket.ticket_number }}</strong></p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+
+      <!-- Ticket info strip -->
+      <div class="rounded-3 p-3 mb-4 d-flex align-items-center gap-3"
+           style="background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width:40px;height:40px;background:rgba(255,255,255,0.18);">
+          <i class="bi bi-ticket-perforated"></i>
         </div>
-        <div class="card-body">
-          <div class="alert alert-info">
-            <strong>Tiket Numeru:</strong> {{ ticket.ticket_number }}
-          </div>
-
-          <form method="post" id="itemsForm">
-            {% csrf_token %}
-
-            <h5 class="mb-3">Ekipamentu - Suporta Tekniku</h5>
-            <div class="equipment-section mb-4">
-              {% for item_key, item_label in equipment_items %}
-                <div class="card mb-2">
-                  <div class="card-body">
-                    <div class="form-check mb-2">
-                      <input class="form-check-input equipment-item-checkbox" type="checkbox" name="equipment_items" value="{{ item_key }}" id="item_{{ item_key }}">
-                      <label class="form-check-label" for="item_{{ item_key }}">
-                        {{ item_label }}
-                      </label>
-                    </div>
-                    <div class="details-input" id="details_{{ item_key }}_container" style="display: none;">
-                      <textarea name="details_{{ item_key }}" class="form-control form-control-sm" rows="3" placeholder="Detalhes..."></textarea>
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-
-            <hr>
-
-            <h5 class="mb-3">Formasaun no Dezenvolvimentu Profisionál</h5>
-            <div class="training-section mb-4">
-              {% for item_key, item_label in training_items %}
-                <div class="card mb-2">
-                  <div class="card-body">
-                    <div class="form-check mb-2">
-                      <input class="form-check-input training-item-checkbox" type="checkbox" name="training_items" value="{{ item_key }}" id="item_{{ item_key }}">
-                      <label class="form-check-label" for="item_{{ item_key }}">
-                        {{ item_label }}
-                      </label>
-                    </div>
-                    <div class="training-inputs" id="training_{{ item_key }}_container" style="display: none;">
-                      <div class="mb-2">
-                        <label class="form-label form-label-sm">Formatu ne'ebé prefere</label>
-                        <input type="text" name="preferred_format_{{ item_key }}" class="form-control form-control-sm" placeholder="Ex: hadau hadap malu, vídeo guia, workshop ho grupu, 1:1">
-                      </div>
-                      <div>
-                        <label class="form-label form-label-sm">Karaterístika aplikasaun nian ne'ebé hakarak aprende</label>
-                        <textarea name="app_features_{{ item_key }}" class="form-control form-control-sm" rows="3" placeholder="Ex: navigasaun, konfigurasaun, jestaun klase"></textarea>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-success">
-                Subete Husu
-              </button>
-              <a href="{% url 'ticket:support-ticket-list' %}" class="btn btn-secondary">Kansela</a>
-            </div>
-          </form>
+        <div>
+          <div class="fw-bold">{{ ticket.ticket_number }}</div>
+          <div style="font-size:0.8rem;opacity:0.8;">Kria iha {{ ticket.created_at|date:"d/m/Y" }}</div>
         </div>
       </div>
+
+      <form method="post" id="itemsForm">
+        {% csrf_token %}
+
+        <!-- Ekipamentu -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-label"><i class="bi bi-box-seam me-1"></i>Ekipamentu — Suporta Tekniku</div>
+            {% for item_key, item_label in equipment_items %}
+            <div>
+              <label class="item-toggle-card d-flex align-items-center gap-3 w-100 mb-0">
+                <input class="form-check-input equipment-item-checkbox flex-shrink-0 mt-0"
+                       type="checkbox" name="equipment_items" value="{{ item_key }}" id="item_{{ item_key }}"
+                       style="width:1.1rem;height:1.1rem;">
+                <span class="item-label" style="font-size:0.88rem;">{{ item_label }}</span>
+              </label>
+              <div class="item-details-panel" id="details_{{ item_key }}_container">
+                <label class="form-label small fw-semibold text-muted">Detalhes adisionál</label>
+                <textarea name="details_{{ item_key }}" class="form-control form-control-sm" rows="3"
+                          placeholder="Deskreve problema ka pedidu..."></textarea>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Formasaun -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-label"><i class="bi bi-mortarboard me-1"></i>Formasaun no Dezenvolvimentu Profisionál</div>
+            {% for item_key, item_label in training_items %}
+            <div>
+              <label class="item-toggle-card d-flex align-items-center gap-3 w-100 mb-0">
+                <input class="form-check-input training-item-checkbox flex-shrink-0 mt-0"
+                       type="checkbox" name="training_items" value="{{ item_key }}" id="item_{{ item_key }}"
+                       style="width:1.1rem;height:1.1rem;">
+                <span class="item-label" style="font-size:0.88rem;">{{ item_label }}</span>
+              </label>
+              <div class="item-details-panel" id="training_{{ item_key }}_container">
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold text-muted">Formatu ne'ebé prefere</label>
+                  <input type="text" name="preferred_format_{{ item_key }}" class="form-control form-control-sm"
+                         placeholder="Ex: hadau hadap malu, vídeo guia, workshop ho grupu, 1:1">
+                </div>
+                <div>
+                  <label class="form-label small fw-semibold text-muted">Karaterístika aplikasaun ne'ebé hakarak aprende</label>
+                  <textarea name="app_features_{{ item_key }}" class="form-control form-control-sm" rows="3"
+                            placeholder="Ex: navigasaun, konfigurasaun, jestaun klase"></textarea>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div id="formValidationAlert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Favor hili pelu menus item ida.
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-send-fill me-1"></i>Submete Husu
+          </button>
+          <a href="{% url 'ticket:support-ticket-list' %}" class="btn btn-outline-secondary rounded-pill px-4">Kansela</a>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
-  // Handle equipment item checkbox visibility
-  document.querySelectorAll('.equipment-item-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const container = document.getElementById(`details_${this.value}_container`);
-      if (container) {
-        container.style.display = this.checked ? 'block' : 'none';
-      }
-    });
+function updateCardState(cb) {
+  const card = cb.closest('.item-toggle-card');
+  if (card) card.classList.toggle('selected', cb.checked);
+}
+document.querySelectorAll('.equipment-item-checkbox').forEach(cb => {
+  cb.addEventListener('change', function() {
+    updateCardState(this);
+    const p = document.getElementById(`details_${this.value}_container`);
+    if (p) p.style.display = this.checked ? 'block' : 'none';
   });
-
-  // Handle training item checkbox visibility
-  document.querySelectorAll('.training-item-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-      const container = document.getElementById(`training_${this.value}_container`);
-      if (container) {
-        container.style.display = this.checked ? 'block' : 'none';
-      }
-    });
+});
+document.querySelectorAll('.training-item-checkbox').forEach(cb => {
+  cb.addEventListener('change', function() {
+    updateCardState(this);
+    const p = document.getElementById(`training_${this.value}_container`);
+    if (p) p.style.display = this.checked ? 'block' : 'none';
   });
-
-  // Form validation
-  document.getElementById('itemsForm').addEventListener('submit', function(e) {
-    const equipmentChecked = document.querySelectorAll('.equipment-item-checkbox:checked').length;
-    const trainingChecked = document.querySelectorAll('.training-item-checkbox:checked').length;
-
-    if (equipmentChecked === 0 && trainingChecked === 0) {
-      e.preventDefault();
-      alert('Favor hili pelomenu ida item.');
-      return false;
-    }
-  });
+});
+document.getElementById('itemsForm').addEventListener('submit', function(e) {
+  const eq = document.querySelectorAll('.equipment-item-checkbox:checked').length;
+  const tr = document.querySelectorAll('.training-item-checkbox:checked').length;
+  const al = document.getElementById('formValidationAlert');
+  if (eq === 0 && tr === 0) {
+    e.preventDefault();
+    al.style.display = 'block';
+    al.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    al.style.display = 'none';
+  }
+});
 </script>
 {% endblock %}

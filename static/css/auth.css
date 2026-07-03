@@ -1,0 +1,128 @@
+/* ============================================================
+   HAAP Platform — Authentication & Registration Page Styles
+   Loaded directly in standalone auth/registration templates.
+   ============================================================ */
+
+/* === Body === */
+body {
+  background: linear-gradient(135deg, #e3f2fd, #ffffff);
+}
+
+/* === Shared Card Wrappers === */
+.reset-card,
+.otp-card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+/* === Gradient Headers === */
+.reset-header {
+  background: linear-gradient(135deg, #cdd1d6, #08951b);
+  padding: 20px;
+  text-align: center;
+}
+
+.otp-header {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  padding: 20px;
+  text-align: center;
+}
+
+.reset-header i,
+.otp-header i {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+/* === Form Controls === */
+.form-control {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
+.form-control:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 0 0.15rem rgba(78, 115, 223, 0.2);
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+/* === Input Icon (Forgot Password) === */
+.input-icon {
+  color: #6c757d;
+  left: 12px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.form-control.with-icon {
+  padding-left: 40px;
+}
+
+/* === Password Field (Reset Password) === */
+.password-wrapper {
+  position: relative;
+}
+
+.password-icon {
+  color: #6c757d;
+  left: 12px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.password-toggle {
+  color: #6c757d;
+  cursor: pointer;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.password-field input,
+input[type="password"],
+input[type="text"] {
+  border-radius: 10px;
+  height: 48px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* === OTP Input === */
+.otp-input {
+  border-radius: 10px;
+  font-size: 22px;
+  letter-spacing: 8px;
+  text-align: center;
+}
+
+/* === Buttons === */
+.btn-primary {
+  border-radius: 10px;
+  font-weight: 500;
+  padding: 10px;
+}
+
+/* === Validation === */
+.error-text {
+  font-size: 13px;
+}
+
+/* === Cards (Parent/Teacher Register hover) === */
+.card {
+  transition: 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+}

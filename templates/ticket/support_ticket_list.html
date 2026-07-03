@@ -1,147 +1,213 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}
-  Lista Tiket Suporta
+{% block title %}Lista Tiket Suporta{% endblock %}
+
+{% block extra_css %}
+<style>
+.ticket-hero { border-radius:20px; background:linear-gradient(135deg,#2563eb 0%,#1e40af 55%,#1d4ed8 100%); }
+.sbadge { display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 10px;font-size:0.75rem;font-weight:600;white-space:nowrap; }
+.sbadge-open    { background:#fef2f2;color:#dc2626; }
+.sbadge-progress{ background:#fffbeb;color:#b45309; }
+.sbadge-resolved{ background:#f0fdf4;color:#15803d; }
+.sbadge-closed  { background:#f8fafc;color:#475569; }
+.pbadge { display:inline-block;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700; }
+.pbadge-urgent { background:#fef2f2;color:#dc2626; }
+.pbadge-high   { background:#fff7ed;color:#c2410c; }
+.pbadge-medium { background:#fffbeb;color:#b45309; }
+.pbadge-low    { background:#f0fdf4;color:#15803d; }
+.tbadge { border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:600; }
+.tbadge-equip { background:#eff6ff;color:#1d4ed8; }
+.tbadge-train { background:#f0fdf4;color:#15803d; }
+.tbadge-both  { background:#faf5ff;color:#7c3aed; }
+.ticket-table th { font-size:0.68rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#64748b;background:#f8fafc !important;white-space:nowrap;padding:0.85rem 1rem;border-bottom:1px solid #e2e8f0; }
+.ticket-table td { padding:0.75rem 1rem;vertical-align:middle;font-size:0.85rem;border-top:1px solid #f1f5f9; }
+.ticket-table tbody tr { transition:background 0.12s; }
+.ticket-table tbody tr:hover { background:#f8fafc; }
+.ticket-num { font-family:monospace;font-size:0.8rem;font-weight:700;color:#1e293b;letter-spacing:0.04em; }
+.pagination .page-link { border-radius:8px;margin:0 2px;border:1px solid #e2e8f0;color:#475569;font-size:0.83rem; }
+.pagination .page-item.active .page-link { background:#2563eb;border-color:#2563eb;color:#fff; }
+.pagination .page-link:hover { background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe; }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h3>Tiket Suporta</h3>
-    </div>
-    <div class="col-md-4 text-end">
-      {% if user.role == 'teacher' %}
-        <a href="{% url 'ticket:support-ticket-create' %}" class="btn btn-primary">
-          Kria Tiket Foun
-        </a>
-      {% endif %}
+<div class="container-fluid py-4">
+
+  <!-- ═══ HERO ═══ -->
+  <div class="card border-0 ticket-hero mb-4">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center g-3">
+        <div class="col">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.65);" class="mb-2">
+            <i class="bi bi-ticket-perforated me-1"></i>Suporte
+          </div>
+          <h3 class="fw-bold text-white mb-1">Lista Tiket Suporta</h3>
+          <p class="text-white mb-0" style="opacity:0.75;font-size:0.88rem;">Jere no acompanha tiket suporta hotu iha ne'e.</p>
+        </div>
+        {% if user.role == 'teacher' %}
+        <div class="col-auto">
+          <a href="{% url 'ticket:support-ticket-create' %}" class="btn btn-light fw-semibold rounded-pill px-4" style="color:#1d4ed8;">
+            <i class="bi bi-plus-circle-fill me-1"></i>Kria Tiket Foun
+          </a>
+        </div>
+        {% endif %}
+      </div>
     </div>
   </div>
 
-  <!-- Filter Section -->
-  <div class="card mb-4">
-    <div class="card-body">
+  <!-- ═══ FILTER ═══ -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+    <div class="card-body p-4">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <i class="bi bi-funnel-fill" style="color:#2563eb;font-size:0.9rem;"></i>
+        <span style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#64748b;">Filtru</span>
+      </div>
       <form method="get" class="row g-3">
-        <div class="col-md-4">
-          <input type="text" name="ticket_number" class="form-control" placeholder="Numeru Tiket" value="{{ request.GET.ticket_number }}">
+        <div class="col-sm-6 col-md-3">
+          <div style="position:relative;">
+            <i class="bi bi-hash" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:0.85rem;pointer-events:none;z-index:4;"></i>
+            <input type="text" name="ticket_number" class="form-control" placeholder="Numeru Tiket"
+                   value="{{ request.GET.ticket_number }}" style="padding-left:2.1rem;border-radius:10px;">
+          </div>
         </div>
-        <div class="col-md-4">
-          <select name="status" class="form-select">
+        <div class="col-sm-6 col-md-3">
+          <select name="status" class="form-select" style="border-radius:10px;">
             <option value="">Hili Status</option>
             {% for status_value, status_label in statuses %}
-              <option value="{{ status_value }}" {% if request.GET.status == status_value %}selected{% endif %}>
-                {{ status_label }}
-              </option>
+              <option value="{{ status_value }}" {% if request.GET.status == status_value %}selected{% endif %}>{{ status_label }}</option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-md-4">
-          <button type="submit" class="btn btn-primary w-100">
-            Foer
+        <div class="col-sm-6 col-md-3">
+          <select name="ticket_type" class="form-select" style="border-radius:10px;">
+            {% for type_value, type_label in ticket_type_choices %}
+              <option value="{{ type_value }}" {% if current_ticket_type == type_value %}selected{% endif %}>{{ type_label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if user.role == 'moe_admin' %}
+        <div class="col-sm-6 col-md-3">
+          <select name="teacher" class="form-select" style="border-radius:10px;">
+            <option value="">Hili Mestri</option>
+            {% for teacher in teachers %}
+              <option value="{{ teacher.id }}" {% if request.GET.teacher == teacher.id|stringformat:"s" %}selected{% endif %}>{{ teacher.get_full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% else %}
+        <div class="col-sm-6 col-md-3"></div>
+        {% endif %}
+        <div class="col-12 d-flex gap-2 justify-content-end">
+          <a href="{% url 'ticket:support-ticket-list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-x-lg me-1"></i>Limpa
+          </a>
+          <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-search me-1"></i>Buka
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Tickets Table -->
-  <div class="card shadow">
+  <!-- ═══ TABLE ═══ -->
+  <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
     <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
+      <table class="table ticket-table mb-0">
+        <thead>
           <tr>
             <th>Numeru Tiket</th>
             <th>Mestri</th>
             <th>Pre-Escolar</th>
             <th>Tipu</th>
+            <th>Prioridade</th>
             <th>Status</th>
             <th>Kria</th>
-            <th>Aksaun</th>
+            <th style="text-align:center;">Aksaun</th>
           </tr>
         </thead>
         <tbody>
           {% for ticket in tickets %}
-            <tr>
-              <td>
-                <strong>{{ ticket.ticket_number }}</strong>
-              </td>
-              <td>{{ ticket.teacher.first_name }} {{ ticket.teacher.last_name }}</td>
-              <td>{{ ticket.preschool.name }}</td>
-              <td>
-                {% if ticket.is_equipment_request and ticket.is_training_request %}
-                  <span class="badge bg-info">Ekipamentu no Formasaun</span>
-                {% elif ticket.is_equipment_request %}
-                  <span class="badge bg-primary">Ekipamentu</span>
-                {% else %}
-                  <span class="badge bg-success">Formasaun</span>
-                {% endif %}
-              </td>
-              <td>
-                <span class="badge bg-{% if ticket.status == 'open' %}danger{% elif ticket.status == 'in_progress' %}warning{% elif ticket.status == 'closed' %}secondary{% else %}success{% endif %}">
-                  {{ ticket.get_status_display }}
-                </span>
-              </td>
-              <td>{{ ticket.created_at|date:"d/m/Y" }}</td>
-              <td>
-                <a href="{% url 'ticket:support-ticket-detail' ticket.pk %}" class="btn btn-sm btn-info">
-                  Detalhes
-                </a>
-              </td>
-            </tr>
+          <tr>
+            <td><span class="ticket-num">{{ ticket.ticket_number }}</span></td>
+            <td><div class="fw-semibold" style="font-size:0.85rem;">{{ ticket.teacher.first_name }} {{ ticket.teacher.last_name }}</div></td>
+            <td><span class="text-muted" style="font-size:0.83rem;">{{ ticket.preschool.name }}</span></td>
+            <td>
+              {% if ticket.is_equipment_request and ticket.is_training_request %}
+                <span class="tbadge tbadge-both"><i class="bi bi-box-seam me-1"></i>Ekip + Form</span>
+              {% elif ticket.is_equipment_request %}
+                <span class="tbadge tbadge-equip"><i class="bi bi-box-seam me-1"></i>Ekipamentu</span>
+              {% else %}
+                <span class="tbadge tbadge-train"><i class="bi bi-mortarboard me-1"></i>Formasaun</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if ticket.priority == 'urgent' %}<span class="pbadge pbadge-urgent">{{ ticket.get_priority_display }}</span>
+              {% elif ticket.priority == 'high' %}<span class="pbadge pbadge-high">{{ ticket.get_priority_display }}</span>
+              {% elif ticket.priority == 'medium' %}<span class="pbadge pbadge-medium">{{ ticket.get_priority_display }}</span>
+              {% else %}<span class="pbadge pbadge-low">{{ ticket.get_priority_display }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if ticket.status == 'open' %}<span class="sbadge sbadge-open"><i class="bi bi-circle-fill" style="font-size:0.45rem;"></i>{{ ticket.get_status_display }}</span>
+              {% elif ticket.status == 'in_progress' %}<span class="sbadge sbadge-progress"><i class="bi bi-circle-fill" style="font-size:0.45rem;"></i>{{ ticket.get_status_display }}</span>
+              {% elif ticket.status == 'resolved' %}<span class="sbadge sbadge-resolved"><i class="bi bi-circle-fill" style="font-size:0.45rem;"></i>{{ ticket.get_status_display }}</span>
+              {% else %}<span class="sbadge sbadge-closed"><i class="bi bi-circle-fill" style="font-size:0.45rem;"></i>{{ ticket.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td><span class="text-muted" style="font-size:0.8rem;">{{ ticket.created_at|date:"d/m/Y" }}</span></td>
+            <td style="text-align:center;">
+              <a href="{% url 'ticket:support-ticket-detail' ticket.pk %}"
+                 class="btn btn-sm rounded-pill fw-semibold"
+                 style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:0.78rem;padding:3px 12px;">
+                <i class="bi bi-eye me-1"></i>Detalhes
+              </a>
+            </td>
+          </tr>
           {% empty %}
-            <tr>
-              <td colspan="7" class="text-center text-muted py-4">
-              Laiha tiket suporta iha sistema. Klik "Kria Tiket Foun" hodi buka ajuda.
-              </td>
-            </tr>
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <i class="bi bi-ticket-perforated" style="font-size:2rem;color:#94a3b8;display:block;margin-bottom:0.75rem;"></i>
+              <div class="fw-semibold mb-1" style="color:#64748b;">Laiha tiket suporta</div>
+              <div style="font-size:0.83rem;color:#94a3b8;">
+                {% if user.role == 'teacher' %}
+                  <a href="{% url 'ticket:support-ticket-create' %}" class="text-primary fw-semibold">Kria tiket foun</a> hodi buka ajuda.
+                {% else %}
+                  Seidauk iha tiket iha sistema.
+                {% endif %}
+              </div>
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <!-- Pagination -->
     {% if is_paginated %}
-      <div class="card-footer bg-light d-flex justify-content-between align-items-center">
-        <div class="text-muted">
-          Pajina{{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}
-        </div>
-        <nav>
-          <ul class="pagination mb-0">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link" href="?page=1">Inisiu</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-              </li>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center px-4 py-3" style="border-top:1px solid #f1f5f9;">
+      <div class="text-muted" style="font-size:0.82rem;">Pajina {{ page_obj.number }} husi {{ page_obj.paginator.num_pages }}</div>
+      <nav>
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.ticket_number %}&ticket_number={{ request.GET.ticket_number }}{% endif %}"><i class="bi bi-chevron-double-left" style="font-size:0.7rem;"></i></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.ticket_number %}&ticket_number={{ request.GET.ticket_number }}{% endif %}"><i class="bi bi-chevron-left" style="font-size:0.7rem;"></i></a></li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.ticket_number %}&ticket_number={{ request.GET.ticket_number }}{% endif %}">{{ num }}</a></li>
             {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-              {% if page_obj.number == num %}
-                <li class="page-item active">
-                  <span class="page-link">{{ num }}</span>
-                </li>
-              {% else %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
-              {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Tuir mai</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Ikus</a>
-              </li>
-            {% endif %}
-          </ul>
-        </nav>
-      </div>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.ticket_number %}&ticket_number={{ request.GET.ticket_number }}{% endif %}"><i class="bi bi-chevron-right" style="font-size:0.7rem;"></i></a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.ticket_number %}&ticket_number={{ request.GET.ticket_number }}{% endif %}"><i class="bi bi-chevron-double-right" style="font-size:0.7rem;"></i></a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
     {% endif %}
   </div>
+
 </div>
 {% endblock %}

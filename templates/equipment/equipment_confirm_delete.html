@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/equipment.css' %}">{% endblock %}
+
+{% block title %}Hamos Ekipamentu{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="delete-icon bg-danger bg-opacity-10 text-danger">
+              <i class="bi bi-trash"></i>
+            </span>
+            <div>
+              <h4 class="fw-bold mb-1">Hamos ekipamentu?</h4>
+              <p class="text-muted mb-0">Aksaun ida ne'e sei hamos rejistu ekipamentu husi sistema.</p>
+            </div>
+          </div>
+
+          <div class="border rounded-3 p-3 mb-4 bg-light">
+            <div class="row g-3 small">
+              <div class="col-md-6">
+                <div class="text-muted">Tipu</div>
+                <div class="fw-semibold">{{ object.get_equipment_type_display }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted">Serial</div>
+                <div class="fw-semibold">{{ object.serial_number|default:"-" }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted">Modelu</div>
+                <div class="fw-semibold">{{ object.model_number|default:"-" }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-muted">Pre-eskolár</div>
+                <div class="fw-semibold">{{ object.preschool.name|default:"-" }}</div>
+              </div>
+            </div>
+          </div>
+
+          <form method="post" class="d-flex justify-content-end gap-2">
+            {% csrf_token %}
+            <a href="{% url 'equipment-list' %}" class="btn btn-light rounded-pill px-4">
+              Kansela
+            </a>
+            <button type="submit" class="btn btn-danger rounded-pill px-4">
+              <i class="bi bi-trash me-2"></i>Hamos
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,203 +1,245 @@
 {% extends "core/base.html" %}
+{% load static %}
 
-<title>HAAP | {% block title %}Lista ba labarik sira{% endblock %}</title>
+{% block title %}Hau nia Oan Sira{% endblock %}
+
+{% block extra_css %}
+<style>
+.child-card {
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.22s;
+  background: #fff;
+}
+.child-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.09) !important;
+  border-color: #c7d7f5;
+}
+.child-avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.group-a { background: #ede9fe; color: #6d28d9; }
+.group-b { background: #dbeafe; color: #1d4ed8; }
+.group-badge-a { background: #ede9fe; color: #6d28d9; }
+.group-badge-b { background: #dbeafe; color: #1d4ed8; }
+.code-pill {
+  font-family: monospace;
+  font-size: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: #475569;
+  letter-spacing: 0.04em;
+}
+.stat-mini {
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px 20px;
+}
+.th-style {
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: #64748b; background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem; white-space: nowrap;
+}
+.td-style { padding: 0.65rem 1rem; vertical-align: middle; font-size: 0.84rem; }
+.child-row { border-top: 1px solid #f1f5f9; transition: background 0.12s; }
+.child-row:hover { background: #f8fafc; }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container-fluid mt-4">
+  <!-- ═══ HERO HEADER ═══ -->
+  <div class="card border-0 mb-4"
+       style="border-radius:20px; background:linear-gradient(135deg,#16a34a 0%,#15803d 55%,#059669 100%);">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center g-3">
+        <div class="col">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.65);" class="mb-2">
+            <i class="bi bi-emoji-smile me-1"></i>Jestaun
+          </div>
+          <h3 class="fw-bold text-white mb-1">Hau nia Oan Sira</h3>
+          <p class="text-white mb-0" style="opacity:0.75;font-size:0.88rem;">
+            Jere informasaun no rejistu oan sira iha ne'e.
+          </p>
+        </div>
+        <div class="col-auto">
+          <a href="{% url 'core:register_child' %}"
+             class="btn btn-light fw-semibold rounded-pill px-4"
+             style="color:#15803d;">
+            <i class="bi bi-plus-circle-fill me-1"></i>Rejista Oan Foun
+          </a>
+        </div>
+      </div>
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">Hau nia oan sira</h3>
-
-    <a href="{% url 'core:register_child' %}" class="btn btn-success shadow-sm">
-      <i class="fas fa-plus"></i> Rejista oan
-    </a>
-  </div>
-
-  <!-- Card -->
-  <div class="card shadow-sm border-0">
-    
-    <!-- Card Header -->
-  <div class="card-header bg-light text-dark border-bottom">
-  <h5 class="mb-0">Lista Oan</h5>
-  </div>
-    <!-- Card Body -->
-  <div class="card-body p-0">
-
-  {% if children %}
-
-  <div class="table-responsive text-center" style="max-height:600px; overflow-y:auto;">
-    <table id="example2"
-           class="table table-hover mb-0"
-           style="font-size:13px;">
-
-      <!-- THEAD -->
-      <thead style="position:sticky; top:0; z-index:1;">
-        <tr style="background:#f8f9fa;">
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Naran  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Tinan <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Grupu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Login <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Status <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-            Data <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-          </th>
-
-          <th class="px-3 py-2"
-              style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">
-                Posto  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-           
-          </th>
-
-        </tr>
-      </thead>
-
-      <!-- TBODY -->
-      <tbody>
-        {% for child in children %}
-        <tr>
-
-          <!-- Name + Avatar -->
-          <td class="px-3">
-            <div class="d-flex align-items-center">
-              <img src="https://ui-avatars.com/api/?name={{ child.first_name }}&background=0D8ABC&color=fff"
-                   class="rounded-circle me-2"
-                   width="36" height="36">
-
-              <a href="{% url 'core:child-activity' child.id %}"
-                 class="text-decoration-none"
-                 style="font-weight:500;">
-                {{ child.first_name }}
-              </a>
-            </div>
-          </td>
-
-          <td class="px-3 text-muted" style="font-size:12px;">
-            {{ child.year_of_birth }}
-          </td>
-
-          <td class="px-3">
-            {{ child.get_age_group_display }}
-          </td>
-
-          <td class="px-3 text-muted" style="font-size:12px;">
-            {{ child.user_id }}
-          </td>
-
-          <!-- Status Badge (same style as your logs) -->
-          <td class="px-3">
-            <span class="badge rounded-pill"
-                  style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
-              Active
-            </span>
-          </td>
-
-          <td class="px-3 text-muted"
-              style="font-size:12px; white-space:nowrap;">
-            {{ child.created_at|date:"d M Y" }}
-          </td>
-
-          <!-- Actions -->
-          <td class="px-3">
-            <a href="{% url 'core:edit_child' child.id %}"
-               class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-edit"></i>
-            </a>
-
-            <button class="btn btn-sm btn-outline-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteModal{{ child.id }}">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-
-        </tr>
-
-        <!-- Delete Modal -->
-        <div class="modal fade" id="deleteModal{{ child.id }}" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-
-              <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Konfirma Hamos</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-
-              <div class="modal-body">
-                Ita hakarak hamos <strong>{{ child.first_name }}</strong>?
-              </div>
-
-              <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">
-                  Kansela
-                </button>
-
-                <a href="{% url 'core:delete_child' child.id %}"
-                   class="btn btn-danger">
-                  Hamos
-                </a>
-              </div>
-
+      {% if children %}
+      <!-- Stats strip -->
+      <div class="row g-2 mt-3">
+        {% with group_a=children|length group_b=0 %}
+        <div class="col-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.15);">
+            <i class="bi bi-people-fill text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">{{ children|length }}</div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Oan hotu</div>
             </div>
           </div>
         </div>
+        {% endwith %}
+        <div class="col-auto">
+          <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
+               style="background:rgba(255,255,255,0.15);">
+            <i class="bi bi-person-fill text-white" style="font-size:1rem;"></i>
+            <div>
+              <div class="text-white fw-bold" style="font-size:1rem;line-height:1.1;">
+                {{ children|length }}
+              </div>
+              <div class="text-white" style="opacity:0.7;font-size:0.7rem;">Aktivo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 
-        {% endfor %}
-      </tbody>
+  <!-- ═══ MESSAGES ═══ -->
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+  {% endif %}
 
-    </table>
+  {% if children %}
+
+  <!-- ═══ CARD GRID ═══ -->
+  <div class="row g-3 mb-4">
+    {% for child in children %}
+    {% with age=child.year_of_birth %}
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+      <div class="child-card shadow-sm p-4 h-100">
+
+        <!-- Top row: avatar + group badge -->
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div class="child-avatar {% if child.age_group == 'A' %}group-a{% else %}group-b{% endif %}">
+            {{ child.first_name|slice:":1"|upper }}
+          </div>
+          <span class="badge rounded-pill px-3 py-2 {% if child.age_group == 'A' %}group-badge-a{% else %}group-badge-b{% endif %}"
+                style="font-size:0.72rem; font-weight:700;">
+            {{ child.get_age_group_display }}
+          </span>
+        </div>
+
+        <!-- Name -->
+        <div class="fw-bold mb-1" style="font-size:1rem;">{{ child.first_name }}</div>
+
+        <!-- Meta: year + age -->
+        <div class="text-muted small mb-3">
+          <i class="bi bi-calendar3 me-1"></i>{{ child.year_of_birth }}
+          <span class="mx-1">·</span>
+          <i class="bi bi-clock me-1"></i>{{ child.age }} tinan
+        </div>
+
+        <!-- Code -->
+        <div class="mb-3">
+          <div class="text-muted" style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Kódigu</div>
+          <span class="code-pill">{{ child.user_id|default:"—" }}</span>
+        </div>
+
+        <!-- Registered date -->
+        <div class="text-muted mb-4" style="font-size:0.75rem;">
+          <i class="bi bi-calendar-check me-1"></i>Rejistu {{ child.created_at|date:"d M Y" }}
+        </div>
+
+        <!-- Action buttons -->
+        <div class="d-flex gap-2 mt-auto">
+          <a href="{% url 'core:child-activity' child.id %}"
+             class="btn btn-sm rounded-pill flex-fill fw-semibold"
+             style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">
+            <i class="bi bi-graph-up me-1"></i>Atividade
+          </a>
+          <a href="{% url 'core:edit_child' child.id %}"
+             class="btn btn-sm rounded-pill fw-semibold"
+             style="background:#fefce8;color:#854d0e;border:1px solid #fde68a;">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <button class="btn btn-sm rounded-pill fw-semibold"
+                  style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal{{ child.id }}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    {% endwith %}
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal{{ child.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content" style="border-radius:16px;border:none;">
+          <div class="modal-body p-4 text-center">
+            <div class="mb-3">
+              <div class="child-avatar group-a mx-auto mb-3" style="width:56px;height:56px;">
+                {{ child.first_name|slice:":1"|upper }}
+              </div>
+              <h6 class="fw-bold mb-1">Hamos {{ child.first_name }}?</h6>
+              <p class="text-muted small mb-0">
+                Aksaun ne'e labele desfaz. Dadus hotu sei hamos.
+              </p>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary rounded-pill flex-fill"
+                      data-bs-dismiss="modal">Kansela</button>
+              <a href="{% url 'core:delete_child' child.id %}"
+                 class="btn btn-danger rounded-pill flex-fill fw-semibold">
+                <i class="bi bi-trash me-1"></i>Hamos
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
   </div>
 
   {% else %}
 
-  <!-- Empty State (same style) -->
-  <div class="text-center text-muted py-5">
-    <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
-    Laiha dadus oan
+  <!-- ═══ EMPTY STATE ═══ -->
+  <div class="card border-0 shadow-sm text-center py-5" style="border-radius:16px;">
+    <div class="card-body py-5">
+      <div class="mb-4 mx-auto d-flex align-items-center justify-content-center"
+           style="width:80px;height:80px;border-radius:24px;background:#f0fdf4;">
+        <i class="bi bi-emoji-smile" style="font-size:2.2rem;color:#22c55e;"></i>
+      </div>
+      <h5 class="fw-bold mb-2">Seidauk iha oan rejistu</h5>
+      <p class="text-muted mb-4">
+        Tama informasaun oan ita nian hodi hahu rejistasaun.
+      </p>
+      <a href="{% url 'core:register_child' %}"
+         class="btn btn-success rounded-pill px-5 fw-semibold">
+        <i class="bi bi-plus-circle-fill me-2"></i>Rejista Oan Primeiru
+      </a>
+    </div>
   </div>
 
   {% endif %}
 
 </div>
-
-  </div>
-
-</div>
-
-<script>
-  $(function () {
-    $("#example2").DataTable({
-      responsive: true,
-      lengthChange: false,
-      autoWidth: false,
-      searching: false,   // ✅ REMOVE SEARCH BAR
-      pageLength: 10,
-      buttons: ["copy", "csv", "excel", "pdf", "print"]
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
-</script>
-
 {% endblock %}

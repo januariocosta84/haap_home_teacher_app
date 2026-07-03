@@ -1,306 +1,192 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}
-  Ataualiza Tiket Suporta {{ object.ticket_number }}
+{% block title %}Atualiza Tiket {{ object.ticket_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ticket.css' %}">
+<style>
+.update-hero { border-radius:20px; background:linear-gradient(135deg,#2563eb 0%,#1e40af 55%,#1d4ed8 100%); }
+.meta-row { display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid #f1f5f9; }
+.meta-row:last-child { border-bottom:none; }
+.meta-key { font-size:0.8rem;font-weight:600;color:#64748b; }
+.meta-val { font-size:0.85rem;color:#1e293b; }
+.section-label { font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;padding-bottom:8px;border-bottom:1px solid #f1f5f9;margin-bottom:1.25rem; }
+.item-row { background:#f8fafc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px; }
+.item-row:last-child { margin-bottom:0; }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Ticket Header -->
-    <div class="card border-0 shadow-lg mb-4 ticket-header">
-        <div class="card-body">
-            <div class="row align-items-center">
 
-                <div class="col-md-8">
-                    <h3 class="fw-bold mb-1">
-                        #{{ object.ticket_number }}
-                    </h3>
+  <!-- ═══ BACK + HEADER ═══ -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'ticket:support-ticket-detail' object.pk %}"
+       class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Atualiza Tiket</h4>
+      <p class="text-muted small mb-0">{{ object.ticket_number }}</p>
+    </div>
+  </div>
 
-                    <p class="text-muted mb-0">
-                        Kria iha {{ object.created_at|date:"d M Y • H:i" }}
-                    </p>
-                </div>
-
-                <div class="col-md-4 text-md-end">
-
-                    <span class="badge rounded-pill fs-6 px-3 py-2
-                    {% if object.status == 'open' %}
-                        bg-danger
-                    {% elif object.status == 'in_progress' %}
-                        bg-warning text-dark
-                    {% elif object.status == 'resolved' %}
-                        bg-success
-                    {% else %}
-                        bg-secondary
-                    {% endif %}">
-                        {{ object.get_status_display }}
-                    </span>
-
-                </div>
-
-            </div>
+  <!-- Hero strip -->
+  <div class="card border-0 update-hero mb-4">
+    <div class="card-body p-4">
+      <div class="row align-items-center g-2">
+        <div class="col">
+          <div class="fw-bold text-white" style="font-size:1.25rem;letter-spacing:-0.5px;">{{ object.ticket_number }}</div>
+          <div class="text-white" style="opacity:0.75;font-size:0.83rem;">Kria iha {{ object.created_at|date:"d M Y" }}</div>
         </div>
+        <div class="col-auto">
+          <span class="badge rounded-pill px-3 py-2
+            {% if object.status == 'open' %}bg-danger
+            {% elif object.status == 'in_progress' %}bg-warning text-dark
+            {% elif object.status == 'resolved' %}bg-success
+            {% else %}bg-secondary{% endif %}"
+            style="font-size:0.8rem;">
+            {{ object.get_status_display }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- LEFT: Info -->
+    <div class="col-lg-4">
+
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+        <div class="card-body p-4">
+          <div class="section-label"><i class="bi bi-person-workspace me-1"></i>Informasaun Mestri</div>
+          <div class="meta-row">
+            <span class="meta-key">Naran</span>
+            <span class="meta-val fw-semibold">{{ object.teacher.first_name }} {{ object.teacher.last_name }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">Pre-Escolar</span>
+            <span class="meta-val">{{ object.preschool.name }}</span>
+          </div>
+          {% if object.classroom %}
+          <div class="meta-row">
+            <span class="meta-key">Sala Aula</span>
+            <span class="meta-val">{{ object.classroom.name }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm" style="border-radius:16px;">
+        <div class="card-body p-4">
+          <div class="section-label"><i class="bi bi-info-circle me-1"></i>Informasaun Tiket</div>
+          <div class="meta-row">
+            <span class="meta-key">Tipu</span>
+            <span class="meta-val">
+              {% if object.is_equipment_request and object.is_training_request %}
+                <span class="badge rounded-pill bg-primary" style="font-size:0.72rem;">Ekip + Form</span>
+              {% elif object.is_equipment_request %}
+                <span class="badge rounded-pill" style="background:#eff6ff;color:#1d4ed8;font-size:0.72rem;">Ekipamentu</span>
+              {% else %}
+                <span class="badge rounded-pill" style="background:#f0fdf4;color:#15803d;font-size:0.72rem;">Formasaun</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">Prioridade</span>
+            <span class="meta-val">
+              <span class="badge rounded-pill
+                {% if object.priority == 'urgent' %}bg-danger
+                {% elif object.priority == 'high' %}bg-warning text-dark
+                {% else %}bg-info{% endif %}"
+                style="font-size:0.72rem;">
+                {{ object.get_priority_display }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="row">
+    <!-- RIGHT: Form + Items -->
+    <div class="col-lg-8">
 
-        <!-- LEFT COLUMN -->
-        <div class="col-lg-4">
-
-            <!-- Teacher Info -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-
-                    <h6 class="fw-bold text-primary mb-3">
-                        Informasaun Mestri
-                    </h6>
-
-                    <div class="mb-3">
-                        <small class="text-muted d-block">Naran</small>
-                        <strong>
-                            {{ object.teacher.first_name }}
-                            {{ object.teacher.last_name }}
-                        </strong>
-                    </div>
-
-                    <div class="mb-3">
-                        <small class="text-muted d-block">Pre-Escolar</small>
-                        <strong>{{ object.preschool.name }}</strong>
-                    </div>
-
-                    {% if object.classroom %}
-                    <div>
-                        <small class="text-muted d-block">Sala Aula</small>
-                        <strong>{{ object.classroom.name }}</strong>
-                    </div>
-                    {% endif %}
-                </div>
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+        <div class="card-body p-4">
+          <div class="section-label"><i class="bi bi-pencil-square me-1"></i>Atualiza Status &amp; Prioridade</div>
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">{{ form.status.label }}</label>
+              {{ form.status }}
             </div>
-
-            <!-- Ticket Info -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-
-                    <h6 class="fw-bold text-primary mb-3">
-                        Informasaun Tiket
-                    </h6>
-
-                    <div class="mb-3">
-                        <small class="text-muted d-block">Tipu Pedidu</small>
-
-                        {% if object.is_equipment_request and object.is_training_request %}
-                            <span class="badge bg-primary">
-                                Ekipamentu + Formasaun
-                            </span>
-                        {% elif object.is_equipment_request %}
-                            <span class="badge bg-info">
-                                Ekipamentu
-                            </span>
-                        {% else %}
-                            <span class="badge bg-success">
-                                Formasaun
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <div>
-                        <small class="text-muted d-block">Prioridade</small>
-
-                        <span class="badge
-                        {% if object.priority == 'urgent' %}
-                            bg-danger
-                        {% elif object.priority == 'high' %}
-                            bg-warning text-dark
-                        {% else %}
-                            bg-info
-                        {% endif %}">
-                            {{ object.get_priority_display }}
-                        </span>
-                    </div>
-
-                </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">{{ form.priority.label }}</label>
+              {{ form.priority }}
             </div>
-
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">{{ form.resolution_note.label }}</label>
+              {{ form.resolution_note }}
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary rounded-pill px-4 fw-semibold">
+                <i class="bi bi-check-lg me-1"></i>Rai Mudansa
+              </button>
+              <a href="{% url 'ticket:support-ticket-detail' object.pk %}"
+                 class="btn btn-outline-secondary rounded-pill px-4">Kansela</a>
+            </div>
+          </form>
         </div>
+      </div>
 
-        <!-- RIGHT COLUMN -->
-        <div class="col-lg-8">
-
-            <!-- Update Form -->
-            <div class="card border-0 shadow-sm mb-4">
-
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 fw-bold">
-                        Atualiza Tiket
-                    </h5>
-                </div>
-
-                <div class="card-body">
-
-                    <form method="post">
-                        {% csrf_token %}
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                {{ form.status.label }}
-                            </label>
-                            {{ form.status }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                {{ form.priority.label }}
-                            </label>
-                            {{ form.priority }}
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">
-                                {{ form.resolution_note.label }}
-                            </label>
-                            {{ form.resolution_note }}
-                        </div>
-
-                        <div class="d-flex gap-2">
-
-                            <button class="btn btn-primary px-4">
-                                Atualiza Tiket
-                            </button>
-
-                            <a href="{% url 'ticket:support-ticket-detail' object.pk %}"
-                               class="btn btn-outline-secondary">
-                                Kansela
-                            </a>
-
-                        </div>
-
-                    </form>
-
-                </div>
-            </div>
-
-            <!-- Ticket Items -->
-            <div class="card border-0 shadow-sm mb-4">
-
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 fw-bold">
-                        Itens Husu
-                    </h5>
-                </div>
-
-                <div class="card-body">
-
-                    {% for item in object.items.all %}
-
-                    <div class="ticket-item">
-
-                        <div class="d-flex justify-content-between mb-2">
-                            <h6 class="fw-bold mb-0">
-                                {{ item.get_item_type_display }}
-                            </h6>
-                        </div>
-
-                        {% if item.details %}
-                        <p class="text-muted mb-2">
-                            {{ item.details|linebreaks }}
-                        </p>
-                        {% endif %}
-
-                        {% if item.preferred_format %}
-                        <div class="alert alert-light border">
-                            <strong>Formatu:</strong>
-                            {{ item.preferred_format }}
-                        </div>
-                        {% endif %}
-
-                        {% if item.app_features_to_learn %}
-                        <div class="alert alert-info">
-                            <strong>Karaterístika Aprende:</strong><br>
-                            {{ item.app_features_to_learn|linebreaks }}
-                        </div>
-                        {% endif %}
-
-                    </div>
-
-                    {% if not forloop.last %}
-                    <hr>
-                    {% endif %}
-
-                    {% empty %}
-                        <p class="text-muted">
-                            Nenhum item rejistadu.
-                        </p>
-                    {% endfor %}
-
-                </div>
-            </div>
-
-            {% if object.resolution_note %}
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">
-                        Nota Solusaun
-                    </h5>
-                </div>
-
-                <div class="card-body">
-
-                    {{ object.resolution_note|linebreaks }}
-
-                    {% if object.resolved_at %}
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            Rezolve iha
-                            {{ object.resolved_at|date:"d/m/Y H:i" }}
-                        </small>
-                    </div>
-                    {% endif %}
-
-                </div>
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+        <div class="card-body p-4">
+          <div class="section-label"><i class="bi bi-list-check me-1"></i>Itens Husu</div>
+          {% for item in object.items.all %}
+          <div class="item-row">
+            <div class="fw-semibold mb-1" style="font-size:0.88rem;">{{ item.get_item_type_display }}</div>
+            {% if item.details %}
+            <div class="text-muted small mb-2">{{ item.details|linebreaksbr }}</div>
+            {% endif %}
+            {% if item.preferred_format %}
+            <div class="rounded-2 p-2 mb-2" style="background:#f1f5f9;font-size:0.82rem;">
+              <span class="fw-semibold text-muted">Formatu:</span> {{ item.preferred_format }}
             </div>
             {% endif %}
-
+            {% if item.app_features_to_learn %}
+            <div class="rounded-2 p-2" style="background:#eff6ff;font-size:0.82rem;">
+              <span class="fw-semibold" style="color:#1d4ed8;">Karaterístika Aprende:</span><br>
+              <span style="color:#374151;">{{ item.app_features_to_learn|linebreaksbr }}</span>
+            </div>
+            {% endif %}
+          </div>
+          {% empty %}
+          <div class="text-muted small text-center py-3">Laiha item rejistadu.</div>
+          {% endfor %}
         </div>
+      </div>
+
+      {% if object.resolution_note %}
+      <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+        <div class="card-header border-0" style="background:#10b981;">
+          <div class="fw-bold text-white" style="font-size:0.9rem;"><i class="bi bi-check-circle me-1"></i>Nota Solusaun</div>
+        </div>
+        <div class="card-body p-4">
+          <div style="color:#334155;line-height:1.6;white-space:pre-wrap;font-size:0.9rem;">{{ object.resolution_note }}</div>
+          {% if object.resolved_at %}
+          <div class="mt-3 text-muted small">
+            <i class="bi bi-clock me-1"></i>Rezolve iha {{ object.resolved_at|date:"d/m/Y H:i" }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
 
     </div>
+  </div>
+
 </div>
-<style>
-.ticket-header{
-    border-radius:16px;
-    background:linear-gradient(135deg,#0d6efd,#4f8cff);
-    color:white;
-}
-
-.ticket-item{
-    padding:1rem;
-    border-radius:12px;
-    background:#f8f9fa;
-    transition:all .2s ease;
-}
-
-.ticket-item:hover{
-    background:#ffffff;
-    box-shadow:0 4px 15px rgba(0,0,0,.08);
-}
-
-.card{
-    border-radius:16px;
-}
-
-.form-control,
-.form-select{
-    border-radius:10px;
-    min-height:48px;
-}
-
-textarea.form-control{
-    min-height:120px;
-}
-
-.btn{
-    border-radius:10px;
-}
-</style>
 {% endblock %}
