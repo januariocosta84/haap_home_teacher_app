@@ -234,7 +234,83 @@ class AppUsageLog(models.Model):
 
 
 # ---------------------------------
-# 5. Preschool Enrollment Opt-In
+# 5. Teacher Activity Logs
+# ---------------------------------
+class TeacherActivityLog(models.Model):
+
+    STATUS_CHOICES = [
+        ('success', 'Success'),
+        ('failed', 'Failed'),
+        ('pending', 'Pending'),
+        ('started', 'Started'),
+        ('completed', 'Completed'),
+    ]
+
+    id = models.BigAutoField(primary_key=True)
+
+    teacher = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='teacher_activity_logs',
+        limit_choices_to={'role': 'teacher'}
+    )
+
+    preschool = models.ForeignKey(
+        'preschools.Preschool',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='teacher_activity_logs'
+    )
+
+    theme = models.CharField(max_length=100, blank=True, null=True)
+    sub_theme = models.CharField(max_length=100, blank=True, null=True)
+    activity_name = models.CharField(max_length=255, blank=True, null=True)
+
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default='success'
+    )
+
+    activity_date = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'teacher_activity_logs'
+        indexes = [
+            models.Index(fields=['teacher']),
+            models.Index(fields=['preschool']),
+            models.Index(fields=['activity_date']),
+        ]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"TeacherActivityLog {self.teacher.get_full_name()} {self.activity_name or ''}"
+    
+def get_teacher_preschool(user):
+    from django.apps import apps
+
+    PreschoolTeacher = apps.get_model('preschools', 'PreschoolTeacher')
+    relation = PreschoolTeacher.objects.filter(
+        teacher=user,
+        is_active=True,
+        is_approved=True,
+        is_primary=True
+    ).select_related('preschool').first()
+    if relation:
+        return relation.preschool
+
+    relation = PreschoolTeacher.objects.filter(
+        teacher=user,
+        is_active=True,
+        is_approved=True
+    ).select_related('preschool').first()
+    return relation.preschool if relation else None
+
+
+# ---------------------------------
+# 6. Preschool Enrollment Opt-In
 # ---------------------------------
 class PreschoolEnrollmentOptIn(models.Model):
     CONTACT_METHOD_CHOICES = [
@@ -388,6 +464,7 @@ class ActivityResult(models.Model):
         indexes = [
             models.Index(fields=['parent']),
             models.Index(fields=['student']),
+            models.Index(fields=['-created_at'], name='activity_result_created_at_idx'),
         ]
 
     def __str__(self):

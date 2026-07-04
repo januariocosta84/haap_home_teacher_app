@@ -90,7 +90,41 @@ class SupportTicket(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.ticket_number} - {self.teacher}"
+        return self.ticket_number
+
+class SupportTicketDetail(models.Model):
+    CATEGORY_CHOICES = [
+        ('equipment', 'Equipment'),
+        ('training', 'Training'),
+    ]
+
+    ticket = models.ForeignKey(
+        SupportTicket,
+        on_delete=models.CASCADE,
+        related_name='details'
+    )
+
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+
+    item_key = models.CharField(max_length=100)
+
+    details = models.TextField(blank=True, null=True)
+
+    preferred_format = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+
+    app_features = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.ticket.ticket_number} - {self.item_key}"
 
 
 class SupportTicketItem(models.Model):
@@ -162,3 +196,84 @@ class SupportCategory(models.Model):
 
     def __str__(self):
         return self.title
+    
+class SupportTicketMessage(models.Model):
+    SENDER_CHOICES = [
+        ('teacher', 'Teacher'),
+        ('admin', 'Admin'),
+    ]
+
+    ticket = models.ForeignKey(
+        SupportTicket,
+        on_delete=models.CASCADE,
+        related_name='messages'
+    )
+
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    sender_type = models.CharField(
+        max_length=20,
+        choices=SENDER_CHOICES
+    )
+
+    message = models.TextField()
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    is_internal = models.BooleanField(
+        default=False,
+        help_text="Only visible to admins"
+    )
+
+    @property
+    def is_admin_reply(self):
+        return self.sender_type == 'admin'
+
+    @property
+    def sender_label(self):
+        return self.get_sender_type_display()
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.ticket.ticket_number} - {self.sender}"
+
+
+class Notification(models.Model):
+    TYPE_CHOICES = [
+        ('new_ticket', 'New Ticket'),
+        ('new_reply', 'New Reply'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='ticket_notifications'
+    )
+
+    ticket = models.ForeignKey(
+        SupportTicket,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+
+    notification_type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'ticket_notifications'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notification_type}] {self.recipient} – {self.ticket.ticket_number}"

@@ -1,449 +1,699 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ══ Hero ══════════════════════════════════════════════════════════════════ */
+.logs-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 2rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.logs-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+}
+.logs-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 40%;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.hero-icon-bubble {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ══ Stat cards ════════════════════════════════════════════════════════════ */
+.stat-card {
+  border-radius: 16px;
+  border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: box-shadow .18s, transform .18s;
+  background: #fff;
+}
+.stat-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.1); transform: translateY(-2px); }
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.stat-icon.blue   { background: #eff6ff; color: #2563eb; }
+.stat-icon.purple { background: #f5f3ff; color: #7c3aed; }
+.stat-icon.green  { background: #f0fdf4; color: #16a34a; }
+.stat-icon.amber  { background: #fffbeb; color: #d97706; }
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+.stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+.stat-sub {
+  font-size: 0.73rem;
+  color: #94a3b8;
+  margin-top: 3px;
+}
+
+/* ══ Filter card ════════════════════════════════════════════════════════════ */
+.filter-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.log-search-wrap {
+  position: relative;
+}
+.log-search-wrap .bi-search {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 0.95rem; pointer-events: none;
+}
+.log-search-wrap input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.5rem 2.2rem 0.5rem 2.2rem;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  background: #f8fafc;
+}
+.log-search-wrap input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  background: #fff;
+}
+.log-search-wrap .clear-search {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 0.78rem; text-decoration: none;
+}
+.filter-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #eff6ff; color: #1d4ed8;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.74rem; font-weight: 600;
+}
+
+/* ══ Table card ═════════════════════════════════════════════════════════════ */
+.table-card {
+  border-radius: 16px;
+  border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+  overflow: hidden;
+}
+.table-card .card-header {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.9rem 1.5rem;
+}
+.section-label-sm {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+/* ══ Table styles ════════════════════════════════════════════════════════════ */
+#myTable thead th,
+#tableSkeleton thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: #f8fafc;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  border-bottom: 2px solid #eef2f7;
+  padding: 0.7rem 0.9rem;
+  white-space: nowrap;
+}
+#myTable tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background .1s;
+}
+#myTable tbody tr:hover { background: #f0f6ff; }
+#myTable tbody td {
+  padding: 0.65rem 0.9rem;
+  font-size: 0.82rem;
+  color: #334155;
+  vertical-align: middle;
+  border-color: #f1f5f9;
+}
+.cell-id {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+.cell-name { font-weight: 600; color: #1e293b; }
+.cell-location { color: #475569; }
+.cell-date { font-size: 0.75rem; color: #94a3b8; white-space: nowrap; }
+.th-filter { cursor: pointer; user-select: none; }
+.th-filter:hover { color: #2563eb; }
+.th-filter .fi { font-size: 0.6rem; opacity: .6; margin-left: 3px; }
+
+/* Result badges */
+.badge-achieved { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 600; padding: 3px 9px; }
+.badge-tentadu  { background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 600; padding: 3px 9px; }
+
+/* ══ Skeleton ════════════════════════════════════════════════════════════════ */
+.skeleton {
+  background: linear-gradient(90deg,#f1f5f9 25%,#e9eef5 50%,#f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+  border-radius: 5px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skeleton-cell { height: 13px; }
+
+/* ══ Pagination ══════════════════════════════════════════════════════════════ */
+.pagination-wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; padding: 0.85rem 1.5rem; border-top: 1px solid #f1f5f9; }
+.page-link { border-radius: 8px !important; margin: 0 1px; border: 1px solid #e2e8f0; color: #374151; font-size: 0.8rem; min-width: 32px; text-align: center; transition: all .15s; }
+.page-item.active .page-link { background: #2563eb; border-color: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
+.page-link:hover:not(.active) { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+.page-item.disabled .page-link { color: #cbd5e1; background: #f8fafc; }
+
+/* ══ Toolbar buttons ═════════════════════════════════════════════════════════ */
+.tb-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 9px; border: 1px solid #e2e8f0;
+  padding: 0.38rem 0.85rem; font-size: 0.8rem; font-weight: 600;
+  transition: all .15s; background: #fff; color: #374151; cursor: pointer;
+}
+.tb-btn:hover { border-color: #93c5fd; color: #1d4ed8; background: #eff6ff; }
+.tb-btn.green { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+.tb-btn.green:hover { background: #dcfce7; border-color: #86efac; }
+
+/* ══ Empty state ═════════════════════════════════════════════════════════════ */
+.empty-state { text-align: center; padding: 4rem 2rem; }
+.empty-state .ei { font-size: 3rem; color: #cbd5e1; display: block; margin-bottom: .75rem; }
+.empty-state .et { font-weight: 600; color: #475569; margin-bottom: .25rem; }
+.empty-state .es { font-size: 0.83rem; color: #94a3b8; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
 
-  <!-- Page Title -->
-  <div class="mb-4">
-    <h4 class="mb-0 fw-500">Rejistu Atividade</h4>
-    <small class="text-muted">Rejistu uza atividade estudante nian</small>
+  <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+  <div class="logs-hero">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3" style="position:relative;z-index:1;">
+      <div class="d-flex align-items-center gap-3">
+        <div class="hero-icon-bubble">
+          <i class="bi bi-journal-bookmark-fill"></i>
+        </div>
+        <div>
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Dashboard
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">Rejistu Atividade</h4>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Rejistu uza atividade estudante nian
+          </div>
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <button id="toggleChart"
+                class="btn rounded-pill px-4 fw-semibold"
+                style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.82rem;backdrop-filter:blur(4px);">
+          <i class="bi bi-graph-up me-1"></i>Haree Trend
+        </button>
+        <div class="btn-group">
+          <button type="button"
+                  class="btn rounded-pill px-4 fw-semibold dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                  style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.82rem;backdrop-filter:blur(4px);">
+            <i class="bi bi-download me-1"></i>Relatoriu
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow" style="border-radius:12px;border:1px solid #e2e8f0;min-width:150px;">
+            <li><button class="dropdown-item py-2" type="button" data-report-format="pdf">
+              <i class="bi bi-file-earmark-pdf text-danger me-2"></i>PDF
+            </button></li>
+            <li><button class="dropdown-item py-2" type="button" data-report-format="csv">
+              <i class="bi bi-file-earmark-spreadsheet text-success me-2"></i>CSV
+            </button></li>
+            <li><button class="dropdown-item py-2" type="button" data-report-format="excel">
+              <i class="bi bi-file-earmark-excel text-success me-2"></i>Excel
+            </button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Summary Metric Cards -->
+  <!-- ══ STAT CARDS ════════════════════════════════════════════════════════ -->
   <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm text-center py-3 px-2"
-           style="background:#f8f9fa; border-radius:10px;">
-        <div class="text-muted mb-1" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">
-          Total Estudante
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="bi bi-people-fill"></i></div>
+        <div>
+          <div class="stat-label">Total Estudante</div>
+          <div class="stat-value" id="statTotalChildren">{{ unique_students }}</div>
+          <div class="stat-sub">Estudante úniku</div>
         </div>
-        <h2 id="statTotalChildren" class="mb-0 fw-semibold">-</h2>
       </div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm text-center py-3 px-2"
-           style="background:#f8f9fa; border-radius:10px;">
-        <div class="text-muted mb-1" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">
-          Total Atividade
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="bi bi-activity"></i></div>
+        <div>
+          <div class="stat-label">Total Atividade</div>
+          <div class="stat-value" id="statTotalActivities">{{ total_activities }}</div>
+          <div class="stat-sub">Rejistu total</div>
         </div>
-        <h2 id="statTotalActivities" class="mb-0 fw-semibold">-</h2>
       </div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm text-center py-3 px-2"
-           style="background:#f8f9fa; border-radius:10px;">
-        <div class="text-muted mb-1" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">
-          Atinji Rezultadu
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="bi bi-patch-check-fill"></i></div>
+        <div>
+          <div class="stat-label">Atinji Rezultadu</div>
+          <div class="stat-value" id="statAchieved">{{ total_achieved }}</div>
+          <div class="stat-sub">Konsege atinji</div>
         </div>
-        <h2 id="statAchieved" class="mb-0 fw-semibold">-</h2>
       </div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="card border-0 shadow-sm text-center py-3 px-2"
-           style="background:#f8f9fa; border-radius:10px;">
-        <div class="text-muted mb-1" style="font-size:11px; text-transform:uppercase; letter-spacing:0.05em;">
-          Taxa Atinji (%)
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon amber"><i class="bi bi-bar-chart-fill"></i></div>
+        <div>
+          <div class="stat-label">Taxa Atinji</div>
+          <div class="stat-value" id="statRate">{{ achievement_rate }}<span style="font-size:1rem;font-weight:500;color:#94a3b8;">%</span></div>
+          <div class="stat-sub">Persentajen suksesu</div>
         </div>
-        <h2 id="statRate" class="mb-0 fw-semibold">-</h2>
-        <!-- <small id="statTrend" class="text-success d-block mt-1" style="font-size:11px;">↑ +10%</small> -->
       </div>
     </div>
   </div>
 
-  <!-- Trend Button -->
-  <div class="mb-3 d-flex justify-content-between align-items-center">
+  <!-- ══ FILTER CARD ════════════════════════════════════════════════════════ -->
+  <div class="filter-card">
+    <form method="GET" id="filterForm">
+      <div class="row g-2 align-items-center">
 
-  <!-- Left side -->
-  <div>
-    <button id="toggleChart"
-            class="btn btn-sm px-3"
-            style="background:#E6F1FB; color:#185FA5; border:0.5px solid #B5D4F4; font-size:13px; border-radius:8px;">
-      <i class="fas fa-chart-line me-1"></i> Hare'e Trend
-    </button>
-  </div>
-
-  <!-- Right side -->
-  <div class="d-flex gap-2 align-items-center">
-    <div class="btn-group">
-      <button type="button"
-              class="btn btn-sm dropdown-toggle px-3"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-              style="background:#EAF7EF; color:#146C43; border:0.5px solid #BFE4CB; border-radius:8px;">
-        <i class="fas fa-file-export me-1"></i>Gera Relatoriu
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li>
-          <button class="dropdown-item" type="button" data-report-format="pdf">
-            <i class="fas fa-file-pdf me-2"></i> PDF
-          </button>
-        </li>
-        <li>
-          <button class="dropdown-item" type="button" data-report-format="csv">
-            <i class="fas fa-file-csv me-2"></i> CSV
-          </button>
-        </li>
-        <li>
-          <button class="dropdown-item" type="button" data-report-format="excel">
-            <i class="fas fa-file-excel me-2"></i> Excel
-          </button>
-        </li>
-      </ul>
-    </div>
-    <button id="manualRefresh"
-            class="btn btn-sm px-3"
-            style="background:#F1F3F5; color:#333; border:0.5px solid #ccc; border-radius:8px;">
-      <i class="fas fa-sync-alt me-1"></i> Atualiza Rejistu
-    </button>
-  </div>
-
-</div>
-
-  <!-- Data Table Card -->
-  <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
-   
-      <div class="card-header bg-white border-bottom d-flex align-items-center py-3 px-4">
-
-        <!-- Left side -->
-        <div style="font-size:14px; font-weight:500;">
-          Dadus Detalhes
+        <!-- Search -->
+        <div class="col-12 col-md-5">
+          <div class="log-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" value="{{ search_q }}"
+                   placeholder="Hili atividade, estudante, ka aman-inan...">
+            {% if search_q %}
+            <a class="clear-search"
+               href="?{% if date_from %}date_from={{ date_from }}&{% endif %}{% if date_to %}date_to={{ date_to }}{% endif %}">
+              <i class="bi bi-x-lg"></i>
+            </a>
+            {% endif %}
+          </div>
         </div>
 
-        <!-- Spacer -->
-        <div class="flex-grow-1"></div>
-
-        <!-- Right side (shifted more to the right) -->
-        <div class="form-check d-flex align-items-center m-0"
-            style="margin-right: 120px;">  <!-- adjust this value -->
-          <input class="form-check-input me-2" type="checkbox" id="excludeTentadu">
-          <label class="form-check-label small mb-0" for="excludeTentadu">
-            Exklui Tentadu
-          </label>
+        <!-- Date from -->
+        <div class="col-6 col-md-2">
+          <input type="date" name="date_from" value="{{ date_from }}"
+                 class="form-control form-control-sm"
+                 style="border-radius:10px;background:#f8fafc;border-color:#e2e8f0;">
         </div>
 
-        <!-- NEW: Sort Dropdown -->
-      <select id="alphabetSort" class="form-select form-select-sm ms-2"
-              style="width:150px; display:none;">
-        <option value="">Ordena</option>
-        <option value="asc">A–Z</option>
-        <option value="desc">Z–A</option>
+        <!-- Date to -->
+        <div class="col-6 col-md-2">
+          <input type="date" name="date_to" value="{{ date_to }}"
+                 class="form-control form-control-sm"
+                 style="border-radius:10px;background:#f8fafc;border-color:#e2e8f0;">
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
+            <i class="bi bi-funnel-fill me-1"></i>Filtra
+          </button>
+          <a href="{% url 'core:logs' %}"
+             class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+             title="Hamoos filtru">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Active filter pills -->
+      {% if search_q or date_from or date_to %}
+      <div class="d-flex flex-wrap gap-2 mt-2 pt-2" style="border-top:1px dashed #e2e8f0;">
+        <span class="section-label-sm me-1" style="line-height:1.6;">Aktidu:</span>
+        {% if search_q %}
+        <span class="filter-pill"><i class="bi bi-search" style="font-size:.7rem;"></i>{{ search_q }}</span>
+        {% endif %}
+        {% if date_from %}
+        <span class="filter-pill"><i class="bi bi-calendar3" style="font-size:.7rem;"></i>Husi {{ date_from }}</span>
+        {% endif %}
+        {% if date_to %}
+        <span class="filter-pill"><i class="bi bi-calendar3" style="font-size:.7rem;"></i>To'o {{ date_to }}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- ══ TABLE CARD ════════════════════════════════════════════════════════ -->
+  <div class="table-card card">
+
+    <!-- Card header / toolbar -->
+    <div class="card-header d-flex align-items-center flex-wrap gap-2">
+      <div>
+        <div style="font-weight:600;font-size:0.88rem;color:#1e293b;">Dadus Detalhes</div>
+        <div class="section-label-sm" style="margin-top:1px;">
+          Hatudu {{ page_obj.start_index }}–{{ page_obj.end_index }} husi {{ total_activities }} rejistu
+        </div>
+      </div>
+      <div class="flex-grow-1"></div>
+
+      <!-- Exclude tentadu toggle -->
+      <div class="d-flex align-items-center gap-2 me-1">
+        <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+          <input class="form-check-input" type="checkbox" id="excludeTentadu" style="cursor:pointer;">
+          <label class="form-check-label small mb-0" for="excludeTentadu" style="font-size:0.8rem;white-space:nowrap;">Exklui Tentadu</label>
+        </div>
+      </div>
+
+      <!-- Alpha sort (shown when exclude-tentadu on) -->
+      <select id="alphabetSort" class="form-select form-select-sm" style="width:120px;display:none;border-radius:8px;font-size:0.8rem;">
+        <option value="">Ordena A–Z</option>
+        <option value="asc">A → Z</option>
+        <option value="desc">Z → A</option>
       </select>
 
-      </div>
-
-    <div class="card-body p-0">
-      <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
-        <table class="table table-hover mb-0" id="myTable"
-               style="font-size:13px;">
-          <thead style="position:sticky; top:0; z-index:1;">
-            <tr style="background:#f8f9fa;">
-              <th class="px-3 py-2" style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">#</th>
-
-              {% if user.role == "moe_admin" %}
-                <th id="parentHeader" class="px-3 py-2"
-                    style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                  Naran Aman-Inan <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-                </th>
-              {% endif %}
-
-              <th class="px-3 py-2" style="font-size:11px; font-weight:500; color:#888; white-space:nowrap;">Estudante</th>
-              <th style="display:none;">Student ID</th>
-
-              <th id="munisipiuHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Munisipiu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="postoHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Posto <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="sucoHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Suco <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="aldeiaHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Aldeia <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="temaHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Tema <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="tipuHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Tipu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="actividadeHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Atividade <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th id="resultadoHeader" class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Rezultadu <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-              <th  class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888; cursor:pointer; white-space:nowrap;">
-                Data <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-            </tr>
-          </thead>
-          <tbody id="logs-body">
-            {% for log in logs %}
-            <tr>
-              <td class="px-3 text-muted" style="font-size:12px;">{{ log.id }}</td>
-
-              {% if user.role == "moe_admin" %}
-                <td class="px-3">{{ log.parent.get_full_name|default:log.parent.username|default:"-" }}</td>
-              {% endif %}
-
-              <td class="px-3 fw-500">
-                {% if log.student %}{{ log.student.first_name }}{% else %}-{% endif %}
-              </td>
-              <td style="display:none;">
-                {% if log.student %}{{ log.student.id }}{% else %}-{% endif %}
-              </td>
-
-              <td class="px-3">{{ log.parent.municipality }}</td>
-              <td class="px-3">{{ log.parent.administrative_post }}</td>
-              <td class="px-3">{{ log.parent.suco }}</td>
-              <td class="px-3">{{ log.parent.aldeia }}</td>
-              <td class="px-3">{{ log.tema|default:"-" }}</td>
-              <td class="px-3">{{ log.tipu|default:"-" }}</td>
-              <td class="px-3">{{ log.activity_name|default:"-" }}</td>
-              <td class="px-3">
-                {% if log.activity_result and log.activity_result != 'Tentadu' %}
-                  <span class="badge rounded-pill"
-                        style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
-                    {{ log.activity_result }}
-                  </span>
-                {% elif log.activity_result == 'Tentadu' %}
-                  <span class="badge rounded-pill"
-                        style="background:#FAECE7; color:#993C1D; font-size:11px; font-weight:500;">
-                    {{ log.activity_result }}
-                  </span>
-                {% else %}
-                  <span class="text-muted">-</span>
-                {% endif %}
-              </td>
-              <td class="px-3 text-muted" style="font-size:12px; white-space:nowrap;">
-                {{ log.created_at|date:"d M Y H:i" }}
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="{% if user.role == 'moe_admin' %}13{% else %}12{% endif %}"
-                  class="text-center text-muted py-5">
-                <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
-                Laiha rejistu atividade
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+      <!-- Refresh -->
+      <button id="manualRefresh" class="tb-btn" title="Atualiza pajina">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
     </div>
-  </div>
-</div>
 
-<!-- Filter Modal -->
+    <!-- Skeleton (shown until DataTable ready) -->
+    <div id="tableSkeleton" class="table-responsive">
+      <table class="table mb-0" style="font-size:13px;">
+        <thead>
+          <tr>
+            {% if user.role == "moe_admin" %}
+            <th class="px-3">#</th>
+            <th class="px-3">Aman-Inan</th>
+            {% endif %}
+            <th class="px-3">Estudante</th>
+            <th class="px-3">Munisipiu</th>
+            <th class="px-3">Posto</th>
+            <th class="px-3">Suco</th>
+            <th class="px-3">Aldeia</th>
+            <th class="px-3">Tema</th>
+            <th class="px-3">Tipu</th>
+            <th class="px-3">Atividade</th>
+            <th class="px-3">Rezultadu</th>
+            <th class="px-3">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in "1234567891011" %}
+          <tr>
+            {% if user.role == "moe_admin" %}
+            <td><div class="skeleton skeleton-cell" style="width:28px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:95px;"></div></td>
+            {% endif %}
+            <td><div class="skeleton skeleton-cell" style="width:68px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:80px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:60px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:55px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:55px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:110px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:80px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:130px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:62px;"></div></td>
+            <td><div class="skeleton skeleton-cell" style="width:88px;"></div></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Real table (hidden until DataTable init) -->
+    <div class="table-responsive" style="max-height:590px;overflow-y:auto;display:none;" id="tableWrapper">
+      <table class="table table-hover mb-0" id="myTable">
+        <thead>
+          <tr>
+            <th class="px-3">#</th>
+            {% if user.role == "moe_admin" %}
+              <th id="parentHeader" class="px-3 th-filter">
+                Aman-Inan <span class="fi"><i class="bi bi-funnel"></i></span>
+              </th>
+            {% endif %}
+            <th class="px-3">Estudante</th>
+            <th style="display:none;">Student ID</th>
+            <th id="munisipiuHeader" class="px-3 th-filter">Munisipiu <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="postoHeader"     class="px-3 th-filter">Posto     <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="sucoHeader"      class="px-3 th-filter">Suco      <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="aldeiaHeader"    class="px-3 th-filter">Aldeia    <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="temaHeader"      class="px-3 th-filter">Tema      <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="tipuHeader"      class="px-3 th-filter">Tipu      <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="actividadeHeader" class="px-3 th-filter">Atividade <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th id="resultadoHeader"  class="px-3 th-filter">Rezultadu <span class="fi"><i class="bi bi-funnel"></i></span></th>
+            <th class="px-3">Data</th>
+          </tr>
+        </thead>
+        <tbody id="logs-body">
+          {% for log in logs %}
+          <tr>
+            <td class="px-3"><span class="cell-id">{{ log.id }}</span></td>
+            {% if user.role == "moe_admin" %}
+              <td class="px-3 cell-name">{{ log.parent.get_full_name|default:log.parent.username|default:"—" }}</td>
+            {% endif %}
+            <td class="px-3"><span class="cell-name">{% if log.student %}{{ log.student.first_name }}{% else %}—{% endif %}</span></td>
+            <td style="display:none;">{% if log.student %}{{ log.student.id }}{% else %}—{% endif %}</td>
+            <td class="px-3 cell-location">{{ log.parent.municipality|default:"—" }}</td>
+            <td class="px-3 cell-location">{{ log.parent.administrative_post|default:"—" }}</td>
+            <td class="px-3 cell-location">{{ log.parent.suco|default:"—" }}</td>
+            <td class="px-3 cell-location">{{ log.parent.aldeia|default:"—" }}</td>
+            <td class="px-3">{{ log.tema|default:"—" }}</td>
+            <td class="px-3">{{ log.tipu|default:"—" }}</td>
+            <td class="px-3">{{ log.activity_name|default:"—" }}</td>
+            <td class="px-3">
+              {% if log.activity_result and log.activity_result != 'Tentadu' %}
+                <span class="badge rounded-pill badge-achieved">{{ log.activity_result }}</span>
+              {% elif log.activity_result == 'Tentadu' %}
+                <span class="badge rounded-pill badge-tentadu">{{ log.activity_result }}</span>
+              {% else %}
+                <span class="text-muted" style="font-size:0.8rem;">—</span>
+              {% endif %}
+            </td>
+            <td class="px-3"><span class="cell-date">{{ log.created_at|date:"d M Y" }}<br><span style="font-size:0.7rem;">{{ log.created_at|date:"H:i" }}</span></span></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="{% if user.role == 'moe_admin' %}13{% else %}12{% endif %}" class="p-0 border-0">
+              <div class="empty-state">
+                <i class="bi bi-inbox ei"></i>
+                <div class="et">Laiha rejistu atividade</div>
+                <div class="es">Tenke hamoos filtru ka haree fali orsida seluk.</div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Server-side pagination -->
+    {% if is_paginated %}
+    <div class="pagination-wrap">
+      <div class="text-muted" style="font-size:0.78rem;">
+        Pajina <strong>{{ page_obj.number }}</strong> husi <strong>{{ paginator.num_pages }}</strong>
+        &nbsp;·&nbsp; {{ total_activities }} rejistu total
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_q %}&q={{ search_q }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_q %}&q={{ search_q }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-left"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_q %}&q={{ search_q }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_q %}&q={{ search_q }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ paginator.num_pages }}{% if search_q %}&q={{ search_q }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-right"></i></span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+  </div><!-- /table-card -->
+
+</div><!-- /container-fluid -->
+
+<!-- ══ COLUMN FILTER MODAL ════════════════════════════════════════════════ -->
 <div class="modal fade" id="columnFilterModal" tabindex="-1">
   <div class="modal-dialog modal-sm">
-    <div class="modal-content" style="border-radius:12px; border:0.5px solid #e0e0e0;">
-      <div class="modal-header border-bottom py-3">
-        <h6 class="modal-title mb-0" id="filterTitle">Filtra</h6>
+    <div class="modal-content" style="border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 8px 32px rgba(0,0,0,.12);">
+      <div class="modal-header border-bottom py-3 px-4">
+        <h6 class="modal-title mb-0 fw-semibold" id="filterTitle">Filtra</h6>
         <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body px-4">
         <div id="filterContent">
-          <select id="columnPopupFilter" class="form-select form-select-sm">
+          <select id="columnPopupFilter" class="form-select form-select-sm" style="border-radius:8px;">
             <option value="">Hotu</option>
           </select>
         </div>
       </div>
-      <div class="modal-footer border-top py-2">
-        <button type="button" class="btn btn-outline-secondary btn-sm px-3"
-                data-bs-dismiss="modal">Kansela</button>
-        <button id="applyColumnFilter" class="btn btn-primary btn-sm px-3">Aplika</button>
+      <div class="modal-footer border-top py-2 px-4">
+        <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Kansela</button>
+        <button id="applyColumnFilter" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">Aplika</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Trend Chart Modal -->
-<div class="modal fade" id="trendChartModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content" style="border-radius:12px; border:0.5px solid #e0e0e0;">
-      <div class="modal-header border-bottom py-3">
-        <h6 class="modal-title mb-0">Trend Atinji</h6>
+<!-- ══ TREND CHART MODAL ══════════════════════════════════════════════════ -->
+<div class="modal fade" id="trendChartModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 8px 32px rgba(0,0,0,.12);">
+      <div class="modal-header border-bottom py-3 px-4">
+        <div>
+          <h6 class="modal-title mb-0 fw-semibold">Trend Atinji</h6>
+          <div style="font-size:0.73rem;color:#94a3b8;margin-top:1px;">Vizualizasaun progresaun atividade</div>
+        </div>
         <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Filtra Periodu</label>
-            <select id="trendGroupBy" class="form-select form-select-sm">
-              <option value="daily">Loron</option>
-              <option value="monthly" selected>Fulan</option>
-              <option value="yearly">Tinan</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Tinan</label>
-            <select id="trendYearSelect" class="form-select form-select-sm">
-              <option value="">Hotu</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Fulan</label>
-            <select id="trendMonthSelect" class="form-select form-select-sm">
-              <option value="">Hotu</option>
-              <option value="01">Janeiro</option>
-              <option value="02">Fevereiro</option>
-              <option value="03">Março</option>
-              <option value="04">Abril</option>
-              <option value="05">Maio</option>
-              <option value="06">Junho</option>
-              <option value="07">Julho</option>
-              <option value="08">Agosto</option>
-              <option value="09">Septembro</option>
-              <option value="10">Outobru</option>
-              <option value="11">Novembru</option>
-              <option value="12">Decembru</option>
-            </select>
+      <div class="modal-body px-4 pt-3">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <label class="small fw-semibold text-muted mb-0" style="white-space:nowrap;">Periodu:</label>
+          <div class="btn-group btn-group-sm" role="group">
+            <input type="radio" class="btn-check" name="trendPeriod" id="pw" value="week">
+            <label class="btn btn-outline-primary" for="pw">Semana</label>
+            <input type="radio" class="btn-check" name="trendPeriod" id="pm" value="month" checked>
+            <label class="btn btn-outline-primary" for="pm">Fulan</label>
+            <input type="radio" class="btn-check" name="trendPeriod" id="py" value="year">
+            <label class="btn btn-outline-primary" for="py">Tinan</label>
           </div>
         </div>
-        <canvas id="trendChart" height="200"></canvas>
+        <div id="trendChartLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status" style="width:2.25rem;height:2.25rem;"></div>
+          <div class="text-muted mt-3 small">A karga dadus trend...</div>
+        </div>
+        <canvas id="trendChart" height="180" style="display:none;"></canvas>
       </div>
-      <div class="modal-footer border-top py-2">
-        <button id="exportChart" class="btn btn-outline-secondary btn-sm px-3">
-          <i class="fas fa-download me-1"></i> Download
+      <div class="modal-footer border-top py-2 px-4">
+        <button id="exportChart" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          <i class="bi bi-download me-1"></i>Download PNG
         </button>
-        <button type="button" class="btn btn-secondary btn-sm px-3"
-                data-bs-dismiss="modal">Taka</button>
+        <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Taka</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-
 <script>
-function refreshTable() {
-    fetch(window.location.href, {
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-    })
-    .then(response => response.json())
-    .then(data => {
+// ── Role flag ──────────────────────────────────────────────────────────────
+const _ADM = {% if user.role == "moe_admin" %}true{% else %}false{% endif %};
 
-        // 🔥 Destroy DataTable first, but preserve search and page length
-        let searchValue = '';
-        let pageLength = 10;
-        if ($.fn.DataTable.isDataTable('#myTable')) {
-            searchValue = activityTable.search();
-            pageLength = activityTable.page.len();
-            $('#myTable').DataTable().destroy();
-        }
-
-        // ✅ Replace tbody only
-        document.getElementById("logs-body").innerHTML = data.html;
-
-        // 🔄 Reinitialize DataTable
-        initializeDataTable();
-
-        // 🔁 Restore search, page length, and rebind filters + stats
-        if (searchValue) {
-            activityTable.search(searchValue);
-        }
-        activityTable.page.len(pageLength).draw();
-        updateStatistics();
-    });
-}
-
-// ⏱ Refresh every 5 seconds
-//setInterval(refreshTable, 5000);
+// ── Column indexes ─────────────────────────────────────────────────────────
 const COLUMN_INDEXES = {
-    studentId: {% if user.role == "moe_admin" %}3{% else %}2{% endif %},
-    date: {% if user.role == "moe_admin" %}12{% else %}11{% endif %},
-    result: {% if user.role == "moe_admin" %}11{% else %}10{% endif %},
+    studentId: _ADM ? 3 : 2,
+    date:      _ADM ? 12 : 11,
+    result:    _ADM ? 11 : 10,
     filterable: {
-        {% if user.role == "moe_admin" %}
-        parent: 1,
-        {% endif %}
-        munisipiu: {% if user.role == "moe_admin" %}4{% else %}3{% endif %},
-        posto: {% if user.role == "moe_admin" %}5{% else %}4{% endif %},
-        tema: {% if user.role == "moe_admin" %}8{% else %}7{% endif %},
-        tipu: {% if user.role == "moe_admin" %}9{% else %}8{% endif %},
-        actividade: {% if user.role == "moe_admin" %}10{% else %}9{% endif %},
-        resultado: {% if user.role == "moe_admin" %}11{% else %}10{% endif %}
+        ..._ADM && {parent: 1},
+        munisipiu:  _ADM ? 4 : 3,
+        posto:      _ADM ? 5 : 4,
+        suco:       _ADM ? 6 : 5,
+        aldeia:     _ADM ? 7 : 6,
+        tema:       _ADM ? 8 : 7,
+        tipu:       _ADM ? 9 : 8,
+        actividade: _ADM ? 10 : 9,
+        resultado:  _ADM ? 11 : 10,
     }
 };
-
 const FILTER_HEADERS = [
-    {% if user.role == "moe_admin" %}
-    { key: 'parent', trigger: '#parentHeader', title: 'Filtra Parent' },
-    {% endif %}
-    { key: 'munisipiu', trigger: '#munisipiuHeader', title: 'Filtra Munisipiu' },
-    { key: 'posto', trigger: '#postoHeader', title: 'Filtra Posto' },
-    { key: 'tema', trigger: '#temaHeader', title: 'Filtra Tema' },
-    { key: 'tipu', trigger: '#tipuHeader', title: 'Filtra Tipu' },
-    { key: 'actividade', trigger: '#actividadeHeader', title: 'Filtra Atividade' },
-    { key: 'resultado', trigger: '#resultadoHeader', title: 'Filtra Rezultadu' }
+    ...(_ADM ? [{key:'parent',    trigger:'#parentHeader',    title:'Filtra Aman-Inan'}] : []),
+    {key:'munisipiu',  trigger:'#munisipiuHeader',  title:'Filtra Munisipiu'},
+    {key:'posto',      trigger:'#postoHeader',      title:'Filtra Posto'},
+    {key:'tema',       trigger:'#temaHeader',       title:'Filtra Tema'},
+    {key:'tipu',       trigger:'#tipuHeader',       title:'Filtra Tipu'},
+    {key:'actividade', trigger:'#actividadeHeader', title:'Filtra Atividade'},
+    {key:'resultado',  trigger:'#resultadoHeader',  title:'Filtra Rezultadu'},
 ];
-
-const DATA_TABLE_LANGUAGE = {
-    search: 'Pesquisa:',
-    lengthMenu: 'Haree _MENU_ rejistu',
-    info: 'Hatudu _START_ to _END_ husi _TOTAL_ rejistu',
-    infoEmpty: 'Laiha rejistu',
-    infoFiltered: '(filtra husi _MAX_ total rejistu)',
-    zeroRecords: 'La hetan dadus',
-    paginate: { first: 'Uluk', last: 'Ikus', next: 'Tuir Mai', previous: 'Antes' }
-};
-
-const monthNameToIndex = {
-    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
-};
-
-const monthIndexToName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const MULTI_SELECT_FILTERS = ['tema', 'tipu', 'actividade'];
-const FILTER_SELECT_LABELS = {
-    tema: 'Hili Tema',
-    tipu: 'Hili Tipu',
-    actividade: 'Hili Atividade'
-};
-const FILTER_EMPTY_MESSAGES = {
-    tema: 'Husik mamuk atu haree tema hotu.',
-    tipu: 'Husik mamuk atu haree tipu hotu.',
-    actividade: 'Husik mamuk atu haree atividade hotu.'
-};
+const MULTI_SELECT_FILTERS = ['tema','tipu','actividade'];
+const FILTER_SELECT_LABELS   = {tema:'Hili Tema',tipu:'Hili Tipu',actividade:'Hili Atividade'};
+const FILTER_EMPTY_MESSAGES  = {tema:'Husik mamuk atu haree tema hotu.',tipu:'Husik mamuk atu haree tipu hotu.',actividade:'Husik mamuk atu haree atividade hotu.'};
 const REPORT_COLUMNS = [
-    { label: '#', index: 0 },
-    {% if user.role == "moe_admin" %}
-    { label: 'Naran Aman-Inan', index: 1 },
-    { label: 'Estudante', index: 2 },
-    { label: 'Munisipiu', index: 4 },
-    { label: 'Posto', index: 5 },
-    { label: 'Suco', index: 6 },
-    { label: 'Aldeia', index: 7 },
-    { label: 'Tema', index: 8 },
-    { label: 'Tipu', index: 9 },
-    { label: 'Atividade', index: 10 },
-    { label: 'Rezultadu', index: 11 },
-    { label: 'Data', index: 12 }
-    {% else %}
-    { label: 'Estudante', index: 1 },
-    { label: 'Munisipiu', index: 3 },
-    { label: 'Posto', index: 4 },
-    { label: 'Suco', index: 5 },
-    { label: 'Aldeia', index: 6 },
-    { label: 'Tema', index: 7 },
-    { label: 'Tipu', index: 8 },
-    { label: 'Atividade', index: 9 },
-    { label: 'Rezultadu', index: 10 },
-    { label: 'Data', index: 11 }
-    {% endif %}
+    {label:'#',index:0},
+    ...(_ADM?[{label:'Aman-Inan',index:1}]:[]),
+    {label:'Estudante', index:_ADM?2:1},
+    {label:'Munisipiu', index:_ADM?4:3},
+    {label:'Posto',     index:_ADM?5:4},
+    {label:'Suco',      index:_ADM?6:5},
+    {label:'Aldeia',    index:_ADM?7:6},
+    {label:'Tema',      index:_ADM?8:7},
+    {label:'Tipu',      index:_ADM?9:8},
+    {label:'Atividade', index:_ADM?10:9},
+    {label:'Rezultadu', index:_ADM?11:10},
+    {label:'Data',      index:_ADM?12:11},
 ];
 
 let trendChart = null;
@@ -451,642 +701,176 @@ let activityTable = null;
 let activeFilterKey = null;
 const currentFilterValues = {};
 
-function normalizeFilterText(value) {
-    return $('<div>').html(value || '').text().replace(/\s+/g, ' ').trim();
+// ── Helpers ────────────────────────────────────────────────────────────────
+function normalizeFilterText(v){ return $('<div>').html(v||'').text().replace(/\s+/g,' ').trim(); }
+function buildFilterOptions(key){
+    const idx = COLUMN_INDEXES.filterable[key];
+    const set = new Set();
+    activityTable.column(idx).data().each(v=>{ const t=normalizeFilterText(v); if(t&&t!=='—') set.add(t); });
+    return Array.from(set).sort((a,b)=>a.localeCompare(b));
 }
+function isMulti(k){ return MULTI_SELECT_FILTERS.includes(k); }
+function getSelectedMulti(){ return $('#multiSelectedList [data-value]').map(function(){ return $(this).data('value'); }).get(); }
 
-function parseTableDate(dateTime) {
-    const [dayStr, monthName, year] = dateTime.split(' ');
-    const day = parseInt(dayStr, 10);
-    const monthIndex = monthNameToIndex[monthName] ?? 0;
-
-    return {
-        dateObj: new Date(parseInt(year, 10), monthIndex, day),
-        year,
-        month: String(monthIndex + 1).padStart(2, '0')
-    };
-}
-
-function formatTrendKey(parsedDate, groupBy) {
-    const { dateObj } = parsedDate;
-
-    if (groupBy === 'yearly') return String(dateObj.getFullYear());
-    if (groupBy === 'monthly') return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-
-    return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-}
-
-function formatTrendLabel(parsedDate, groupBy) {
-    const { dateObj } = parsedDate;
-
-    if (groupBy === 'yearly') return String(dateObj.getFullYear());
-    if (groupBy === 'monthly') return `${monthIndexToName[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-
-    // For daily view, show just the day number
-    return `${String(dateObj.getDate()).padStart(2, '0')}`;
-}
-
-function getFilteredRows() {
-    return activityTable.rows({ search: 'applied' }).data().toArray();
-}
-
-function getTrendFilterValues() {
-    return {
-        groupBy: $('#trendGroupBy').val(),
-        year: $('#trendYearSelect').val(),
-        month: $('#trendMonthSelect').val()
-    };
-}
-
-function isAchievedResult(value) {
-    const normalizedValue = normalizeFilterText(value);
-    return normalizedValue !== '' && normalizedValue !== 'Tentadu' && normalizedValue !== '-';
-}
-
-function buildFilterOptions(columnKey) {
-    const columnIndex = COLUMN_INDEXES.filterable[columnKey];
-    const optionSet = new Set();
-
-    activityTable.column(columnIndex).data().each(function(cellValue) {
-        const optionText = normalizeFilterText(cellValue);
-        if (optionText) optionSet.add(optionText);
-    });
-
-    return Array.from(optionSet).sort((a, b) => a.localeCompare(b));
-}
-
-function isMultiSelectFilter(columnKey) {
-    return MULTI_SELECT_FILTERS.includes(columnKey);
-}
-
-function getSelectedMultiValues() {
-    return $('#multiSelectedList [data-value]').map(function() {
-        return $(this).data('value');
-    }).get();
-}
-
-function syncMultiSelectOptions() {
-    const selectedValues = getSelectedMultiValues();
-
-    $('#columnPopupFilter option').each(function() {
-        const optionValue = $(this).val();
-        $(this).prop('disabled', optionValue !== '' && selectedValues.includes(optionValue));
-    });
-
+// ── Multi-select badge filter ──────────────────────────────────────────────
+function syncMultiOpts(){
+    const sel = getSelectedMulti();
+    $('#columnPopupFilter option').each(function(){ $(this).prop('disabled', $(this).val()!=='' && sel.includes($(this).val())); });
     $('#columnPopupFilter').val('');
-    $('#multiEmptySelection').toggle(selectedValues.length === 0);
+    $('#multiEmptyMsg').toggle(sel.length===0);
+}
+function addMultiBadge(text){
+    if(!text||getSelectedMulti().includes(text)) return;
+    const b=$('<span>',{class:'badge rounded-pill bg-primary d-inline-flex align-items-center gap-2 px-2 py-2','data-value':text});
+    const rm=$('<button>',{type:'button',class:'btn-close btn-close-white','aria-label':'Remove'}).css({width:'.5rem',height:'.5rem',fontSize:'.55rem'});
+    rm.on('click',()=>{ b.remove(); syncMultiOpts(); });
+    b.append($('<span>').text(text),rm);
+    $('#multiSelectedList').append(b);
+    syncMultiOpts();
+}
+function renderBadgeMulti(key,opts){
+    const sel=$('<select>',{id:'columnPopupFilter',class:'form-select form-select-sm',style:'border-radius:8px;'});
+    sel.append($('<option>',{value:'',text:FILTER_SELECT_LABELS[key]||'Hili'}));
+    opts.forEach(o=>sel.append($('<option>',{value:o,text:o})));
+    const list=$('<div>',{id:'multiSelectedList',class:'d-flex flex-wrap gap-2 mt-3'});
+    const empty=$('<small>',{id:'multiEmptyMsg',class:'text-muted d-block mt-2',text:FILTER_EMPTY_MESSAGES[key]||''});
+    $('#filterContent').html(sel).append(list,empty);
+    (currentFilterValues[key]||[]).forEach(addMultiBadge);
+    syncMultiOpts();
+    sel.on('change',()=>addMultiBadge(sel.val()));
+}
+function renderFilterSelect(key){
+    const opts = buildFilterOptions(key);
+    if(isMulti(key)){ renderBadgeMulti(key,opts); return; }
+    const sel=$('<select>',{id:'columnPopupFilter',class:'form-select form-select-sm',style:'border-radius:8px;'});
+    sel.append($('<option>',{value:'',text:'Hotu'}));
+    opts.forEach(o=>sel.append($('<option>',{value:o,text:o})));
+    sel.val(currentFilterValues[key]||'');
+    $('#filterContent').html(sel);
+}
+function openFilter(key,title){
+    activeFilterKey=key; $('#filterTitle').text(title);
+    renderFilterSelect(key); $('#columnFilterModal').modal('show');
 }
 
-function addMultiSelectBadge(optionText) {
-    if (!optionText || getSelectedMultiValues().includes(optionText)) return;
-
-    const badge = $('<span>', {
-        class: 'badge rounded-pill bg-primary d-inline-flex align-items-center gap-2 px-2 py-2',
-        'data-value': optionText
-    });
-    const label = $('<span>').text(optionText);
-    const removeButton = $('<button>', {
-        type: 'button',
-        class: 'btn-close btn-close-white',
-        'aria-label': 'Remove ' + optionText
-    }).css({
-        width: '0.55rem',
-        height: '0.55rem',
-        fontSize: '0.6rem'
-    });
-
-    removeButton.on('click', function() {
-        badge.remove();
-        syncMultiSelectOptions();
-    });
-
-    badge.append(label, removeButton);
-    $('#multiSelectedList').append(badge);
-    syncMultiSelectOptions();
-}
-
-function renderBadgeMultiSelect(columnKey, filterOptions) {
-    const filterSelect = $('<select>', {
-        id: 'columnPopupFilter',
-        class: 'form-select form-select-sm'
-    });
-
-    filterSelect.append($('<option>', {
-        value: '',
-        text: FILTER_SELECT_LABELS[columnKey] || 'Hili'
-    }));
-
-    filterOptions.forEach(function(optionText) {
-        filterSelect.append($('<option>', {
-            value: optionText,
-            text: optionText
-        }));
-    });
-
-    const selectedList = $('<div>', {
-        id: 'multiSelectedList',
-        class: 'd-flex flex-wrap gap-2 mt-3'
-    });
-    const emptySelection = $('<small>', {
-        id: 'multiEmptySelection',
-        class: 'text-muted d-block mt-2',
-        text: FILTER_EMPTY_MESSAGES[columnKey] || 'Husik mamuk atu haree hotu.'
-    });
-
-    $('#filterContent').html(filterSelect).append(selectedList, emptySelection);
-
-    (currentFilterValues[columnKey] || []).forEach(function(optionText) {
-        addMultiSelectBadge(optionText);
-    });
-    syncMultiSelectOptions();
-
-    filterSelect.on('change', function() {
-        addMultiSelectBadge($(this).val());
-    });
-}
-
-function renderFilterSelect(columnKey) {
-    const filterSelect = $('<select>', {
-        id: 'columnPopupFilter',
-        class: 'form-select form-select-sm'
-    });
-    const filterOptions = buildFilterOptions(columnKey);
-
-    if (isMultiSelectFilter(columnKey)) {
-        renderBadgeMultiSelect(columnKey, filterOptions);
-        return;
-    }
-
-    filterSelect.append($('<option>', { value: '', text: 'Hotu' }));
-
-    filterOptions.forEach(function(optionText) {
-        filterSelect.append($('<option>', {
-            value: optionText,
-            text: optionText
-        }));
-    });
-
-    filterSelect.val(currentFilterValues[columnKey] || '');
-    $('#filterContent').html(filterSelect);
-}
-
-function openFilter(columnKey, title) {
-    activeFilterKey = columnKey;
-    $('#filterTitle').text(title);
-    renderFilterSelect(columnKey);
-    $('#columnFilterModal').modal('show');
-}
-
-function populateTrendSelectors(filteredRows) {
-    const uniqueYears = new Set();
-    const yearSelect = $('#trendYearSelect');
-    const selectedYear = yearSelect.val();
-    const currentMonth = $('#trendMonthSelect').val();
-
-    filteredRows.forEach(function(row) {
-        const parsedDate = parseTableDate(row[COLUMN_INDEXES.date]);
-        uniqueYears.add(parsedDate.year);
-    });
-
-    yearSelect.empty().append('<option value="">Hotu</option>');
-    Array.from(uniqueYears).sort().reverse().forEach(function(year) {
-        yearSelect.append(`<option value="${year}">${year}</option>`);
-    });
-
-    // Restore selections if they exist in the data
-    if (selectedYear && Array.from(uniqueYears).includes(selectedYear)) {
-        yearSelect.val(selectedYear);
-    }
-    
-    // Also try to restore month selection
-    if (currentMonth) {
-        $('#trendMonthSelect').val(currentMonth);
-    }
-}
-
-function updateTrendControls() {
-    const groupBy = $('#trendGroupBy').val();
-    $('#trendYearSelect').prop('disabled', false);
-    // Enable month select for both daily and monthly views
-    $('#trendMonthSelect').prop('disabled', groupBy === 'yearly');
-}
-
-function renderTrendChart(labels, successData, totalData) {
-    const ctx = document.getElementById('trendChart').getContext('2d');
-
-    if (trendChart) trendChart.destroy();
-
-    trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                {
-                    label: 'Atinji Rezultadu',
-                    data: successData,
-                    borderColor: '#1D9E75',
-                    backgroundColor: 'rgba(29,158,117,0.08)',
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                },
-                {
-                    label: 'Total Atividade',
-                    data: totalData,
-                    borderColor: '#378ADD',
-                    backgroundColor: 'rgba(55,138,221,0.08)',
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+// ── Trend chart ────────────────────────────────────────────────────────────
+function fetchTrend(){
+    const period = $('[name=trendPeriod]:checked').val()||'month';
+    $('#trendChartLoading').show(); $('#trendChart').hide();
+    fetch(`{% url 'core:api_trends' %}?period=${period}`,{credentials:'same-origin'})
+        .then(r=>r.json())
+        .then(data=>{
+            $('#trendChartLoading').hide(); $('#trendChart').show();
+            const trends = data.trends||[];
+            const labels   = trends.map(t=>t.date||t.period||'');
+            const total    = trends.map(t=>t.total_count||0);
+            const achieved = trends.map(t=>t.success_count||0);
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            if(trendChart) trendChart.destroy();
+            trendChart = new Chart(ctx,{
+                type:'line',
+                data:{labels,datasets:[
+                    {label:'Atinji Rezultadu',data:achieved,borderColor:'#16a34a',backgroundColor:'rgba(22,163,74,.08)',tension:.4,fill:true,pointRadius:3,pointHoverRadius:5,borderWidth:2},
+                    {label:'Total Atividade', data:total,   borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.06)',tension:.4,fill:true,pointRadius:3,pointHoverRadius:5,borderWidth:2},
+                ]},
+                options:{
+                    responsive:true,
+                    plugins:{legend:{position:'top',labels:{font:{size:12},usePointStyle:true,padding:18}}},
+                    scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11}}},x:{grid:{display:false},ticks:{font:{size:11}}}}
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { font: { size: 12 } }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' }
-                }
-            }
+            });
+        })
+        .catch(()=>$('#trendChartLoading').html('<div class="text-muted small py-2">La konsege karga dadus trend.</div>'));
+}
+
+// ── Report export ──────────────────────────────────────────────────────────
+function normalRow(row){ return REPORT_COLUMNS.map(c=>normalizeFilterText(row[c.index])); }
+function getReportRows(){ return activityTable.rows({search:'applied'}).data().toArray().map(normalRow); }
+function getFilename(ext){ const n=new Date(); return `atividade_${n.getFullYear()}${String(n.getMonth()+1).padStart(2,'0')}${String(n.getDate()).padStart(2,'0')}.${ext}`; }
+function dl(content,name,mime){ const b=new Blob([content],{type:mime}),a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href); }
+function esc(v){ return `"${String(v??'').replace(/"/g,'""')}"`; }
+function escH(v){ return $('<div>').text(v||'').html(); }
+function ensureRows(){ const r=getReportRows(); if(!r.length){alert('Laiha dadus atu gera relatoriu.');return null;} return r; }
+function generateCsv(){ const r=ensureRows(); if(!r) return; const h=REPORT_COLUMNS.map(c=>esc(c.label)).join(','); dl('﻿'+[h,...r.map(row=>row.map(esc).join(','))].join('\r\n'),getFilename('csv'),'text/csv;charset=utf-8;'); }
+function generateExcel(){ const r=ensureRows(); if(!r) return; const h=REPORT_COLUMNS.map(c=>`<th>${escH(c.label)}</th>`).join(''); const b=r.map(row=>`<tr>${row.map(c=>`<td>${escH(c)}</td>`).join('')}</tr>`).join(''); dl(`<html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${h}</tr></thead><tbody>${b}</tbody></table></body></html>`,getFilename('xls'),'application/vnd.ms-excel;charset=utf-8;'); }
+function generatePdf(){ const r=ensureRows(); if(!r) return; const h=REPORT_COLUMNS.map(c=>`<th>${escH(c.label)}</th>`).join(''); const b=r.map(row=>`<tr>${row.map(c=>`<td>${escH(c)}</td>`).join('')}</tr>`).join(''); const w=window.open('','_blank'); if(!w){alert('Browser blokadu popup.');return;} w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Relatoriu</title><style>body{font-family:Arial,sans-serif;margin:24px}h2{color:#1e293b}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #ddd;padding:5px 8px}th{background:#f1f5f9;font-weight:600}@media print{body{margin:10mm}}</style></head><body><h2>Relatoriu Atividade</h2><table><thead><tr>${h}</tr></thead><tbody>${b}</tbody></table></body></html>`); w.document.close(); w.focus(); w.print(); }
+function generateReport(fmt){ if(fmt==='csv') generateCsv(); else if(fmt==='excel') generateExcel(); else if(fmt==='pdf') generatePdf(); }
+
+// ── DataTable ──────────────────────────────────────────────────────────────
+function initDataTable(){
+    if($.fn.DataTable.isDataTable('#myTable')){ activityTable=$('#myTable').DataTable(); return; }
+    activityTable = $('#myTable').DataTable({
+        language:{search:'',searchPlaceholder:'Sosa iha pajina ne\'e...',zeroRecords:'La hetan dadus',paginate:{first:'Uluk',last:'Ikus',next:'Mai',previous:'Antes'}},
+        paging: false,
+        info: false,
+        order: [[COLUMN_INDEXES.date,'desc']],
+        columnDefs: [{targets: COLUMN_INDEXES.studentId, visible: false}],
+        dom: 'ft',
+        initComplete: function(){
+            document.getElementById('tableSkeleton').style.display='none';
+            document.getElementById('tableWrapper').style.display='block';
         }
     });
 }
 
-function updateTrendChart() {
-    try {
-        const filteredRows = getFilteredRows();
-        const { groupBy, year, month } = getTrendFilterValues();
-        const dateMap = new Map();
-
-        populateTrendSelectors(filteredRows);
-        updateTrendControls();
-
-        filteredRows.forEach(function(row) {
-            const parsedDate = parseTableDate(row[COLUMN_INDEXES.date]);
-            const result = row[COLUMN_INDEXES.result];
-
-            if (year && parsedDate.year !== year) return;
-            if (month && parsedDate.month !== month) return;
-
-            const key = formatTrendKey(parsedDate, groupBy);
-            if (!dateMap.has(key)) dateMap.set(key, { parsedDate, total: 0, success: 0 });
-
-            const item = dateMap.get(key);
-            item.total += 1;
-            if (isAchievedResult(result)) item.success += 1;
-        });
-
-        // Generate complete date range for daily view with specific month
-        let sortedEntries;
-        if (groupBy === 'daily' && year && month) {
-            // Get days in the selected month
-            const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
-            const completeEntries = [];
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateKey = `${year}-${month}-${String(day).padStart(2, '0')}`;
-                const existingEntry = dateMap.get(dateKey);
-                
-                if (existingEntry) {
-                    completeEntries.push(existingEntry);
-                } else {
-                    // Create entry with 0 values for days without data
-                    completeEntries.push({
-                        parsedDate: {
-                            dateObj: new Date(parseInt(year), parseInt(month) - 1, day),
-                            year: year,
-                            month: month
-                        },
-                        total: 0,
-                        success: 0
-                    });
-                }
-            }
-            sortedEntries = completeEntries;
-        } else {
-            sortedEntries = Array.from(dateMap.values()).sort((a, b) => a.parsedDate.dateObj - b.parsedDate.dateObj);
+// ── Custom column filter ───────────────────────────────────────────────────
+function bindFilterSearch(){
+    $.fn.dataTable.ext.search.push(function(settings,data){
+        if(settings.nTable !== activityTable.table().node()) return true;
+        if($('#excludeTentadu').is(':checked')){
+            if(normalizeFilterText(data[COLUMN_INDEXES.result])==='Tentadu') return false;
         }
-        
-        const labels = sortedEntries.map(item => formatTrendLabel(item.parsedDate, groupBy));
-        const successData = sortedEntries.map(item => item.success);
-        const totalData = sortedEntries.map(item => item.total);
-
-        renderTrendChart(labels, successData, totalData);
-    } catch (error) {
-        console.error('Error updating chart:', error);
-    }
-}
-
-function updateStatistics() {
-    try {
-        const filteredRows = getFilteredRows();
-        const totalActivities = filteredRows.length;
-        const totalChildren = new Set(filteredRows.map(row => row[COLUMN_INDEXES.studentId])).size;
-        const achieved = filteredRows.filter(row => isAchievedResult(row[COLUMN_INDEXES.result])).length;
-        const rate = totalActivities > 0 ? ((achieved / totalActivities) * 100).toFixed(1) : 0;
-
-        $('#statTotalChildren').text(totalChildren);
-        $('#statTotalActivities').text(totalActivities);
-        $('#statAchieved').text(achieved);
-        $('#statRate').text(`${rate}%`);
-
-        updateTrendChart();
-    } catch (error) {
-        console.error('Error updating statistics:', error);
-    }
-}
-
-function getReportRows() {
-    return getFilteredRows().map(function(row) {
-        return REPORT_COLUMNS.map(function(column) {
-            return normalizeFilterText(row[column.index]);
+        return Object.entries(currentFilterValues).every(([k,v])=>{
+            if(Array.isArray(v)&&!v.length) return true;
+            if(!Array.isArray(v)&&!v) return true;
+            const cell=normalizeFilterText(data[COLUMN_INDEXES.filterable[k]]);
+            return Array.isArray(v)?v.includes(cell):cell===v;
         });
     });
 }
 
-function getReportFilename(extension) {
-    const now = new Date();
-    const timestamp = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        String(now.getDate()).padStart(2, '0'),
-        String(now.getHours()).padStart(2, '0'),
-        String(now.getMinutes()).padStart(2, '0')
-    ].join('');
+// ── Bind all actions ───────────────────────────────────────────────────────
+function bindActions(){
+    FILTER_HEADERS.forEach(f=>$(f.trigger).on('click',()=>openFilter(f.key,f.title)));
 
-    return `atividade_report_${timestamp}.${extension}`;
-}
+    $('#toggleChart').on('click',()=>$('#trendChartModal').modal('show'));
+    $('#trendChartModal').on('shown.bs.modal',fetchTrend);
+    $('[name=trendPeriod]').on('change',fetchTrend);
 
-function downloadReportFile(content, filename, mimeType) {
-    const blob = new Blob([content], { type: mimeType });
-    const link = document.createElement('a');
-
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-}
-
-function escapeCsvValue(value) {
-    const safeValue = String(value ?? '');
-    return `"${safeValue.replace(/"/g, '""')}"`;
-}
-
-function escapeHtml(value) {
-    return $('<div>').text(value || '').html();
-}
-
-function ensureReportRows() {
-    const rows = getReportRows();
-    if (rows.length === 0) {
-        alert('Laiha dadus atu generate report.');
-        return null;
-    }
-
-    return rows;
-}
-
-function generateCsvReport() {
-    const rows = ensureReportRows();
-    if (!rows) return;
-
-    const headerRow = REPORT_COLUMNS.map(column => escapeCsvValue(column.label)).join(',');
-    const bodyRows = rows.map(row => row.map(escapeCsvValue).join(','));
-    const csvContent = '\ufeff' + [headerRow, ...bodyRows].join('\r\n');
-
-    downloadReportFile(csvContent, getReportFilename('csv'), 'text/csv;charset=utf-8;');
-}
-
-function generateExcelReport() {
-    const rows = ensureReportRows();
-    if (!rows) return;
-
-    const headerCells = REPORT_COLUMNS
-        .map(column => `<th>${escapeHtml(column.label)}</th>`)
-        .join('');
-    const bodyRows = rows
-        .map(row => `<tr>${row.map(cell => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`)
-        .join('');
-    const excelContent = `
-        <html>
-          <head><meta charset="UTF-8"></head>
-          <body>
-            <table border="1">
-              <thead><tr>${headerCells}</tr></thead>
-              <tbody>${bodyRows}</tbody>
-            </table>
-          </body>
-        </html>
-    `;
-
-    downloadReportFile(excelContent, getReportFilename('xls'), 'application/vnd.ms-excel;charset=utf-8;');
-}
-
-function generatePdfReport() {
-    const rows = ensureReportRows();
-    if (!rows) return;
-
-    const headerCells = REPORT_COLUMNS
-        .map(column => `<th>${escapeHtml(column.label)}</th>`)
-        .join('');
-    const bodyRows = rows
-        .map(row => `<tr>${row.map(cell => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`)
-        .join('');
-    const printedAt = new Date().toLocaleString();
-    const reportWindow = window.open('', '_blank');
-
-    if (!reportWindow) {
-        alert('Browser blokadu janela report. Favor permite popup atu generate PDF.');
-        return;
-    }
-
-    reportWindow.document.write(`
-        <!doctype html>
-        <html>
-          <head>
-            <meta charset="utf-8">
-            <title>Relatoriu Atividade</title>
-            <style>
-              body { font-family: Arial, sans-serif; color: #222; margin: 24px; }
-              h2 { margin: 0 0 4px; font-size: 18px; }
-              .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
-              table { width: 100%; border-collapse: collapse; font-size: 11px; }
-              th, td { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: top; }
-              th { background: #f1f3f5; }
-              @media print {
-                body { margin: 12mm; }
-              }
-            </style>
-          </head>
-          <body>
-            <h2>Relatoriu Atividade</h2>
-            <div class="meta">Generate: ${escapeHtml(printedAt)} | Total: ${rows.length}</div>
-            <table>
-              <thead><tr>${headerCells}</tr></thead>
-              <tbody>${bodyRows}</tbody>
-            </table>
-          </body>
-        </html>
-    `);
-    reportWindow.document.close();
-    reportWindow.focus();
-    reportWindow.print();
-}
-
-function generateReport(format) {
-    if (format === 'csv') {
-        generateCsvReport();
-        return;
-    }
-    if (format === 'excel') {
-        generateExcelReport();
-        return;
-    }
-    if (format === 'pdf') {
-        generatePdfReport();
-    }
-}
-
-function bindFilterSearch() {
-    $.fn.dataTable.ext.search.push(function(settings, data) {
-        if (settings.nTable !== activityTable.table().node()) return true;
-
-        // Check exclude Tentadu
-        const excludeTentadu = $('#excludeTentadu').is(':checked');
-        if (excludeTentadu) {
-            const resultValue = normalizeFilterText(data[COLUMN_INDEXES.result]);
-            if (resultValue === 'Tentadu') return false;
-        }
-
-        return Object.entries(currentFilterValues).every(function([columnKey, selectedValue]) {
-            if (Array.isArray(selectedValue) && selectedValue.length === 0) return true;
-            if (!Array.isArray(selectedValue) && !selectedValue) return true;
-
-            const cellText = normalizeFilterText(data[COLUMN_INDEXES.filterable[columnKey]]);
-            if (Array.isArray(selectedValue)) return selectedValue.includes(cellText);
-
-            return cellText === selectedValue;
-        });
-    });
-}
-
-function bindFilterHeaders() {
-    FILTER_HEADERS.forEach(function(filterConfig) {
-        $(filterConfig.trigger).on('click', function() {
-            openFilter(filterConfig.key, filterConfig.title);
-        });
-    });
-}
-
-function bindPageActions() {
-    $('#toggleChart').on('click', function() {
-        $('#trendChartModal').modal('show');
+    $('#exportChart').on('click',()=>{
+        const a=document.createElement('a');
+        a.href=document.getElementById('trendChart').toDataURL();
+        a.download='trend_atividade.png'; a.click();
     });
 
-    $('#exportChart').on('click', function() {
-        const link = document.createElement('a');
-        link.href = document.getElementById('trendChart').toDataURL();
-        link.download = 'trend_chart.png';
-        link.click();
-    });
+    $('[data-report-format]').on('click',function(){ generateReport($(this).data('report-format')); });
 
-    $('[data-report-format]').on('click', function() {
-        generateReport($(this).data('report-format'));
-    });
-
-    $('#applyColumnFilter').on('click', function() {
-        const selectedValue = isMultiSelectFilter(activeFilterKey)
-            ? getSelectedMultiValues()
-            : ($('#columnPopupFilter').val() || '');
-
-        currentFilterValues[activeFilterKey] = selectedValue;
+    $('#applyColumnFilter').on('click',function(){
+        const val = isMulti(activeFilterKey) ? getSelectedMulti() : ($('#columnPopupFilter').val()||'');
+        currentFilterValues[activeFilterKey]=val;
         activityTable.draw();
-        updateStatistics();
         $('#columnFilterModal').modal('hide');
     });
 
-    $('#trendGroupBy, #trendYearSelect, #trendMonthSelect').on('change', function() {
-        updateTrendChart();
+    $('#excludeTentadu').on('change',function(){
+        $('#alphabetSort').toggle($(this).is(':checked'));
+        if(!$(this).is(':checked')){ $('#alphabetSort').val(''); activityTable.order([[COLUMN_INDEXES.date,'desc']]).draw(); }
+        else activityTable.draw();
     });
+
+    $('#alphabetSort').on('change',function(){
+        const v=$(this).val(); if(!v) return;
+        activityTable.order([[COLUMN_INDEXES.filterable.actividade,v]]).draw();
+    });
+
+    $('#manualRefresh').on('click',()=>window.location.reload());
 }
 
-function initializeDataTable() {
-    if ($.fn.DataTable.isDataTable('#myTable')) {
-        activityTable = $('#myTable').DataTable();
-        return;
-    }
-
-    activityTable = $('#myTable').DataTable({
-        language: DATA_TABLE_LANGUAGE,
-        lengthMenu: [10, 25, 50, 100],
-        order: [[ COLUMN_INDEXES.date, 'desc' ]],
-
-        columnDefs: [{
-            targets: COLUMN_INDEXES.studentId,
-            visible: false
-        }]
-    });
-}
-
-$('#excludeTentadu').on('change', function() {
-    const isChecked = $(this).is(':checked');
-
-    // Show/hide sort dropdown
-    if (isChecked) {
-        $('#alphabetSort').show();
-    } else {
-        $('#alphabetSort').hide();
-        $('#alphabetSort').val('');
-        
-        // Reset sorting to default (by date desc)
-        activityTable.order([[ COLUMN_INDEXES.date, 'desc' ]]).draw();
-    }
-
-    activityTable.draw();
-    updateStatistics();
-});
-
-$('#alphabetSort').on('change', function() {
-    const sortValue = $(this).val();
-
-    if (!sortValue) return;
-
-    const columnIndex = COLUMN_INDEXES.filterable.actividade;
-
-    activityTable.order([[ columnIndex, sortValue ]]).draw();
-});
-//Manual refresh
-$('#manualRefresh').on('click', function() {
-    refreshTable();
-});
-
-$(document).ready(function() {
-    // Set default values for chart to current month and year
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-    
-    $('#trendYearSelect').val(currentYear);
-    $('#trendMonthSelect').val(currentMonth);
-    
-    // Initialize DataTable first
-    initializeDataTable();
+// ── Boot ───────────────────────────────────────────────────────────────────
+$(document).ready(function(){
+    initDataTable();
     bindFilterSearch();
-    bindFilterHeaders();
-    bindPageActions();
-    updateStatistics();
+    bindActions();
 });
 </script>
 {% endblock %}

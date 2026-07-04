@@ -3,7 +3,7 @@ from core.api_view import ActivityResultCreateAPIView, LoginAPIView, LogoutAPIVi
 from core.views import *
 
 
-from core.views.activity_logs import ChildActivityView
+from core.views.activity_logs import ChildActivityView, TeacherActivityLogListView
 from core.views.analytics_api import trend_data_api, summary_stats_api, get_municipalities_api
 from core.views.parents import verify_register_otp
 from core.views.send import send_whatsapp
@@ -46,6 +46,7 @@ urlpatterns = [
     path("dashboard/profile/change-password/", change_password, name="change_password"),
 
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),
+    path('dashboard/teacher-logs/', TeacherActivityLogListView.as_view(), name='teacher_logs'),
     #path('dashboard/teacher/', teacher_dashboard, name='teacher_dashboard'),
 
     path('dashboard/apk/', apk_list, name='apk_list'),

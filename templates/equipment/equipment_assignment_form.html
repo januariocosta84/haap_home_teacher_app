@@ -1,164 +1,559 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}
-  Halo Atribisaun Fali - {{ equipment.serial_number }}
+{% block title %}Atribuisaun — {{ equipment.serial_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipment.css' %}">
+<style>
+/* ── Hero ── */
+.assign-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg,#2563eb 0%,#1e40af 55%,#1d4ed8 100%);
+}
+
+/* ── Section label ── */
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Current assignment info rows ── */
+.cur-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  font-size: 0.83rem;
+}
+.cur-key {
+  font-size: 0.73rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  min-width: 90px;
+}
+.cur-val {
+  color: #fff;
+  font-weight: 500;
+}
+.cur-empty {
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+/* ── Action selector cards ── */
+.action-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  user-select: none;
+}
+.action-card:hover { border-color: #93c5fd; background: #f8faff; }
+
+.action-card.selected-reassign  { border-color: #2563eb; background: #eff6ff; }
+.action-card.selected-delete    { border-color: #d97706; background: #fffbeb; }
+.action-card.selected-retire    { border-color: #dc2626; background: #fef2f2; }
+
+.action-card input[type="radio"] { display: none; }
+
+.action-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.icon-reassign { background: #dbeafe; color: #2563eb; }
+.icon-delete   { background: #fef3c7; color: #d97706; }
+.icon-retire   { background: #fee2e2; color: #dc2626; }
+
+.action-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+.action-desc {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ── Reassign panel ── */
+#reassignSection {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+  margin-top: 0;
+}
+#reassignSection.open {
+  max-height: 600px;
+  opacity: 1;
+  margin-top: 1rem;
+}
+
+/* ── Form controls ── */
+.form-label-sm {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.35rem;
+}
+.field-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Status badge (equipment icon strip) ── */
+.equip-icon-bubble {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Warning strip for destructive actions ── */
+.danger-strip {
+  border-radius: 12px;
+  border-left: 4px solid;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.83rem;
+  margin-top: 1rem;
+  display: none;
+}
+.danger-strip.show { display: flex; align-items: flex-start; gap: 0.6rem; }
+.danger-strip.warn { border-color: #d97706; background: #fffbeb; color: #92400e; }
+.danger-strip.danger { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      <div class="card shadow">
-        <div class="card-header bg-warning text-dark">
-          <h4 class="mb-0">Halo Atribisaun Fali / Hamos Ekipamentu</h4>
-          <small>Serial: {{ equipment.serial_number }}</small>
-        </div>
-        <div class="card-body">
-          <div class="alert alert-info">
-            <strong>Ekipamentu Atual:</strong><br>
-            Pre-Escolar: {{ equipment.preschool.name|default:"Nao atribuado" }}<br>
-            Sala Aula: {{ equipment.classroom.name|default:"Nao atribuado" }}<br>
-            Professor: {{ equipment.teacher.first_name|default:"Nao atribuado" }} {{ equipment.teacher.last_name|default:"" }}
-          </div>
+<div class="container-fluid py-4">
 
-          <form method="post" class="needs-validation" novalidate>
+  <!-- ═══ BACK + TITLE ═══ -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'equipment-detail' equipment.pk %}"
+       class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0"
+       title="Fila ba detalhe">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Jestaun Atribuisaun</h4>
+      <p class="text-muted small mb-0">{{ equipment.get_equipment_type_display }} · {{ equipment.serial_number }}</p>
+    </div>
+  </div>
+
+  <!-- ═══ HERO — current assignment state ═══ -->
+  <div class="card border-0 assign-hero mb-4">
+    <div class="card-body p-4">
+      <div class="row align-items-center g-3">
+
+        <div class="col d-flex align-items-center gap-3">
+          <div class="equip-icon-bubble">
+            {% if equipment.equipment_type == 'tablet' %}
+              <i class="bi bi-tablet-landscape"></i>
+            {% elif equipment.equipment_type == 'projector' %}
+              <i class="bi bi-projector-fill"></i>
+            {% elif equipment.equipment_type == 'screen' %}
+              <i class="bi bi-display"></i>
+            {% else %}
+              <i class="bi bi-plug-fill"></i>
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.6);">
+              Atribuisaun Atual
+            </div>
+            <div class="fw-bold text-white" style="font-size:1.15rem;letter-spacing:-0.3px;font-family:monospace;">
+              {{ equipment.serial_number }}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-auto">
+          <div class="cur-row">
+            <span class="cur-key">Pre-Escolar</span>
+            {% if equipment.preschool %}
+              <span class="cur-val">{{ equipment.preschool.name }}</span>
+            {% else %}
+              <span class="cur-empty">La atribuidu</span>
+            {% endif %}
+          </div>
+          <div class="cur-row">
+            <span class="cur-key">Sala Aula</span>
+            {% if equipment.classroom %}
+              <span class="cur-val">{{ equipment.classroom.name }}</span>
+            {% else %}
+              <span class="cur-empty">La atribuidu</span>
+            {% endif %}
+          </div>
+          <div class="cur-row">
+            <span class="cur-key">Profesór</span>
+            {% if equipment.teacher %}
+              <span class="cur-val">{{ equipment.teacher.first_name }} {{ equipment.teacher.last_name }}</span>
+            {% else %}
+              <span class="cur-empty">La atribuidu</span>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FORM ═══ -->
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm" style="border-radius:16px;">
+        <div class="card-body p-4">
+
+          <form method="post" class="needs-validation" novalidate id="assignForm">
             {% csrf_token %}
 
-            <!-- Action Selection -->
-            <div class="mb-4">
-              <label class="form-label"><strong>{{ form.action.label }}</strong></label>
-              <div class="border rounded p-3">
-                {% for value, label in form.action.field.choices %}
-                  <div class="form-check mb-2">
-                    <input class="form-check-input action-radio" type="radio" name="action" value="{{ value }}" id="action_{{ value }}" {% if form.action.value == value %}checked{% endif %} onchange="toggleReassignForm()">
-                    <label class="form-check-label" for="action_{{ value }}">
-                      {{ label }}
-                    </label>
-                  </div>
-                {% endfor %}
-              </div>
-              {% if form.action.errors %}
-                <div class="alert alert-danger mt-2">{{ form.action.errors }}</div>
-              {% endif %}
+            <!-- ── Step 1: Choose action ── -->
+            <div class="section-label">
+              <i class="bi bi-hand-index me-1"></i>Pasu 1 — Hili Aksaun
             </div>
 
-            <!-- Reassign Section -->
-            <div id="reassignSection" class="card mb-4" style="display: none;">
-              <div class="card-header bg-light">
-                <h5 class="mb-0">Atribisaun Foun</h5>
-              </div>
-              <div class="card-body">
-                <div class="mb-3">
-                  <label for="{{ form.preschool.id_for_label }}" class="form-label">{{ form.preschool.label }}</label>
-                  {{ form.preschool }}
-                  {% if form.preschool.errors %}
-                    <div class="alert alert-danger mt-2">{{ form.preschool.errors }}</div>
-                  {% endif %}
-                </div>
+            <div class="d-flex flex-column gap-2 mb-2">
 
-                <div class="mb-3">
-                  <label for="{{ form.classroom.id_for_label }}" class="form-label">{{ form.classroom.label }}</label>
-                  {{ form.classroom }}
-                  {% if form.classroom.errors %}
-                    <div class="alert alert-danger mt-2">{{ form.classroom.errors }}</div>
-                  {% endif %}
+              <!-- Reassign -->
+              <label class="action-card" id="card-reassign" for="action_reassign">
+                <input type="radio" class="action-radio" name="action" value="reassign"
+                       id="action_reassign"
+                       {% if not form.action.value or form.action.value == 'reassign' %}checked{% endif %}>
+                <div class="action-icon icon-reassign">
+                  <i class="bi bi-arrow-left-right"></i>
                 </div>
+                <div>
+                  <div class="action-title">Halo Atribuisaun Fali</div>
+                  <div class="action-desc">Atribui ekipamentu ba pre-eskolár, sala aula, ka profesór seluk.</div>
+                </div>
+              </label>
 
-                <div class="mb-3">
-                  <label for="{{ form.teacher.id_for_label }}" class="form-label">{{ form.teacher.label }}</label>
-                  {{ form.teacher }}
-                  {% if form.teacher.errors %}
-                    <div class="alert alert-danger mt-2">{{ form.teacher.errors }}</div>
-                  {% endif %}
+              <!-- Remove assignment -->
+              <label class="action-card" id="card-delete" for="action_delete">
+                <input type="radio" class="action-radio" name="action" value="delete"
+                       id="action_delete"
+                       {% if form.action.value == 'delete' %}checked{% endif %}>
+                <div class="action-icon icon-delete">
+                  <i class="bi bi-x-circle-fill"></i>
                 </div>
-              </div>
+                <div>
+                  <div class="action-title">Hamos Atribuisaun</div>
+                  <div class="action-desc">Hasai ekipamentu husi pre-eskolár, sala aula, no profesór atual.</div>
+                </div>
+              </label>
+
+              <!-- Retire -->
+              <label class="action-card" id="card-retire" for="action_retire">
+                <input type="radio" class="action-radio" name="action" value="retire"
+                       id="action_retire"
+                       {% if form.action.value == 'retire' %}checked{% endif %}>
+                <div class="action-icon icon-retire">
+                  <i class="bi bi-archive-fill"></i>
+                </div>
+                <div>
+                  <div class="action-title">Retira Ekipamentu</div>
+                  <div class="action-desc">Marka ekipamentu hanesan reformadu no hasai husi sirkulasaun.</div>
+                </div>
+              </label>
+
             </div>
 
-            <!-- Change Reason -->
-            <div class="mb-4">
-              <label for="{{ form.change_reason.id_for_label }}" class="form-label">{{ form.change_reason.label }}</label>
-              {{ form.change_reason }}
-              {% if form.change_reason.errors %}
-                <div class="alert alert-danger mt-2">{{ form.change_reason.errors }}</div>
-              {% endif %}
+            {% if form.action.errors %}
+            <div class="field-error mb-3">
+              <i class="bi bi-exclamation-circle-fill"></i> {{ form.action.errors|join:", " }}
             </div>
-
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-              </div>
             {% endif %}
 
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-warning">
-                Halo Mudansa
-              </button>
-              <a href="{% url 'equipment-detail' equipment.pk %}" class="btn btn-secondary">Kansela</a>
+            <!-- ── Destructive action warning ── -->
+            <div class="danger-strip warn" id="warnDelete">
+              <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+              <div>
+                <strong>Konfirma:</strong> Asaun ida ne'e sei hasai atribuisaun ekipamentu hotu.
+                Ekipamentu sei livre maibé sei kontinua iha sistema.
+              </div>
             </div>
+            <div class="danger-strip danger" id="warnRetire">
+              <i class="bi bi-exclamation-diamond-fill flex-shrink-0 mt-1"></i>
+              <div>
+                <strong>Avizu:</strong> Ekipamentu ida ne'e sei retiradu no sai husi sirkulasaun ativa.
+                Asaun ida ne'e presiza konfirmasaun.
+              </div>
+            </div>
+
+            <!-- ── Step 2: New assignment (reassign only) ── -->
+            <div id="reassignSection">
+              <div class="section-label mt-3">
+                <i class="bi bi-geo-alt me-1"></i>Pasu 2 — Atribuisaun Foun
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-sm" for="{{ form.preschool.id_for_label }}">
+                  Pre-Escolar <span class="text-danger">*</span>
+                </label>
+                {{ form.preschool }}
+                {% if form.preschool.errors %}
+                <div class="field-error">
+                  <i class="bi bi-exclamation-circle-fill"></i> {{ form.preschool.errors|join:", " }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-sm" for="{{ form.classroom.id_for_label }}">
+                  Sala Aula <span class="text-muted fw-normal">(opcionál)</span>
+                </label>
+                {{ form.classroom }}
+                {% if form.classroom.errors %}
+                <div class="field-error">
+                  <i class="bi bi-exclamation-circle-fill"></i> {{ form.classroom.errors|join:", " }}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-sm" for="{{ form.teacher.id_for_label }}">
+                  Profesór <span class="text-muted fw-normal">(opcionál)</span>
+                </label>
+                {{ form.teacher }}
+                {% if form.teacher.errors %}
+                <div class="field-error">
+                  <i class="bi bi-exclamation-circle-fill"></i> {{ form.teacher.errors|join:", " }}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- ── Step 3: Reason ── -->
+            <div class="mt-1" id="reasonSection">
+              <div class="section-label">
+                <i class="bi bi-chat-left-text me-1"></i>Razaun ba Mudansa
+                <span class="text-muted fw-normal" style="text-transform:none;letter-spacing:0;">(opcionál)</span>
+              </div>
+              <textarea name="{{ form.change_reason.html_name }}"
+                        id="{{ form.change_reason.id_for_label }}"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Deskreve razaun ba mudansa ida ne'e...">{{ form.change_reason.value|default:"" }}</textarea>
+              {% if form.change_reason.errors %}
+              <div class="field-error mt-1">
+                <i class="bi bi-exclamation-circle-fill"></i> {{ form.change_reason.errors|join:", " }}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- ── Non-field errors ── -->
+            {% if form.non_field_errors %}
+            <div class="d-flex align-items-start gap-2 p-3 mt-3"
+                 style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 10px 10px 0;">
+              <i class="bi bi-exclamation-diamond-fill text-danger mt-1"></i>
+              <div style="font-size:0.83rem;color:#991b1b;">{{ form.non_field_errors }}</div>
+            </div>
+            {% endif %}
+
+            <!-- ── Buttons ── -->
+            <div class="d-flex flex-wrap gap-2 mt-4 pt-2 border-top">
+              <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold" id="submitBtn">
+                <i class="bi bi-check-lg me-1"></i><span id="submitLabel">Halo Atribuisaun Fali</span>
+              </button>
+              <a href="{% url 'equipment-detail' equipment.pk %}"
+                 class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-x-lg me-1"></i>Kansela
+              </a>
+            </div>
+
           </form>
         </div>
       </div>
     </div>
+
+    <!-- ── RIGHT: Help panel ── -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm" style="border-radius:16px;position:sticky;top:1rem;">
+        <div class="card-body p-4">
+          <div class="section-label"><i class="bi bi-info-circle me-1"></i>Informasaun</div>
+
+          <div class="mb-3 pb-3 border-bottom">
+            <div class="fw-semibold mb-1" style="font-size:0.85rem;color:#1e293b;">
+              <i class="bi bi-arrow-left-right me-1 text-primary"></i>Halo Atribuisaun Fali
+            </div>
+            <div style="font-size:0.8rem;color:#64748b;line-height:1.55;">
+              Atribui fali ekipamentu ba fatin foun. Pre-Escolar mak nesesáriu.
+              Sala Aula no Profesór mak opcionál.
+            </div>
+          </div>
+
+          <div class="mb-3 pb-3 border-bottom">
+            <div class="fw-semibold mb-1" style="font-size:0.85rem;color:#1e293b;">
+              <i class="bi bi-x-circle-fill me-1" style="color:#d97706;"></i>Hamos Atribuisaun
+            </div>
+            <div style="font-size:0.8rem;color:#64748b;line-height:1.55;">
+              Hasai ligasaun hotu-hotu ba pre-eskolár, sala aula, no profesór.
+              Ekipamentu sei iha sistema hanesan la atribuidu.
+            </div>
+          </div>
+
+          <div>
+            <div class="fw-semibold mb-1" style="font-size:0.85rem;color:#1e293b;">
+              <i class="bi bi-archive-fill me-1 text-danger"></i>Retira Ekipamentu
+            </div>
+            <div style="font-size:0.8rem;color:#64748b;line-height:1.55;">
+              Muda status ekipamentu ba "Reformadu" no hasai husi atribuisaun ativa.
+              Rekorda istoria sei mantén.
+            </div>
+          </div>
+
+          <div class="mt-4 p-3" style="background:#f8fafc;border-radius:10px;">
+            <div class="fw-semibold mb-2" style="font-size:0.78rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">
+              Ekipamentu ida ne'e
+            </div>
+            <div style="font-size:0.83rem;color:#334155;">
+              <div><span class="text-muted" style="font-size:0.77rem;">Tipu:</span> {{ equipment.get_equipment_type_display }}</div>
+              <div><span class="text-muted" style="font-size:0.77rem;">Serial:</span> <code style="font-size:0.8rem;">{{ equipment.serial_number }}</code></div>
+              <div><span class="text-muted" style="font-size:0.77rem;">Modelo:</span> {{ equipment.model_number }}</div>
+              <div>
+                <span class="text-muted" style="font-size:0.77rem;">Status:</span>
+                <span class="badge rounded-pill ms-1
+                  {% if equipment.status == 'active' %}bg-success
+                  {% elif equipment.status == 'damaged' %}bg-danger
+                  {% elif equipment.status == 'retired' %}bg-secondary
+                  {% else %}bg-secondary{% endif %}"
+                  style="font-size:0.7rem;">
+                  {{ equipment.get_status_display }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
-  function toggleReassignForm() {
-    const action = document.querySelector('input[name="action"]:checked').value;
-    const reassignSection = document.getElementById('reassignSection');
-    const preschoolField = document.getElementById('{{ form.preschool.id_for_label }}');
-    const classroomField = document.getElementById('{{ form.classroom.id_for_label }}');
-    const teacherField = document.getElementById('{{ form.teacher.id_for_label }}');
+(function () {
+  var LABELS = {
+    reassign: 'Halo Atribuisaun Fali',
+    delete:   'Hamos Atribuisaun',
+    retire:   'Retira Ekipamentu',
+  };
 
+  var reassignSection = document.getElementById('reassignSection');
+  var warnDelete      = document.getElementById('warnDelete');
+  var warnRetire      = document.getElementById('warnRetire');
+  var submitBtn       = document.getElementById('submitBtn');
+  var submitLabel     = document.getElementById('submitLabel');
+  var preschoolSelect = document.getElementById('{{ form.preschool.id_for_label }}');
+  var classroomSelect = document.getElementById('{{ form.classroom.id_for_label }}');
+
+  function applyAction(action) {
+    // Action card selected styles
+    ['reassign','delete','retire'].forEach(function(a) {
+      var card = document.getElementById('card-' + a);
+      card.classList.remove('selected-reassign','selected-delete','selected-retire');
+      if (a === action) card.classList.add('selected-' + a);
+    });
+
+    // Reassign panel
     if (action === 'reassign') {
-      reassignSection.style.display = 'block';
-      preschoolField.required = true;
+      reassignSection.classList.add('open');
+      if (preschoolSelect) preschoolSelect.required = true;
     } else {
-      reassignSection.style.display = 'none';
-      preschoolField.required = false;
-      classroomField.required = false;
-      teacherField.required = false;
+      reassignSection.classList.remove('open');
+      if (preschoolSelect) preschoolSelect.required = false;
     }
+
+    // Warning strips
+    warnDelete.classList.toggle('show', action === 'delete');
+    warnRetire.classList.toggle('show', action === 'retire');
+
+    // Submit button label + color
+    submitLabel.textContent = LABELS[action] || 'Halo Mudansa';
+    submitBtn.className = 'btn rounded-pill px-4 fw-semibold';
+    if (action === 'reassign') submitBtn.classList.add('btn-primary');
+    else if (action === 'delete') submitBtn.classList.add('btn-warning');
+    else submitBtn.classList.add('btn-danger');
   }
 
-  // Dynamic classroom loading
-  document.getElementById('{{ form.preschool.id_for_label }}').addEventListener('change', function() {
-    let preschoolId = this.value;
-    let classroomSelect = document.getElementById('{{ form.classroom.id_for_label }}');
-
-    if (preschoolId) {
-      fetch(`{% url 'ajax-load-classrooms' %}?preschool_id=${preschoolId}`)
-        .then(response => response.json())
-        .then(data => {
-          classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
-          data.forEach(classroom => {
-            classroomSelect.innerHTML += `<option value="${classroom.id}">${classroom.name}</option>`;
-          });
-        });
-    } else {
-      classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
-    }
+  // Wire up radio buttons
+  document.querySelectorAll('.action-radio').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      if (this.checked) applyAction(this.value);
+    });
   });
 
-  // Initialize on page load
-  toggleReassignForm();
+  // Also make the whole card label trigger visuals on click
+  document.querySelectorAll('.action-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var radio = this.querySelector('input[type="radio"]');
+      if (radio) applyAction(radio.value);
+    });
+  });
+
+  // Dynamic classroom loading
+  if (preschoolSelect) {
+    preschoolSelect.addEventListener('change', function() {
+      var preschoolId = this.value;
+      if (!classroomSelect) return;
+      if (preschoolId) {
+        fetch('{% url "ajax-load-classrooms" %}?preschool_id=' + preschoolId)
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
+            data.forEach(function(c) {
+              classroomSelect.innerHTML += '<option value="' + c.id + '">' + c.name + '</option>';
+            });
+          })
+          .catch(function(){});
+      } else {
+        classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
+      }
+    });
+  }
 
   // Bootstrap validation
-  (function() {
-    'use strict';
-    window.addEventListener('load', function() {
-      let forms = document.querySelectorAll('.needs-validation');
-      Array.prototype.slice.call(forms).forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          form.classList.add('was-validated');
-        }, false);
-      });
-    }, false);
-  })();
+  document.getElementById('assignForm').addEventListener('submit', function(e) {
+    if (!this.checkValidity()) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    this.classList.add('was-validated');
+  });
+
+  // Initialise on load
+  var checked = document.querySelector('.action-radio:checked');
+  if (checked) applyAction(checked.value);
+})();
 </script>
 {% endblock %}

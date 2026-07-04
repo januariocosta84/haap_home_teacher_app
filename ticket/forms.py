@@ -1,10 +1,35 @@
 # ticket/forms.py
 from django import forms
-from ticket.models import SupportTicket, SupportTicketItem
+from ticket.models import SupportTicket, SupportTicketItem,SupportTicketMessage
 from core.models import User
 from preschools.models import Preschool
 from klase.models import Classroom
 
+
+class TicketReplyForm(forms.ModelForm):
+    class Meta:
+        model = SupportTicketMessage
+        fields = ['message']
+        widgets = {
+            'message':
+            forms.Textarea(
+                attrs={
+
+                    'class':
+                    (
+                        'form-control'
+                    ),
+
+                    'rows':
+                    3,
+
+                    'placeholder':
+                    (
+                        'Hakerek resposta...'
+                    )
+                }
+            )
+        }
 
 class SupportTicketForm(forms.ModelForm):
     """Form for creating support tickets"""

@@ -7,6 +7,10 @@ from .views import (
     SupportTicketListView,
     SupportTicketUpdateView,
     get_ticket_by_number,
+    notification_unread_count,
+    notification_list,
+    notification_mark_read,
+    notification_mark_all_read,
 )
 
 urlpatterns = [
@@ -45,5 +49,27 @@ urlpatterns = [
         'ajax/get-by-number/',
         get_ticket_by_number,
         name='ajax-get-ticket'
+    ),
+
+    # Notification endpoints
+    path(
+        'notifications/count/',
+        notification_unread_count,
+        name='notification-count'
+    ),
+    path(
+        'notifications/',
+        notification_list,
+        name='notification-list'
+    ),
+    path(
+        'notifications/<uuid:notification_id>/read/',
+        notification_mark_read,
+        name='notification-mark-read'
+    ),
+    path(
+        'notifications/read-all/',
+        notification_mark_all_read,
+        name='notification-read-all'
     ),
 ]

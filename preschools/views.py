@@ -22,7 +22,7 @@ from fonte_api import send_whatsapp_message
 @method_decorator(login_required, name='dispatch')
 class PreschoolListView(ListView):
     model = Preschool
-    template_name = 'preschool/preschool_list.html'
+    template_name = 'preschools/preschool_list.html'
     context_object_name = 'preschools'
     paginate_by = 10
 

@@ -1,253 +1,469 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
-{% block title %}Lista Pre-Escolar{% endblock %}
+{% block title %}Lista Pre-Eskolár{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══ Hero ══════════════════════════════════════════════════════════════════ */
+.ps-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.85rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.ps-hero::before {
+  content: '';
+  position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.ps-hero::after {
+  content: '';
+  position: absolute; bottom: -70px; left: 38%;
+  width: 250px; height: 250px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.ps-hero-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.45rem; color: #fff; flex-shrink: 0;
+}
+.hero-content { position: relative; z-index: 1; }
+
+/* ══ Filter card ════════════════════════════════════════════════════════════ */
+.filter-card {
+  background: #fff;
+  border-radius: 16px; border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);
+  padding: 1.1rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.ps-search-wrap { position: relative; }
+.ps-search-wrap .bi-search {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 0.9rem; pointer-events: none;
+}
+.ps-search-wrap input {
+  width: 100%; border: 1px solid #e2e8f0; border-radius: 10px;
+  padding: 0.5rem 1rem 0.5rem 2.2rem;
+  font-size: 0.85rem; outline: none; background: #f8fafc;
+  transition: border-color .15s, box-shadow .15s;
+}
+.ps-search-wrap input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  background: #fff;
+}
+.filter-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #eff6ff; color: #1d4ed8;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.74rem; font-weight: 600;
+}
+
+/* ══ Table card ═════════════════════════════════════════════════════════════ */
+.ps-table-card {
+  border-radius: 16px; border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+  overflow: hidden;
+}
+.ps-table-card .card-header {
+  background: #fff; border-bottom: 1px solid #f1f5f9;
+  padding: 0.85rem 1.5rem;
+}
+.section-label-sm {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: #94a3b8;
+}
+
+/* ══ Table ══════════════════════════════════════════════════════════════════ */
+#psTable thead th {
+  background: #f8fafc;
+  font-size: 10.5px; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 2px solid #eef2f7;
+  padding: 0.7rem 1rem; white-space: nowrap;
+}
+#psTable tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background .1s;
+}
+#psTable tbody tr:hover { background: #f0f6ff; }
+#psTable tbody td {
+  padding: 0.75rem 1rem;
+  font-size: 0.83rem; color: #334155;
+  vertical-align: middle; border-color: #f1f5f9;
+}
+.ps-name { font-weight: 700; color: #1e293b; font-size: 0.87rem; }
+.ps-location { font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
+.ps-contact { font-size: 0.78rem; color: #475569; }
+
+/* ══ Type badges ════════════════════════════════════════════════════════════ */
+.type-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: .02em;
+}
+.type-government { background: #eff6ff; color: #1d4ed8; }
+.type-community  { background: #f0fdf4; color: #15803d; }
+.type-private    { background: #f5f3ff; color: #6d28d9; }
+.type-playgroup  { background: #fffbeb; color: #b45309; }
+
+/* ══ Action buttons ═════════════════════════════════════════════════════════ */
+.action-wrap { display: flex; align-items: center; gap: 6px; }
+.act-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid #e2e8f0; background: #fff; color: #475569;
+  font-size: 0.85rem; transition: all .15s; text-decoration: none;
+  flex-shrink: 0;
+}
+.act-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,.12); }
+.act-btn.view:hover  { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+.act-btn.edit:hover  { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+.act-btn.del:hover   { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+
+/* ══ Pagination ═════════════════════════════════════════════════════════════ */
+.ps-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; padding: 0.85rem 1.5rem; border-top: 1px solid #f1f5f9; }
+.page-link { border-radius: 8px !important; margin: 0 1px; border: 1px solid #e2e8f0; color: #374151; font-size: 0.8rem; min-width: 32px; text-align: center; transition: all .15s; }
+.page-item.active .page-link { background: #2563eb; border-color: #2563eb; color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
+.page-link:hover { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+.page-item.disabled .page-link { color: #cbd5e1; background: #f8fafc; }
+
+/* ══ Empty state ════════════════════════════════════════════════════════════ */
+.empty-state { text-align: center; padding: 4rem 2rem; }
+.empty-state .ei { font-size: 3rem; color: #cbd5e1; display: block; margin-bottom: .75rem; }
+.empty-state .et { font-weight: 600; color: #475569; margin-bottom: .3rem; }
+.empty-state .es { font-size: 0.83rem; color: #94a3b8; }
+
+/* ══ Count chip ═════════════════════════════════════════════════════════════ */
+.count-chip {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,.18); color: #fff;
+  border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; font-weight: 600;
+  letter-spacing: .03em;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-
 <div class="container-fluid py-4">
 
-  <!-- MODERN DASHBOARD HEADER -->
-<div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="ps-hero">
+    <div class="hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="ps-hero-icon">
+          <i class="bi bi-building"></i>
+        </div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Jestaun Pre-Eskolár
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">Lista Pre-Eskolár</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Hatudu lista kompletu hosi pre-eskolár hotu iha sistema
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        {% if user.role == 'moe_admin' %}
+        <a href="{% url 'preschools:preschool_list' %}"
+           class="btn rounded-pill px-3 fw-semibold"
+           style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.8rem;">
+          <i class="bi bi-hourglass-split me-1"></i>Pedidu Mestri
+        </a>
+        <a href="{% url 'preschools:preschool_create' %}"
+           class="btn rounded-pill px-4 fw-semibold"
+           style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
+          <i class="bi bi-plus-lg me-1"></i>Adisiona Pre-Eskolár
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-    <div class="card-body p-4">
+  <!-- ══ FILTER CARD ════════════════════════════════════════════════════════ -->
+  <div class="filter-card">
+    <form method="GET" id="filterForm">
+      <div class="row g-2 align-items-center">
 
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+        <!-- Text search -->
+        <div class="col-12 col-md-5">
+          <div class="ps-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" value="{{ request.GET.search }}"
+                   placeholder="Hili naran pre-eskolár...">
+          </div>
+        </div>
 
-            <!-- LEFT: TITLE -->
-            <div>
+        <!-- Municipality filter -->
+        <div class="col-12 col-md-4">
+          <select name="municipality" class="form-select form-select-sm"
+                  style="border-radius:10px;background:#f8fafc;border-color:#e2e8f0;font-size:0.85rem;">
+            <option value="">Munisípiu hotu</option>
+            {% for m in municipalities %}
+            <option value="{{ m.id }}"
+              {% if request.GET.municipality == m.id|stringformat:"s" %}selected{% endif %}>
+              {{ m.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
 
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-primary rounded-pill px-3 py-2">
-                         Sistema Pre-Eskolár
-                    </span>
+        <!-- Buttons -->
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
+            <i class="bi bi-funnel-fill me-1"></i>Filtra
+          </button>
+          <a href="{% url 'preschools:preschool_list' %}"
+             class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Hamoos filtru">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Active filter pills -->
+      {% if request.GET.search or request.GET.municipality %}
+      <div class="d-flex flex-wrap gap-2 mt-2 pt-2" style="border-top:1px dashed #e2e8f0;">
+        <span class="section-label-sm me-1" style="line-height:1.7;">Aktidu:</span>
+        {% if request.GET.search %}
+        <span class="filter-pill"><i class="bi bi-search" style="font-size:.7rem;"></i>{{ request.GET.search }}</span>
+        {% endif %}
+        {% for m in municipalities %}
+          {% if request.GET.municipality == m.id|stringformat:"s" %}
+          <span class="filter-pill"><i class="bi bi-geo-alt" style="font-size:.7rem;"></i>{{ m.name }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- ══ TABLE CARD ═════════════════════════════════════════════════════════ -->
+  <div class="ps-table-card card">
+
+    <!-- Card header -->
+    <div class="card-header d-flex align-items-center flex-wrap gap-2">
+      <div>
+        <div style="font-weight:600;font-size:0.88rem;color:#1e293b;">Dadus Pre-Eskolár</div>
+        <div class="section-label-sm" style="margin-top:1px;">
+          {% if is_paginated %}
+            Hatudu {{ page_obj.start_index }}–{{ page_obj.end_index }} husi {{ paginator.count }} rejistu
+          {% else %}
+            {{ preschools|length }} pre-eskolár total
+          {% endif %}
+        </div>
+      </div>
+      <div class="flex-grow-1"></div>
+      <!-- Quick stat chips -->
+      <div class="d-none d-md-flex gap-2">
+        <span class="badge rounded-pill" style="background:#eff6ff;color:#1d4ed8;font-size:0.72rem;padding:4px 10px;">
+          <i class="bi bi-building me-1"></i>
+          {% if is_paginated %}{{ paginator.count }}{% else %}{{ preschools|length }}{% endif %} Pre-Eskolár
+        </span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table mb-0" id="psTable">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">Naran Pre-Eskolár</th>
+            <th>Munisípiu</th>
+            <th>Postu Administrativu</th>
+            <th>Tipu</th>
+            <th>Kontaktu</th>
+            <th>Data Kria</th>
+            <th class="text-center" style="padding-right:1.5rem;">Aksaun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for preschool in preschools %}
+          <tr>
+            <!-- Name -->
+            <td style="padding-left:1.5rem;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="flex-shrink-0"
+                     style="width:36px;height:36px;border-radius:10px;
+                            background:{% if preschool.preschool_type == 'government' %}#eff6ff{% elif preschool.preschool_type == 'community' %}#f0fdf4{% elif preschool.preschool_type == 'private' %}#f5f3ff{% else %}#fffbeb{% endif %};
+                            display:flex;align-items:center;justify-content:center;">
+                  <i class="bi bi-building"
+                     style="font-size:1rem;color:{% if preschool.preschool_type == 'government' %}#2563eb{% elif preschool.preschool_type == 'community' %}#16a34a{% elif preschool.preschool_type == 'private' %}#6d28d9{% else %}#b45309{% endif %};"></i>
                 </div>
+                <div>
+                  <div class="ps-name">{{ preschool.name }}</div>
+                  {% if preschool.suco %}
+                  <div class="ps-location"><i class="bi bi-geo-alt me-1"></i>{{ preschool.suco }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
 
-                <h3 class="fw-bold mb-1">
-                    Lista Pre-Eskolár
-                </h3>
+            <!-- Municipality -->
+            <td>
+              <span style="font-size:0.83rem;color:#334155;">{{ preschool.municipality|default:"—" }}</span>
+            </td>
 
-                <p class="text-muted mb-0">
-                    Hatudu lista kompletu hosi pre-eskolár hotu iha sistema.
-                </p>
+            <!-- Admin post -->
+            <td>
+              <span style="font-size:0.83rem;color:#475569;">{{ preschool.administrative_post|default:"—" }}</span>
+            </td>
 
-            </div>
+            <!-- Type badge -->
+            <td>
+              <span class="type-badge type-{{ preschool.preschool_type }}">
+                {% if preschool.preschool_type == 'government' %}<i class="bi bi-bank2"></i>
+                {% elif preschool.preschool_type == 'community' %}<i class="bi bi-people-fill"></i>
+                {% elif preschool.preschool_type == 'private' %}<i class="bi bi-briefcase-fill"></i>
+                {% else %}<i class="bi bi-stars"></i>{% endif %}
+                {{ preschool.get_preschool_type_display }}
+              </span>
+            </td>
 
-            <!-- RIGHT: ACTIONS -->
-            <div class="d-flex flex-column flex-sm-row gap-2">
+            <!-- Contact -->
+            <td>
+              {% if preschool.whatsapp_contact %}
+              <div class="ps-contact"><i class="bi bi-whatsapp text-success me-1"></i>{{ preschool.whatsapp_contact }}</div>
+              {% endif %}
+              {% if preschool.email %}
+              <div class="ps-contact"><i class="bi bi-envelope text-muted me-1"></i>{{ preschool.email }}</div>
+              {% endif %}
+              {% if not preschool.whatsapp_contact and not preschool.email %}
+              <span class="text-muted" style="font-size:0.8rem;">—</span>
+              {% endif %}
+            </td>
 
-                <!-- ADD -->
+            <!-- Date -->
+            <td>
+              <div style="font-size:0.8rem;color:#334155;font-weight:500;">{{ preschool.created_at|date:"d M Y" }}</div>
+              <div style="font-size:0.71rem;color:#94a3b8;">{{ preschool.created_at|date:"H:i" }}</div>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-center" style="padding-right:1.5rem;">
+              <div class="action-wrap justify-content-center">
+                <a href="{% url 'preschools:preschool_detail' preschool.pk %}"
+                   class="act-btn view" title="Haree Detallu"
+                   data-bs-toggle="tooltip" data-bs-placement="top">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if user.role == 'moe_admin' %}
+                <a href="{% url 'preschools:preschool_edit' preschool.pk %}"
+                   class="act-btn edit" title="Edita"
+                   data-bs-toggle="tooltip" data-bs-placement="top">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'preschools:preschool_delete' preschool.pk %}"
+                   class="act-btn del" title="Hamos"
+                   data-bs-toggle="tooltip" data-bs-placement="top">
+                  <i class="bi bi-trash3"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="border-0 p-0">
+              <div class="empty-state">
+                <i class="bi bi-building-x ei"></i>
+                <div class="et">Laiha pre-eskolár iha sistema</div>
+                <div class="es">
+                  {% if request.GET.search or request.GET.municipality %}
+                    Tenke hamoos filtru atu haree rekord hotu.
+                  {% else %}
+                    Sei laiha pre-eskolár rejistadu iha sistema.
+                  {% endif %}
+                </div>
+                {% if user.role == 'moe_admin' %}
                 <a href="{% url 'preschools:preschool_create' %}"
-                   class="btn btn-success rounded-pill px-4 shadow-sm">
-                    <i class="bi bi-plus-circle me-1"></i>
-                    Adisiona
+                   class="btn btn-primary rounded-pill px-4 mt-3 fw-semibold" style="font-size:0.83rem;">
+                  <i class="bi bi-plus-lg me-1"></i>Adisiona Pre-Eskolár
                 </a>
-
-                <!-- FILTER FORM -->
-                <form method="GET" class="d-flex gap-2">
-
-                    <select name="municipality"
-                            class="form-select rounded-pill shadow-sm"
-                            style="min-width: 200px;">
-                        <option value="">Munisípiu hotu</option>
-                        {% for m in municipalities %}
-                            <option value="{{ m.id }}"
-                                {% if request.GET.municipality == m.id|stringformat:"s" %}
-                                    selected
-                                {% endif %}>
-                                {{ m.name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-
-                    <button class="btn btn-primary rounded-pill px-4 shadow-sm">
-                        Filtra
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    <!-- subtle gradient bottom line -->
-    <div style="height:4px; background: linear-gradient(90deg,#0d6efd,#20c997,#6610f2);"></div>
-
-</div>
-
-    <!-- TABLE -->
-    <div class="card shadow-sm border-0 rounded-4">
-        <div class="card-body table-responsive">
-
-            <table class="table align-middle table-hover">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>Naran</th>
-                        <th>Munisípiu</th>
-                        <th>Postu Administrativu</th>
-                        <th>Tipu</th>
-                        <th>WhatsApp</th>
-                        <th>Email</th>
-                        <th>Data Kria</th>
-                        <th class="text-center">Aksaun</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for preschool in preschools %}
-                    <tr>
-
-                        <td>
-                            <strong>{{ preschool.name }}</strong>
-                        </td>
-
-                        <td>{{ preschool.municipality }}</td>
-
-                        <td>{{ preschool.administrative_post }}</td>
-
-                        <td>
-                            <span class="badge bg-primary rounded-pill px-3 py-2">
-                                {{ preschool.get_preschool_type_display }}
-                            </span>
-                        </td>
-
-                        <td>
-                            {{ preschool.whatsapp_contact|default:"-" }}
-                        </td>
-
-                        <td>
-                            {{ preschool.email|default:"-" }}
-                        </td>
-
-                        <td>
-                            {{ preschool.created_at|date:"d M Y" }}
-                        </td>
-
-                        <!-- ACTION BUTTONS -->
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-
-                                <!-- Haree -->
-                                <a href="{% url 'preschools:preschool_detail' preschool.id %}"
-                                   class="btn btn-sm btn-light border rounded-circle shadow-sm action-btn"
-                                   title="Haree Detallu">
-                                    <i class="bi bi-eye text-info"></i>
-                                </a>
-
-                                <!-- Edit -->
-                                <a href="{% url 'preschools:preschool_edit' preschool.id %}"
-                                   class="btn btn-sm btn-light border rounded-circle shadow-sm action-btn"
-                                   title="Edita">
-                                    <i class="bi bi-pencil text-primary"></i>
-                                </a>
-
-                                <!-- Delete -->
-                                <a href="{% url 'preschools:preschool_delete' preschool.id %}"
-                                   class="btn btn-sm btn-light border rounded-circle shadow-sm action-btn"
-                                   title="Hamos">
-                                    <i class="bi bi-trash text-danger"></i>
-                                </a>
-
-                            </div>
-                        </td>
-
-                    </tr>
-
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
-                            <i class="bi bi-folder-x fs-2 d-block mb-2"></i>
-                            Laiha dadus pre-eskolár iha sistema.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-
-        </div>
-    </div>
-
-    <!-- PAGINATION -->
+    <!-- Pagination -->
     {% if is_paginated %}
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
+    <div class="ps-pagination">
+      <div class="text-muted" style="font-size:0.78rem;">
+        Pajina <strong>{{ page_obj.number }}</strong> husi <strong>{{ paginator.num_pages }}</strong>
+        &nbsp;·&nbsp; {{ paginator.count }} rejistu total
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-left"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+          {% endif %}
 
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link rounded-pill mx-1"
-                   href="?page={{ page_obj.previous_page_number }}">
-                    ← Antes
-                </a>
-            </li>
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}">{{ num }}</a>
+              </li>
             {% endif %}
+          {% endfor %}
 
-            <li class="page-item active">
-                <span class="page-link rounded-pill mx-1">
-                    {{ page_obj.number }}
-                </span>
-            </li>
-
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link rounded-pill mx-1"
-                   href="?page={{ page_obj.next_page_number }}">
-                    Oin →
-                </a>
-            </li>
-            {% endif %}
-
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-right"></i></span></li>
+          {% endif %}
         </ul>
-    </nav>
+      </nav>
+    </div>
     {% endif %}
 
-</div>
+  </div><!-- /ps-table-card -->
 
-<!-- CUSTOM UI STYLE -->
-<style>
-    .action-btn {
-        width: 38px;
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all .25s ease;
-    }
+</div><!-- /container-fluid -->
 
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 14px rgba(0,0,0,.12);
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .table tbody tr {
-        transition: all 0.2s ease;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    .card {
-        overflow: hidden;
-    }
-
-    .btn {
-        font-weight: 500;
-    }
-
-    .page-link {
-        border-radius: 50px !important;
-    }
-
-    .badge {
-        font-weight: 500;
-    }
-</style>
-
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Bootstrap tooltips
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+    new bootstrap.Tooltip(el, { trigger: 'hover' });
+  });
+  // Auto-submit on municipality change
+  document.querySelector('select[name="municipality"]')?.addEventListener('change', function() {
+    this.closest('form').submit();
+  });
+});
+</script>
 {% endblock %}
