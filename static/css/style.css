@@ -92,6 +92,59 @@ body, html { height: 100%; margin: 0; overflow: hidden; }
   display: block;
 }
 
+/* ── Auth page footer (overlay pages) ── */
+.auth-footer {
+  background: rgba(10, 16, 40, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding: 0.55rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .01em;
+  line-height: 1.5;
+}
+.auth-footer a {
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  transition: color .15s;
+}
+.auth-footer a:hover { color: #fff; }
+.auth-footer-dot { color: rgba(255,255,255,.22); font-size: 0.55rem; }
+
+/* ── Auth page footer (plain pages — forgot password) ── */
+.auth-footer-plain {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 8px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  font-size: 0.68rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  z-index: 100;
+}
+.auth-footer-plain a {
+  color: #64748b;
+  text-decoration: none;
+  font-weight: 500;
+}
+.auth-footer-plain a:hover { color: #2563eb; }
+.auth-footer-plain .auth-footer-dot { color: #cbd5e1; font-size: 0.55rem; }
+
 /* Mobile */
 @media (max-width: 768px) {
   .auth-header { padding: 0.55rem 1.2rem; }
