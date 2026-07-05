@@ -1,24 +1,299 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Atividade Profesór{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══ Hero ══════════════════════════════════════════════════════════════════ */
+.tl-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.85rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative; overflow: hidden;
+}
+.tl-hero::before {
+  content: ''; position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.tl-hero::after {
+  content: ''; position: absolute; bottom: -60px; left: 42%;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.tl-hero-content { position: relative; z-index: 1; }
+.tl-hero-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,.18);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: #fff; flex-shrink: 0;
+}
+
+/* ══ Filter card ════════════════════════════════════════════════════════════ */
+.tl-filter-card {
+  background: #fff; border-radius: 16px; border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.tl-filter-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: #64748b; margin-bottom: 4px; display: block;
+}
+.tl-filter-card .form-select,
+.tl-filter-card .form-control {
+  border-radius: 10px; border-color: #e2e8f0; font-size: 0.83rem;
+  background-color: #f8fafc;
+  transition: border-color .15s, box-shadow .15s;
+}
+.tl-filter-card .form-select:focus,
+.tl-filter-card .form-control:focus {
+  border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  background-color: #fff;
+}
+.active-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #eff6ff; color: #1d4ed8;
+  border-radius: 20px; padding: 2px 9px;
+  font-size: 0.72rem; font-weight: 700;
+}
+
+/* ══ Export / toolbar ═══════════════════════════════════════════════════════ */
+.tl-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: .5rem;
+  margin-bottom: 1rem;
+}
+.tl-export-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 5px 16px;
+  font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  transition: all .12s; text-decoration: none; border: 1px solid;
+}
+.tl-export-csv {
+  background: #f0fdf4; color: #15803d; border-color: #86efac;
+}
+.tl-export-csv:hover { background: #dcfce7; color: #166534; }
+.tl-export-pdf {
+  background: #fef2f2; color: #dc2626; border-color: #fca5a5;
+}
+.tl-export-pdf:hover { background: #fee2e2; color: #b91c1c; }
+.tl-refresh-btn {
+  background: #f8fafc; color: #475569; border-color: #e2e8f0;
+  margin-left: auto;
+}
+.tl-refresh-btn:hover { background: #f1f5f9; }
+
+/* ══ Table card ═════════════════════════════════════════════════════════════ */
+.tl-table-card {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+
+/* ══ DataTables override ════════════════════════════════════════════════════ */
+div.dataTables_wrapper {
+  padding: 0;
+}
+div.dataTables_wrapper div.dataTables_filter {
+  float: none;
+  display: flex;
+  align-items: center;
+}
+div.dataTables_wrapper div.dataTables_filter label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.78rem; font-weight: 600; color: #64748b;
+  white-space: nowrap; margin: 0;
+}
+div.dataTables_wrapper div.dataTables_filter input {
+  border: 1px solid #e2e8f0; border-radius: 10px;
+  padding: 5px 10px 5px 2rem; font-size: 0.82rem;
+  background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 0.6rem center;
+  transition: border-color .15s, box-shadow .15s;
+  width: 200px !important;
+  margin-left: 0 !important;
+}
+div.dataTables_wrapper div.dataTables_filter input:focus {
+  border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  background-color: #fff; outline: none;
+}
+div.dataTables_wrapper div.dataTables_length {
+  float: none;
+}
+div.dataTables_wrapper div.dataTables_length label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; color: #64748b; font-weight: 600; margin: 0;
+}
+div.dataTables_wrapper div.dataTables_length select {
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  padding: 4px 8px; font-size: 0.78rem; background: #f8fafc;
+  color: #334155; cursor: pointer;
+}
+div.dataTables_wrapper div.dataTables_info {
+  font-size: 0.75rem; color: #94a3b8; padding: 0;
+}
+/* Pagination */
+div.dataTables_wrapper div.dataTables_paginate {
+  padding: 0;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+  margin: 0;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link {
+  border-radius: 8px !important; margin: 0 2px;
+  border: 1px solid #e2e8f0; color: #374151;
+  font-size: 0.78rem; padding: 4px 10px;
+  transition: all .12s;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-item.active .page-link {
+  background: #2563eb; border-color: #2563eb; color: #fff;
+}
+div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
+  background: #eff6ff; border-color: #93c5fd; color: #1d4ed8;
+}
+/* Table itself */
+#teacherLogsTable {
+  font-size: 0.84rem; margin: 0 !important;
+}
+#teacherLogsTable thead th {
+  background: #f8fafc !important;
+  font-size: 10.5px; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: .06em;
+  border-bottom: 2px solid #eef2f7 !important;
+  padding: 0.75rem 1rem; white-space: nowrap;
+  border-top: 0 !important;
+}
+#teacherLogsTable thead th.sorting::after,
+#teacherLogsTable thead th.sorting_asc::after,
+#teacherLogsTable thead th.sorting_desc::after {
+  opacity: 0.5;
+}
+#teacherLogsTable tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background .1s;
+}
+#teacherLogsTable tbody tr:hover { background: #f0f6ff !important; }
+#teacherLogsTable tbody td {
+  padding: 0.72rem 1rem; vertical-align: middle;
+  border-color: #f1f5f9; border-top: 0;
+}
+
+/* ══ Status badges ══════════════════════════════════════════════════════════ */
+.tl-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+}
+.tl-success   { background: #f0fdf4; color: #15803d; }
+.tl-completed { background: #eff6ff; color: #1d4ed8; }
+.tl-started   { background: #f0fdf4; color: #0f766e; }
+.tl-pending   { background: #fffbeb; color: #b45309; }
+.tl-failed    { background: #fef2f2; color: #dc2626; }
+
+/* ══ Teacher avatar chip ════════════════════════════════════════════════════ */
+.teacher-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.teacher-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #eff6ff; color: #2563eb;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800; flex-shrink: 0; letter-spacing: -0.5px;
+}
+.teacher-name { font-weight: 600; color: #1e293b; font-size: 0.84rem; }
+
+/* ══ Theme pill ═════════════════════════════════════════════════════════════ */
+.theme-pill {
+  display: inline-block; background: #f5f3ff; color: #6d28d9;
+  border-radius: 20px; padding: 1px 8px;
+  font-size: 0.7rem; font-weight: 700;
+}
+
+/* ══ DT controls bar ════════════════════════════════════════════════════════ */
+.dt-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .75rem;
+  padding: .85rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+}
+.dt-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .75rem;
+  padding: .75rem 1.25rem;
+  border-top: 1px solid #f1f5f9;
+  background: #fff;
+}
+
+/* ══ Responsive ═════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .tl-hero { padding: 1.3rem 1.25rem; }
+  .col-hide-xs { display: none !important; }
+  div.dataTables_wrapper div.dataTables_filter input { width: 140px !important; }
+}
+@media (max-width: 768px) {
+  .col-hide-sm { display: none !important; }
+  .dt-controls { flex-direction: column; align-items: flex-start; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-  <div class="mb-4">
-    <h4 class="mb-0 fw-500">Actividades Professores</h4>
-    <!-- <small class="text-muted">Login, logout and activity history for teachers.</small> -->
+<div class="container-fluid py-4">
+
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="tl-hero">
+    <div class="tl-hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="tl-hero-icon">
+          <i class="bi bi-journal-richtext"></i>
+        </div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Jestaun Atividade
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">Atividade Profesór</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Haree no monitoriza rejistu atividade profesór sira
+          </div>
+        </div>
+      </div>
+
+      <!-- Export buttons in hero -->
+      <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <a class="tl-export-btn tl-export-csv"
+           href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=csv">
+          <i class="bi bi-filetype-csv"></i>CSV
+        </a>
+        <a class="tl-export-btn tl-export-pdf"
+           href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=pdf">
+          <i class="bi bi-filetype-pdf"></i>PDF
+        </a>
+        <button id="manualRefresh" type="button" class="tl-export-btn tl-refresh-btn">
+          <i class="bi bi-arrow-clockwise" id="refreshIcon"></i>Atualiza
+        </button>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Filters Card -->
-  <div class="card shadow-sm mb-3" style="border-radius:12px;">
-    <div class="card-header bg-light px-4 py-3">
-      <h6 class="mb-0">Filtros</h6>
+  <!-- ══ FILTER CARD ════════════════════════════════════════════════════════ -->
+  <div class="tl-filter-card">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <i class="bi bi-funnel-fill" style="color:#2563eb;font-size:0.88rem;"></i>
+      <span style="font-size:0.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#64748b;">Filtru</span>
     </div>
-    <div class="card-body p-4">
-      <form method="get" class="row g-3">
+
+    <form method="get" id="filterForm">
+      <div class="row g-3">
+
         {% if teachers %}
-        <div class="col-md-3">
-          <label class="form-label small">Formador</label>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="tl-filter-label">Profesór</label>
           <select name="teacher" class="form-select form-select-sm">
-            <option value="">Hotu</option>
+            <option value="">Hotu profesór</option>
             {% for teacher in teachers %}
             <option value="{{ teacher.id }}" {% if filter_teacher == teacher.id|stringformat:"s" %}selected{% endif %}>
               {{ teacher.get_full_name }}
@@ -29,10 +304,10 @@
         {% endif %}
 
         {% if preschools %}
-        <div class="col-md-3">
-          <label class="form-label small">Eskola</label>
+        <div class="col-12 col-sm-6 col-lg-3">
+          <label class="tl-filter-label">Pre-Eskolár</label>
           <select name="preschool" class="form-select form-select-sm">
-            <option value="">Hotu</option>
+            <option value="">Hotu eskola</option>
             {% for preschool in preschools %}
             <option value="{{ preschool.id }}" {% if filter_preschool == preschool.id|stringformat:"s" %}selected{% endif %}>
               {{ preschool.name }}
@@ -42,147 +317,248 @@
         </div>
         {% endif %}
 
-        <div class="col-md-2">
-          <label class="form-label small">Status</label>
+        <div class="col-12 col-sm-6 col-lg-2">
+          <label class="tl-filter-label">Status</label>
           <select name="status" class="form-select form-select-sm">
-            <option value="">Hotu</option>
-            <option value="success" {% if filter_status == "success" %}selected{% endif %}>Success</option>
-            <option value="failed" {% if filter_status == "failed" %}selected{% endif %}>Failed</option>
-            <option value="pending" {% if filter_status == "pending" %}selected{% endif %}>Pending</option>
-            <option value="started" {% if filter_status == "started" %}selected{% endif %}>Started</option>
+            <option value="">Hotu status</option>
+            <option value="success"   {% if filter_status == "success"   %}selected{% endif %}>Success</option>
             <option value="completed" {% if filter_status == "completed" %}selected{% endif %}>Completed</option>
+            <option value="started"   {% if filter_status == "started"   %}selected{% endif %}>Started</option>
+            <option value="pending"   {% if filter_status == "pending"   %}selected{% endif %}>Pending</option>
+            <option value="failed"    {% if filter_status == "failed"    %}selected{% endif %}>Failed</option>
           </select>
         </div>
 
-        <div class="col-md-2">
-          <label class="form-label small">Data Husi</label>
+        <div class="col-12 col-sm-6 col-lg-2">
+          <label class="tl-filter-label">Data Husi</label>
           <input type="date" name="date_from" class="form-control form-control-sm" value="{{ filter_date_from }}">
         </div>
 
-        <div class="col-md-2">
-          <label class="form-label small">Data to'o</label>
+        <div class="col-12 col-sm-6 col-lg-2">
+          <label class="tl-filter-label">Data To'o</label>
           <input type="date" name="date_to" class="form-control form-control-sm" value="{{ filter_date_to }}">
         </div>
 
-        <div class="col-md-12">
-          <button type="submit" class="btn btn-primary btn-sm">
-            <i class="fas fa-filter me-1"></i> Aplika Filtro
-          </button>
-          <a href="{% url 'core:teacher_logs' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-redo me-1"></i> Limpa
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Export Buttons -->
-  <div class="mb-3 d-flex gap-2 align-items-center">
-    <a href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=csv" class="btn btn-success btn-sm">
-      <i class="fas fa-file-csv me-1"></i> Export ba CSV
-    </a>
-    <a href="?{% if filter_teacher %}teacher={{ filter_teacher }}&{% endif %}{% if filter_preschool %}preschool={{ filter_preschool }}&{% endif %}{% if filter_status %}status={{ filter_status }}&{% endif %}{% if filter_date_from %}date_from={{ filter_date_from }}&{% endif %}{% if filter_date_to %}date_to={{ filter_date_to }}&{% endif %}export=pdf" class="btn btn-danger btn-sm">
-      <i class="fas fa-file-pdf me-1"></i> Export ba PDF
-    </a>
-    <button id="manualRefresh" type="button" class="btn btn-outline-secondary btn-sm ms-auto">
-      <i class="fas fa-sync-alt me-1"></i> Atualiza Rejistu
-    </button>
-  </div>
-
-  <div class="card shadow-sm" style="border-radius:12px; overflow:hidden;">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table id="teacherLogsTable" class="table table-hover mb-0" style="font-size:13px;">
-          <thead class="bg-light">
-            <tr>
-              <th class="px-3 py-2">Data</th>
-              <th class="px-3 py-2">Formador</th>
-              <th class="px-3 py-2">Eskola</th>
-              <th class="px-3 py-2">Tema</th>
-              <th class="px-3 py-2">Sub Tema</th>
-              <th class="px-3 py-2">Atividade</th>
-              <th class="px-3 py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody id="logs-body">
-            {% include "partials/teacher_logs_body.html" %}
-          </tbody>
-        </table>
       </div>
-    </div>
+
+      <!-- Active filter pills -->
+      {% if filter_teacher or filter_preschool or filter_status or filter_date_from or filter_date_to %}
+      <div class="d-flex flex-wrap gap-2 mt-3 pt-3" style="border-top:1px dashed #e2e8f0;">
+        <span style="font-size:0.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;line-height:1.9;">Aktidu:</span>
+        {% if filter_status %}<span class="active-pill"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{{ filter_status|capfirst }}</span>{% endif %}
+        {% if filter_date_from %}<span class="active-pill"><i class="bi bi-calendar-event" style="font-size:.7rem;"></i>{{ filter_date_from }}</span>{% endif %}
+        {% if filter_date_to %}<span class="active-pill"><i class="bi bi-calendar-event" style="font-size:.7rem;"></i>{{ filter_date_to }}</span>{% endif %}
+      </div>
+      {% endif %}
+
+      <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">
+          <i class="bi bi-funnel-fill me-1"></i>Aplika
+        </button>
+        <a href="{% url 'core:teacher_logs' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
+          <i class="bi bi-x-lg me-1"></i>Limpa
+        </a>
+      </div>
+    </form>
   </div>
+
+  <!-- ══ TABLE CARD ════════════════════════════════════════════════════════ -->
+  <div class="tl-table-card">
+
+    <!-- DT Controls top bar (length + search) — filled by DataTables init -->
+    <div class="dt-controls" id="dt-controls-top"></div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table id="teacherLogsTable" class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="padding-left:1.25rem;">Data</th>
+            <th>Profesór</th>
+            <th class="col-hide-sm">Pre-Eskolár</th>
+            <th class="col-hide-sm">Tema</th>
+            <th class="col-hide-xs">Sub-Tema</th>
+            <!-- <th>Atividade</th> -->
+            <!-- <th>Status</th> -->
+          </tr>
+        </thead>
+        <tbody id="logs-body">
+          {% include "partials/teacher_logs_body.html" %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DT Footer (info + pagination) — filled by DataTables init -->
+    <div class="dt-footer" id="dt-footer"></div>
+
+  </div><!-- /tl-table-card -->
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    let teacherLogsTable;
+document.addEventListener('DOMContentLoaded', function () {
 
-    function initializeTeacherLogsTable() {
+  var dtTable;
+
+  function buildExportUrl(fmt) {
+    var p = new URLSearchParams(window.location.search);
+    p.delete('export');
+    p.set('export', fmt);
+    return window.location.pathname + '?' + p.toString();
+  }
+
+  function initDT() {
+    if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
+      dtTable = $('#teacherLogsTable').DataTable();
+      return;
+    }
+
+    dtTable = $('#teacherLogsTable').DataTable({
+      order: [[0, 'desc']],
+      pageLength: 10,
+      lengthMenu: [10, 25, 50, 100],
+      dom: 'rt',          // only render table + no built-in header/footer
+      language: {
+        search: '',
+        searchPlaceholder: 'Buka...',
+        lengthMenu: '_MENU_ rejistu',
+        info: 'Hatudu _START_–_END_ husi _TOTAL_',
+        infoEmpty: 'Laiha rejistu',
+        infoFiltered: '(filtra husi _MAX_)',
+        zeroRecords: 'La hetan dadus ne\'ebé koresponde',
+        paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+      },
+      drawCallback: function () {
+        renderDtControls();
+      },
+      initComplete: function () {
+        renderDtControls();
+      }
+    });
+  }
+
+  function renderDtControls() {
+    if (!dtTable) return;
+    var info = dtTable.page.info();
+
+    /* ── Top bar: length selector + search ── */
+    var topHtml =
+      '<div class="d-flex align-items-center gap-2">' +
+        '<span style="font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Haree</span>' +
+        '<select id="dt-length-sel" class="form-select form-select-sm" style="width:70px;border-radius:8px;border-color:#e2e8f0;background:#f8fafc;font-size:0.8rem;">' +
+          [10,25,50,100].map(function(n){
+            return '<option value="'+n+'"'+(info.length===n?' selected':'')+'>'+n+'</option>';
+          }).join('') +
+        '</select>' +
+        '<span style="font-size:0.72rem;color:#94a3b8;">rejistu</span>' +
+      '</div>' +
+      '<div style="position:relative;">' +
+        '<i class="bi bi-search" style="position:absolute;left:.65rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.8rem;pointer-events:none;z-index:2;"></i>' +
+        '<input id="dt-search-input" type="text" placeholder="Buka rejistu..." value="'+dtTable.search()+'" ' +
+          'style="border:1px solid #e2e8f0;border-radius:10px;padding:5px 10px 5px 2rem;font-size:0.82rem;background:#f8fafc;width:200px;transition:border-color .15s,box-shadow .15s;">' +
+      '</div>';
+    document.getElementById('dt-controls-top').innerHTML = topHtml;
+
+    /* ── Footer: info + pagination ── */
+    var totalPages = Math.ceil(info.recordsDisplay / info.length) || 1;
+    var currentPage = info.page + 1;
+    var paginHtml = '<ul class="pagination pagination-sm mb-0" style="gap:2px;">';
+
+    paginHtml += '<li class="page-item'+(currentPage<=1?' disabled':'')+'"><button class="page-link" data-page="0" style="border-radius:8px;border:1px solid #e2e8f0;font-size:.75rem;padding:4px 9px;">‹‹</button></li>';
+    paginHtml += '<li class="page-item'+(currentPage<=1?' disabled':'')+'"><button class="page-link" data-page="'+(info.page-1)+'" style="border-radius:8px;border:1px solid #e2e8f0;font-size:.75rem;padding:4px 9px;">‹</button></li>';
+
+    var start = Math.max(0, info.page-2);
+    var end   = Math.min(totalPages-1, info.page+2);
+    for (var p = start; p <= end; p++) {
+      var active = (p === info.page) ? 'background:#2563eb;border-color:#2563eb;color:#fff;' : 'border:1px solid #e2e8f0;color:#374151;';
+      paginHtml += '<li class="page-item"><button class="page-link" data-page="'+p+'" style="border-radius:8px;'+active+'font-size:.75rem;padding:4px 9px;">'+(p+1)+'</button></li>';
+    }
+
+    paginHtml += '<li class="page-item'+(currentPage>=totalPages?' disabled':'')+'"><button class="page-link" data-page="'+(info.page+1)+'" style="border-radius:8px;border:1px solid #e2e8f0;font-size:.75rem;padding:4px 9px;">›</button></li>';
+    paginHtml += '<li class="page-item'+(currentPage>=totalPages?' disabled':'')+'"><button class="page-link" data-page="'+(totalPages-1)+'" style="border-radius:8px;border:1px solid #e2e8f0;font-size:.75rem;padding:4px 9px;">››</button></li>';
+    paginHtml += '</ul>';
+
+    var infoText = info.recordsDisplay > 0
+      ? 'Pajina <strong>'+currentPage+'</strong> husi <strong>'+totalPages+'</strong> &nbsp;&middot;&nbsp; '+info.recordsDisplay+' rejistu'
+      : 'Laiha rejistu';
+
+    document.getElementById('dt-footer').innerHTML =
+      '<div style="font-size:0.75rem;color:#94a3b8;">'+infoText+'</div>' +
+      '<nav>'+paginHtml+'</nav>';
+
+    /* ── Bind events ── */
+    var lenSel = document.getElementById('dt-length-sel');
+    if (lenSel) {
+      lenSel.addEventListener('change', function () {
+        dtTable.page.len(+this.value).draw();
+      });
+    }
+
+    var srch = document.getElementById('dt-search-input');
+    if (srch) {
+      srch.addEventListener('input', function () {
+        dtTable.search(this.value).draw();
+      });
+      srch.addEventListener('focus', function () {
+        this.style.borderColor = '#93c5fd';
+        this.style.boxShadow = '0 0 0 3px rgba(37,99,235,.08)';
+        this.style.backgroundColor = '#fff';
+      });
+      srch.addEventListener('blur', function () {
+        this.style.borderColor = '#e2e8f0';
+        this.style.boxShadow = '';
+        this.style.backgroundColor = '#f8fafc';
+      });
+    }
+
+    document.querySelectorAll('#dt-footer .page-link[data-page]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!btn.closest('.page-item').classList.contains('disabled')) {
+          dtTable.page(+btn.getAttribute('data-page')).draw(false);
+        }
+      });
+    });
+  }
+
+  function refreshLogs() {
+    var icon = document.getElementById('refreshIcon');
+    if (icon) { icon.style.animation = 'spin 0.8s linear infinite'; }
+
+    fetch(window.location.href, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var search = dtTable ? dtTable.search() : '';
+      var len    = dtTable ? dtTable.page.len() : 10;
+
       if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
-        teacherLogsTable = $('#teacherLogsTable').DataTable();
-        return;
+        dtTable.destroy();
+        dtTable = null;
       }
 
-      teacherLogsTable = $('#teacherLogsTable').DataTable({
-        order: [[0, 'desc']],
-        pageLength: 10,
-        lengthMenu: [10, 25, 50, 100],
-        language: {
-          search: 'Pesquisa:',
-          lengthMenu: 'Haree _MENU_ rejistu',
-          info: 'Hatudu _START_ to _END_ husi _TOTAL_ rejistu',
-          infoEmpty: 'Laiha rejistu',
-          infoFiltered: '(filtra husi _MAX_ total rejistu)',
-          zeroRecords: 'La hetan dadus',
-          paginate: { first: 'Uluk', last: 'Ikus', next: 'Tuir Mai', previous: 'Antes' }
-        }
-      });
-    }
+      document.getElementById('logs-body').innerHTML = data.html;
+      initDT();
 
-    function refreshTeacherLogs() {
-      fetch(window.location.href, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-      })
-      .then(response => response.json())
-      .then(data => {
-        let searchValue = '';
-        let pageLength = 10;
-        let order = [[0, 'desc']];
-
-        if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
-          teacherLogsTable = $('#teacherLogsTable').DataTable();
-          searchValue = teacherLogsTable.search();
-          pageLength = teacherLogsTable.page.len();
-          order = teacherLogsTable.order();
-          teacherLogsTable.destroy();
-        }
-
-        document.getElementById('logs-body').innerHTML = data.html;
-        initializeTeacherLogsTable();
-
-        if (searchValue) {
-          teacherLogsTable.search(searchValue).draw();
-        }
-
-        if (order && order.length) {
-          teacherLogsTable.order(order).draw();
-        }
-
-        teacherLogsTable.page.len(pageLength).draw(false);
-      })
-      .catch(() => {
-        console.warn('Failed to refresh teacher logs.');
-      });
-    }
-
-    initializeTeacherLogsTable();
-
-    document.getElementById('manualRefresh').addEventListener('click', function() {
-      refreshTeacherLogs();
+      if (search) dtTable.search(search).draw();
+      dtTable.page.len(len).draw(false);
+    })
+    .catch(function () {
+      console.warn('Refresh failed.');
+    })
+    .finally(function () {
+      if (icon) { icon.style.animation = ''; }
     });
-  });
+  }
+
+  initDT();
+
+  document.getElementById('manualRefresh').addEventListener('click', refreshLogs);
+});
 </script>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
 {% endblock %}

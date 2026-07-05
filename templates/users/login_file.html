@@ -1,9 +1,10 @@
 {% extends "registration/layout.html" %}
-<title>{% block title %}HAAP | Login{% endblock %}</title>
+{% block title %}HAAP | Login{% endblock %}
+
 {% block content %}
 
-<!-- Background Carousel (UNCHANGED) -->
-<div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+<!-- Full-screen background carousel -->
+<div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
   <div class="carousel-inner">
     <div class="carousel-item active">
       <img src="/static/img/Background 1_Transport.png" alt="Background 1">
@@ -17,146 +18,99 @@
   </div>
 </div>
 
-<!-- Login Form Overlay -->
+<!-- Overlay: flex column — header on top, form area below -->
 <div class="overlay-container">
-  <div class="container w-100 pt-3">
 
-    <div class="login-title d-flex align-items-center mt-2">
-      <img src="/static/img/logo-ori.png" alt="Logo" class="logo">
-      <h1>Bemvindo Mai hahu App!</h1>
-    </div>
+  <!-- ── Top header bar with logo ── -->
+  <div class="auth-header">
+    <img src="/static/img/logo-ori.png" alt="HAAP Logo">
+  </div>
 
-    <div class="login-container mt-2">
+  <!-- ── Main area: login card on the right ── -->
+  <div class="auth-body">
+    <div class="login-container">
 
-      <!-- ✅ ALERTS -->
+      <!-- Card heading (no logo) -->
+      <div style="margin-bottom:1.25rem;">
+        <div class="login-card-title">Bem-vindo de volta</div>
+        <div class="login-card-sub">Tama ho ita nia numeru no password</div>
+      </div>
+
+      <!-- Alerts -->
       {% if messages %}
-        <div class="alert-container mb-3">
+        <div class="mb-3">
           {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert" style="border-radius: 8px; padding: 12px 16px;">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>
-              {{ message }}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+                 role="alert" style="border-radius:8px;padding:10px 14px;font-size:0.85rem;">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
               <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
           {% endfor %}
         </div>
       {% endif %}
 
-          {% if form.errors %}
-              <div class="alert alert-danger alert-dismissible fade show"
-                  role="alert"
-                  style="border-radius: 8px; padding: 12px 16px;">
-
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-
-                {% for field in form %}
-                  {% for error in field.errors %}
-                    <div>{{ error }}</div>
-                  {% endfor %}
-                {% endfor %}
-
-                {% for error in form.non_field_errors %}
-                  <div>{{ error }}</div>
-                {% endfor %}
-
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-        {% endif %}
+      {% if form.errors %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3"
+             role="alert" style="border-radius:8px;padding:10px 14px;font-size:0.85rem;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {% for field in form %}{% for error in field.errors %}<div>{{ error }}</div>{% endfor %}{% endfor %}
+          {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endif %}
 
       <form action="{% url 'core:login' %}" method="POST">
         {% csrf_token %}
 
-        <!-- WhatsApp -->
-        <div class="form-group">
-          <label class="label">Numeru Telefone</label>
+        <div class="form-group mb-3">
+          <label class="label"><i class="bi bi-phone me-1 text-primary"></i>Numeru Telefone</label>
           <div class="input-group">
             {{ form.username }}
-            <div class="input-group-append">
-              <span class="input-group-text">
-                <i class="bi bi-whatsapp"></i>
-              </span>
-            </div>
+            <span class="input-group-text"><i class="bi bi-phone"></i></span>
           </div>
+          <small id="phone-error" class="text-danger d-none"></small>
         </div>
 
-        <!-- Password -->
-        <div class="form-group">
-          <label class="label">Palavras Passe</label>
+        <div class="form-group mb-4">
+          <label class="label"><i class="bi bi-lock me-1 text-primary"></i>Palavras Passe</label>
           <div class="input-group">
-
             {{ form.password }}
-
-            <!-- Lock icon -->
-            <div class="input-group-append">
-              <span class="input-group-text">
-                <i class="fas fa-lock"></i>
-              </span>
-            </div>
-
+            <span class="input-group-text" style="cursor:pointer;" onclick="toggleLoginPassword()">
+              <i class="bi bi-eye" id="loginEyeIcon"></i>
+            </span>
           </div>
         </div>
 
-        <!-- BUTTON (UNCHANGED) -->
-        <div class="form-group">
-          <button id="submit-button" style="border: none; background: none; padding: 0;">
-            <img src="/static/img/Button 1_Login.png" alt="Rejistu" style="height: 70px; border: none; outline: none;">
+        <div class="form-group mb-2">
+          <button id="submit-button" type="submit" class="login-submit-btn">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Tama / Login
           </button>
         </div>
 
-        <!-- Register -->
-        <div class="text-block text-center my-3">
-          <span style="color: rgb(115, 99, 92);">Laos Membro ?</span>
-          <div class="d-flex justify-content-center gap-2">
-            <a href="{% url 'core:parent_register' %}" class="btn btn-outline-primary">Rejistu Parent</a>
-            <a href="{% url 'core:teacher_register' %}" class="btn btn-outline-success">Rejistu Formadores</a>
+        <div class="login-link-row">
+          <a href="{% url 'core:forgot_password' %}">
+            <i class="bi bi-key me-1"></i>Haluan Password?
+          </a>
+          <div style="display:flex;flex-direction:column;gap:4px;text-align:right;">
+            <a href="{% url 'core:parent_register' %}">Rejistu hanesan <strong>Aman-Inan</strong></a>
+            <a href="{% url 'core:teacher_register' %}">Rejistu hanesan <strong>Formadór</strong></a>
           </div>
-        </div>
-
-        <!-- Forgot Password -->
-        <div class="text-center">
-          <span style="color: rgb(115, 99, 92);">Haluan Password ?</span>
-          <a href="{%url 'core:forgot_password' %}">Klik iha ne’e</a>
         </div>
 
       </form>
     </div>
-  </div>
-</div>
+  </div><!-- /auth-body -->
 
-<!-- ✅ AUTO HIDE ALERTS -->
+</div><!-- /overlay-container -->
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const alerts = document.querySelectorAll('.alert');
-
-  alerts.forEach(function(alert) {
-    setTimeout(function() {
-      const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-      bsAlert.close();
-    }, 5000);
-  });
-});
-</script>
-
-<!-- ✅ SHOW / HIDE PASSWORD -->
-<script>
-function togglePassword() {
-  const passwordField = document.getElementById("passwordField");
-  const icon = document.getElementById("eyeIcon");
-
-  if (passwordField.type === "password") {
-    passwordField.type = "text";
-    icon.classList.replace("bi-eye", "bi-eye-slash");
-  } else {
-    passwordField.type = "password";
-    icon.classList.replace("bi-eye-slash", "bi-eye");
-  }
+function toggleLoginPassword() {
+  const f = document.querySelector('[name=password]');
+  const i = document.getElementById('loginEyeIcon');
+  if (!f) return;
+  if (f.type === 'password') { f.type = 'text'; i.classList.replace('bi-eye','bi-eye-slash'); }
+  else { f.type = 'password'; i.classList.replace('bi-eye-slash','bi-eye'); }
 }
 </script>
-
-<!-- ✅ SMOOTH FADE -->
-<style>
-.alert {
-  transition: opacity 0.10s ease-out;
-}
-</style>
 
 {% endblock %}

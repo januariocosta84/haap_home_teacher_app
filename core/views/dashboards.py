@@ -2,9 +2,15 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.models import User, Child
 from preschools.models import PreschoolTeacher, Preschool
+from equipment.models import Equipment
+from ticket.models import SupportTicket
 
 @login_required
 def moe_admin_dashboard(request):
+    tickets_qs = SupportTicket.objects.select_related(
+        'teacher', 'preschool'
+    ).order_by('-created_at')
+
     context = {
         "all_users": User.objects.count(),
         "parents": User.objects.filter(role="parent").count(),
@@ -12,10 +18,15 @@ def moe_admin_dashboard(request):
         "children": Child.objects.count(),
         "teachers": User.objects.filter(role="teacher").count(),
         "preschools": Preschool.objects.count(),
+        "equipments": Equipment.objects.count(),
         "pending_teacher_requests": PreschoolTeacher.objects.filter(is_active=True, is_approved=False).count(),
-        "all_parents": User.objects.filter(role="parent"),
-        "all_children": Child.objects.all(),
-        "all_teachers": User.objects.filter(role="teacher"),
+        # Ticket stats
+        "tickets_total": tickets_qs.count(),
+        "tickets_open": tickets_qs.filter(status="open").count(),
+        "tickets_in_progress": tickets_qs.filter(status="in_progress").count(),
+        "tickets_resolved": tickets_qs.filter(status__in=["resolved", "closed"]).count(),
+        # Recent tickets for list
+        "recent_tickets": tickets_qs[:10],
     }
     return render(request, "dashboards/moe_admin.html", context=context)
 

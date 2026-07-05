@@ -1,65 +1,151 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Formadór{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-  <h2>👩‍🏫 Dashboard ba Formadores husi Munisipiu - {{ municipality}}</h2>
-  <hr>
+<div class="container-fluid py-4">
 
-  <!-- Summary Cards -->
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">👨‍👩‍👧 Parentes</h5>
-          <p class="display-4">{{ parents_count }}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">🧒 Labarik</h5>
-          <p class="display-4">{{ children_count }}</p>
+  <!-- ══ HERO ══ -->
+  <div class="haap-hero">
+    <div class="haap-hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="haap-hero-icon"><i class="bi bi-person-workspace"></i></div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Munisípiu — {{ municipality }}
+          </div>
+          <h4 class="fw-bold text-white mb-0">Dashboard Formadór</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Informasaun kona-ba parentes no labarik iha ita nia munisípiu
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Tabs -->
-  <ul class="nav nav-tabs mt-5" id="teacherTabs" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" id="parents-tab" data-toggle="tab" href="#parents" role="tab">Parentes</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" id="children-tab" data-toggle="tab" href="#children" role="tab">Labarik</a>
-    </li>
-  </ul>
-
-  <div class="tab-content mt-3" id="teacherTabsContent">
-    <!-- Parents Tab -->
-    <div class="tab-pane fade show active" id="parents" role="tabpanel">
-      <ul class="list-group">
-        {% for parent in parents_list %}
-          <li class="list-group-item">
-            {{ parent.first_name }} {{ parent.last_name }} — {{ parent.municipality.name }}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Laiha Familia.</li>
-        {% endfor %}
-      </ul>
+  <!-- ══ STAT CARDS ══ -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card" style="border-radius:16px;background:linear-gradient(135deg,#059669,#10b981);overflow:hidden;position:relative;">
+        <div class="card-body p-4 text-white">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:6px;">Parentes</div>
+          <h2 class="fw-bold mb-0">{{ parents_count }}</h2>
+          <div style="font-size:0.8rem;opacity:.75;margin-top:4px;">Inan-aman rejistadu</div>
+          <i class="bi bi-person-hearts card-bg-icon text-white"></i>
+        </div>
+      </div>
     </div>
-
-    <!-- Children Tab -->
-    <div class="tab-pane fade" id="children" role="tabpanel">
-      <ul class="list-group">
-        {% for child in children_list %}
-          <li class="list-group-item">
-            {{ child.first_name }} {{ child.last_name }} — Parent: {{ child.parent.first_name }} {{ child.parent.last_name }}
-          </li>
-        {% empty %}
-          <li class="list-group-item text-muted">Laiha Labarik.</li>
-        {% endfor %}
-      </ul>
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card" style="border-radius:16px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);overflow:hidden;position:relative;">
+        <div class="card-body p-4 text-white">
+          <div style="font-size:0.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:6px;">Labarik</div>
+          <h2 class="fw-bold mb-0">{{ children_count }}</h2>
+          <div style="font-size:0.8rem;opacity:.75;margin-top:4px;">Oan sira rejistadu</div>
+          <i class="bi bi-emoji-smile-fill card-bg-icon text-white"></i>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- ══ TABS ══ -->
+  <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+    <div class="card-header bg-white" style="padding:0 1.5rem;border-bottom:1px solid #f1f5f9;">
+      <ul class="nav nav-tabs border-0" id="teacherTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active fw-semibold" id="parents-tab"
+                  data-bs-toggle="tab" data-bs-target="#parents-pane"
+                  type="button" role="tab" style="font-size:0.85rem;padding:0.75rem 1rem;">
+            <i class="bi bi-person-hearts me-1"></i>Parentes
+            <span class="badge ms-1" style="background:#eff6ff;color:#2563eb;font-size:0.72rem;">{{ parents_count }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="children-tab"
+                  data-bs-toggle="tab" data-bs-target="#children-pane"
+                  type="button" role="tab" style="font-size:0.85rem;padding:0.75rem 1rem;">
+            <i class="bi bi-emoji-smile me-1"></i>Labarik
+            <span class="badge ms-1" style="background:#f0fdf4;color:#15803d;font-size:0.72rem;">{{ children_count }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tab-content" id="teacherTabsContent">
+
+      <!-- Parents Tab -->
+      <div class="tab-pane fade show active" id="parents-pane" role="tabpanel">
+        {% if parents_list %}
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead style="background:#f8fafc;">
+                <tr>
+                  <th style="font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;padding:0.7rem 1.5rem;border-bottom:1px solid #e2e8f0;border-top:none;">Naran</th>
+                  <th style="font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;padding:0.7rem 1rem;border-bottom:1px solid #e2e8f0;border-top:none;">Munisípiu</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for parent in parents_list %}
+                <tr style="border-bottom:1px solid #f8fafc;">
+                  <td style="padding:0.72rem 1.5rem;font-size:0.84rem;color:#1e293b;font-weight:500;vertical-align:middle;">
+                    <div class="d-flex align-items-center gap-2">
+                      <div style="width:30px;height:30px;border-radius:50%;background:#eff6ff;color:#2563eb;display:inline-flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;">
+                        {{ parent.first_name|slice:":1"|upper }}{{ parent.last_name|slice:":1"|upper }}
+                      </div>
+                      {{ parent.first_name }} {{ parent.last_name }}
+                    </div>
+                  </td>
+                  <td style="padding:0.72rem 1rem;font-size:0.83rem;color:#475569;vertical-align:middle;">
+                    {{ parent.municipality.name|default:"—" }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="text-align:center;padding:3.5rem 2rem;">
+            <i class="bi bi-person-x" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:.5rem;"></i>
+            <div style="font-weight:600;color:#475569;">Laiha Familia.</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Children Tab -->
+      <div class="tab-pane fade" id="children-pane" role="tabpanel">
+        {% if children_list %}
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead style="background:#f8fafc;">
+                <tr>
+                  <th style="font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;padding:0.7rem 1.5rem;border-bottom:1px solid #e2e8f0;border-top:none;">Naran Labarik</th>
+                  <th style="font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;padding:0.7rem 1rem;border-bottom:1px solid #e2e8f0;border-top:none;">Parentes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for child in children_list %}
+                <tr style="border-bottom:1px solid #f8fafc;">
+                  <td style="padding:0.72rem 1.5rem;font-size:0.84rem;color:#1e293b;font-weight:500;vertical-align:middle;">
+                    <i class="bi bi-emoji-smile text-success me-2"></i>{{ child.first_name }} {{ child.last_name }}
+                  </td>
+                  <td style="padding:0.72rem 1rem;font-size:0.83rem;color:#475569;vertical-align:middle;">
+                    {{ child.parent.first_name }} {{ child.parent.last_name }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="text-align:center;padding:3.5rem 2rem;">
+            <i class="bi bi-emoji-smile" style="font-size:2.5rem;color:#cbd5e1;display:block;margin-bottom:.5rem;"></i>
+            <div style="font-weight:600;color:#475569;">Laiha Labarik.</div>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
 </div>
 {% endblock %}

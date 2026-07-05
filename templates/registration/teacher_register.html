@@ -1,242 +1,169 @@
 {% extends "./layout.html" %}
-<style>
-.form-control {
-  border-radius: 10px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  width: 100%;
-}
+{% load static %}
 
-.form-control:focus {
-  border-color: #4e73df;
-  box-shadow: 0 0 0 0.15rem rgba(78, 115, 223, 0.2);
-}
+{% block title %}HAAP | Rejistrasaun Formadór{% endblock %}
 
-.input-group-text {
-  border-radius: 10px;
-  background-color: #f8f9fa;
-}
-
-.card {
-  transition: 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-1px);
-}
-</style>
-<title>{% block title %}HAAP | Teacher Registration{% endblock %}</title>
 {% block content %}
 
-<!-- Background Carousel -->
-<div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+<!-- Background carousel (fixed behind everything) -->
+<div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="4000"
+     style="position:fixed;inset:0;z-index:0;">
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/static/img/Background 1_Transport.png" class="img-fluid w-100" alt="Background 1">
+      <img src="/static/img/Background 1_Transport.png" class="img-fluid w-100" alt="">
     </div>
     <div class="carousel-item">
-      <img src="/static/img/Background 2_Me.png" class="img-fluid w-100" alt="Background 2">
+      <img src="/static/img/Background 2_Me.png" class="img-fluid w-100" alt="">
     </div>
     <div class="carousel-item">
-      <img src="/static/img/Background 3_Culture.png" class="img-fluid w-100" alt="Background 3">
+      <img src="/static/img/Background 3_Culture.png" class="img-fluid w-100" alt="">
     </div>
   </div>
 </div>
 
-<!-- Overlay Container -->
-<div class="overlay-container d-flex flex-column align-items-center justify-content-start min-vh-100 py-4 px-2" 
-     style="overflow-y: auto; overflow-x: hidden;">
+<!-- Overlay: flex column — header bar on top, scrollable body below -->
+<div class="overlay-container">
 
-  <div class="container-fluid mt-3">
-    <div class="row justify-content-center">
-      <div class="col-12">
+  <!-- ── Top header bar with logo ── -->
+  <div class="auth-header">
+    <img src="/static/img/logo-ori.png" alt="HAAP Logo">
+  </div>
 
-        <div class="card border shadow-sm"
-             style="border-radius: 12px; overflow: hidden; max-width: 700px; margin: auto;">
+  <!-- ── Scrollable form area ── -->
+  <div class="auth-body" style="justify-content:center;align-items:flex-start;padding-top:1.5rem;padding-bottom:1.5rem;">
+    <div class="auth-card" style="width:100%;max-width:680px;">
 
-          <div class="card-body border-bottom d-flex align-items-center gap-3 flex-wrap"
-               style="padding: 20px 18px; background: #f8f9fc;">
+      <!-- Card title strip (no logo) -->
+      <div class="auth-card-header">
+        <h3><i class="bi bi-mortarboard me-2"></i>Rejistrasaun Formadór</h3>
+        <p>Rejistu ho informasaun ne'ebé kompletu no validu</p>
+      </div>
 
-            <img src="/static/img/logo-ori.png"
-                 alt="Logo"
-                 style="height: 55px; width: auto; object-fit: contain;">
+      <!-- White form body -->
+      <div class="auth-card-body">
+        <form method="post" id="teacherForm">
+          {% csrf_token %}
 
-            <div>
-              <h3 class="fw-bold mb-1" style="font-size: 22px; color: #1f2d3d;">
-                Formulariu Rejistrasaun Formadór
-              </h3>
-
-              <p class="mb-0" style="font-size: 14px; color: #6c757d;">
-                Registra formadór ho interface ne'ebé mesak parent register.
-              </p>
+          <!-- Personal info -->
+          <div class="reg-section-divider"><i class="bi bi-person me-1"></i>Informasaun Pessoál</div>
+          <div class="row g-3 mb-1">
+            <div class="col-md-6">
+              <label class="form-label">Naran Uluk <span class="text-danger">*</span></label>
+              {{ form.first_name }}
             </div>
-
+            <div class="col-md-6">
+              <label class="form-label">Naran Ikus</label>
+              {{ form.last_name }}
+            </div>
           </div>
 
-          <div class="card-body px-4 py-4">
-
-            <form method="post" id="teacherForm">
-              {% csrf_token %}
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Naran Uluk*</label>
-                  {{ form.first_name }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Naran Ikus</label>
-                  {{ form.last_name }}
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Numeru WhatsApp</label>
-                <div class="input-group w-100">
-                  {{ form.whatsapp_number }}
-                  <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
-                </div>
-                <small id="phone-error" class="text-danger d-none"></small>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Email (Opsional)</label>
-                {{ form.email }}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label fw-semibold">Hela Fatin</label>
-                {{ form.address }}
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Munisípiu</label>
-                  {{ form.municipality }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Postu Administrativu</label>
-                  {{ form.administrative_post }}
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Suku</label>
-                  {{ form.suco }}
-                </div>
-
-                <div class="col-md-6 mb-3">
-                  <label class="form-label fw-semibold">Aldeia</label>
-                  {{ form.aldeia }}
-                </div>
-              </div>
-
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Password</label>
-                <div class="input-group w-100">
-                  {{ form.password }}
-                  <span class="input-group-text" onclick="togglePassword()" style="cursor:pointer;">
-                    <i class="bi bi-eye" id="eyeIcon"></i>
-                  </span>
-                </div>
-              </div>
-
-              <div class="card-footer bg-white border-top d-flex gap-2 flex-wrap justify-content-between align-items-center px-0 pt-3">
-
-                <button type="submit" id="submit-button"
-                        style="border: none; background: none; padding: 0;">
-                  <img src="/static/img/Button 2_Rejistu.png"
-                       class="img-fluid"
-                       style="height: 50px;">
-                </button>
-
-                <div class="ms-auto text-end mt-3 mt-sm-0 d-flex flex-column gap-1">
-
-                  <a href="{% url 'core:forgot_password' %}"
-                    class="text-decoration-none"
-                    style="font-size: 15px; color: #4e73df;">
-                    Haluan Password?
-                  </a>
-
-                  <a href="{% url 'core:login' %}"
-                    class="text-decoration-none"
-                    style="font-size: 15px; color: #4e73df;">
-                    Iha ona konta? Login
-                  </a>
-
-                </div>
-              </div>
-
-            </form>
-
+          <!-- Contact -->
+          <div class="reg-section-divider"><i class="bi bi-telephone me-1"></i>Kontaktu</div>
+          <div class="mb-3">
+            <label class="form-label">Numeru WhatsApp <span class="text-danger">*</span></label>
+            <div class="input-group">
+              {{ form.whatsapp_number }}
+              <span class="input-group-text"><i class="bi bi-whatsapp text-success"></i></span>
+            </div>
+            <small id="phone-error" class="text-danger d-none"></small>
+            <div class="text-muted" style="font-size:0.72rem;margin-top:3px;">Formatu: +6707XXXXXXX</div>
           </div>
-        </div>
+          <div class="mb-3">
+            <label class="form-label">Email <span class="text-muted fw-normal">(Opsional)</span></label>
+            {{ form.email }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Hela Fatin / Enderesu</label>
+            {{ form.address }}
+          </div>
 
+          <!-- Location -->
+          <div class="reg-section-divider"><i class="bi bi-geo-alt me-1"></i>Lokalizasaun</div>
+          <div class="row g-3 mb-1">
+            <div class="col-md-6">
+              <label class="form-label">Munisípiu <span class="text-danger">*</span></label>
+              {{ form.municipality }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Postu Administrativu</label>
+              {{ form.administrative_post }}
+            </div>
+          </div>
+          <div class="row g-3 mb-1">
+            <div class="col-md-6">
+              <label class="form-label">Suku</label>
+              {{ form.suco }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Aldeia</label>
+              {{ form.aldeia }}
+            </div>
+          </div>
+
+          <!-- Security -->
+          <div class="reg-section-divider"><i class="bi bi-shield-lock me-1"></i>Seguransa</div>
+          <div class="mb-3">
+            <label class="form-label">Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              {{ form.password }}
+              <span class="input-group-text" onclick="togglePassword()" style="cursor:pointer;">
+                <i class="bi bi-eye" id="eyeIcon"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="auth-card-footer">
+            <button type="submit" id="submit-button" class="auth-btn-primary">
+              <i class="bi bi-mortarboard-fill me-1"></i>Rejistu hanesan Formadór
+            </button>
+            <div class="auth-links">
+              <a href="{% url 'core:forgot_password' %}"><i class="bi bi-key me-1"></i>Haluan Password?</a>
+              <a href="{% url 'core:login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Iha ona konta? Login</a>
+            </div>
+          </div>
+
+        </form>
       </div>
     </div>
-  </div>
-</div>
+  </div><!-- /auth-body -->
 
-<!-- jQuery -->
+</div><!-- /overlay-container -->
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Phone validation script -->
 <script>
 $(document).ready(function () {
-  // Load Administrative Posts when municipality changes
   $("#id_municipality").change(function () {
-    var municipalityId = $(this).val();
+    var id = $(this).val();
     $("#id_administrative_post").html('<option value="">Hili Postu Administrativu</option>');
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (municipalityId) {
-      $.ajax({
-        url: "{% url 'core:ajax_load_admin_posts' %}",
-        data: { municipality_id: municipalityId },
-        success: function(data) {
-          data.forEach(p => $("#id_administrative_post").append(new Option(p.name, p.id)));
-        }
+    if (id) {
+      $.ajax({ url:"{% url 'core:ajax_load_admin_posts' %}", data:{municipality_id:id},
+        success:function(d){ d.forEach(p=>$("#id_administrative_post").append(new Option(p.name,p.id))); }
       });
     }
   });
-
-  // Load Sucos when administrative post changes
   $("#id_administrative_post").change(function () {
-    var postId = $(this).val();
+    var id = $(this).val();
     $("#id_suco").html('<option value="">Hili Suku</option>');
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (postId) {
-      $.ajax({
-        url: "{% url 'core:ajax_load_sucos' %}",
-        data: { administrative_post_id: postId },
-        success: function(data) {
-          data.forEach(s => $("#id_suco").append(new Option(s.name, s.id)));
-        }
+    if (id) {
+      $.ajax({ url:"{% url 'core:ajax_load_sucos' %}", data:{administrative_post_id:id},
+        success:function(d){ d.forEach(s=>$("#id_suco").append(new Option(s.name,s.id))); }
       });
     }
   });
-
-  // Load Aldeias when suco changes
   $("#id_suco").change(function () {
-    var sucoId = $(this).val();
+    var id = $(this).val();
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
-
-    if (sucoId) {
-      $.ajax({
-        url: "{% url 'core:ajax_load_aldeias' %}",
-        data: { suco_id: sucoId },
-        success: function(data) {
-          data.forEach(a => $("#id_aldeia").append(new Option(a.name, a.id)));
-        }
+    if (id) {
+      $.ajax({ url:"{% url 'core:ajax_load_aldeias' %}", data:{suco_id:id},
+        success:function(d){ d.forEach(a=>$("#id_aldeia").append(new Option(a.name,a.id))); }
       });
     }
   });
 
-  // WhatsApp validation
   const phoneInput = document.getElementById("id_whatsapp_number");
   const errorDisplay = document.getElementById("phone-error");
   const submitButton = document.getElementById("submit-button");
@@ -247,44 +174,31 @@ $(document).ready(function () {
     if (phone.startsWith("7")) phone = "+670" + phone;
     else if (phone.startsWith("670")) phone = "+" + phone;
     phoneInput.value = phone;
-
     errorDisplay.classList.add("d-none");
     submitButton.disabled = false;
-
     if (phone && !timorPhoneRegex.test(phone)) {
       errorDisplay.textContent = "Numeru WhatsApp tenke komesa ho +6707...";
       errorDisplay.classList.remove("d-none");
       submitButton.disabled = true;
       return;
     }
-
     if (timorPhoneRegex.test(phone)) {
       fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.exists) {
-            errorDisplay.textContent = "Numeru WhatsApp ida ne’e rejistadu ona.";
+        .then(r=>r.json()).then(d=>{
+          if (d.exists) {
+            errorDisplay.textContent = "Numeru WhatsApp ida ne'e rejistadu ona.";
             errorDisplay.classList.remove("d-none");
             submitButton.disabled = true;
           }
-        }).catch(err => console.error("Error checking WhatsApp:", err));
+        }).catch(e=>console.error(e));
     }
   });
 });
+
 function togglePassword() {
-  const field = document.getElementById("id_password");
-  const icon = document.getElementById("eyeIcon");
-
-  if (field.type === "password") {
-    field.type = "text";
-    icon.classList.replace("bi-eye", "bi-eye-slash");
-  } else {
-    field.type = "password";
-    icon.classList.replace("bi-eye-slash", "bi-eye");
-  }
+  const f = document.getElementById("id_password"), i = document.getElementById("eyeIcon");
+  if (f.type === "password") { f.type = "text"; i.classList.replace("bi-eye","bi-eye-slash"); }
+  else { f.type = "password"; i.classList.replace("bi-eye-slash","bi-eye"); }
 }
-
 </script>
-
-
 {% endblock %}

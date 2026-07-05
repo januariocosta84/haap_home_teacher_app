@@ -147,7 +147,44 @@
   border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; font-weight: 600;
   letter-spacing: .03em;
 }
+
+/* ══ Map ════════════════════════════════════════════════════════════════════ */
+#mapSection {
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+  margin-bottom: 1.25rem;
+}
+#psMap { height: 480px; width: 100%; }
+.map-toggle-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  transition: all .15s; border: 1px solid transparent;
+}
+.map-toggle-btn.active {
+  background: #fff; color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(0,0,0,.10);
+}
+.map-toggle-btn:not(.active) {
+  background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+  border-color: rgba(255,255,255,.3);
+}
+.map-toggle-btn:not(.active):hover {
+  background: rgba(255,255,255,.25); color: #fff;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important; padding: 0 !important; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15) !important;
+}
+.leaflet-popup-content { margin: 0 !important; }
+.map-popup { padding: 12px 14px; min-width: 180px; }
+.map-popup-title { font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 4px; }
+.map-popup-type { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 700; margin-bottom: 6px; }
+.map-popup-muni { font-size: 0.76rem; color: #64748b; }
+.map-popup-link { display: inline-block; margin-top: 8px; font-size: 0.76rem; font-weight: 600; color: #2563eb; text-decoration: none; }
+.map-popup-link:hover { text-decoration: underline; }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 {% endblock %}
 
 {% block content %}
@@ -171,12 +208,17 @@
         </div>
       </div>
       <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <!-- View toggle -->
+        <div style="display:flex;gap:4px;background:rgba(0,0,0,.15);border-radius:24px;padding:3px;">
+          <button id="btnViewList" class="map-toggle-btn active">
+            <i class="bi bi-list-ul"></i>Lista
+          </button>
+          <button id="btnViewMap" class="map-toggle-btn">
+            <i class="bi bi-geo-alt-fill"></i>Mapa
+            {% if map_count %}<span style="background:rgba(255,255,255,.25);border-radius:12px;padding:0 6px;font-size:0.7rem;">{{ map_count }}</span>{% endif %}
+          </button>
+        </div>
         {% if user.role == 'moe_admin' %}
-        <a href="{% url 'preschools:preschool_list' %}"
-           class="btn rounded-pill px-3 fw-semibold"
-           style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.8rem;">
-          <i class="bi bi-hourglass-split me-1"></i>Pedidu Mestri
-        </a>
         <a href="{% url 'preschools:preschool_create' %}"
            class="btn rounded-pill px-4 fw-semibold"
            style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
@@ -244,8 +286,24 @@
     </form>
   </div>
 
+  <!-- ══ MAP SECTION ══════════════════════════════════════════════════════ -->
+  <div id="mapSection">
+    <div class="card border-0" style="border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);margin-bottom:1.25rem;">
+      <div style="background:#fff;padding:0.7rem 1.25rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <span style="font-weight:600;font-size:0.88rem;color:#1e293b;"><i class="bi bi-geo-alt-fill me-1" style="color:#2563eb;"></i>Mapa Pre-Eskolár</span>
+          <span style="font-size:0.75rem;color:#94a3b8;margin-left:8px;">{{ map_count }} pre-eskolár ho lokalizasaun</span>
+        </div>
+        <div style="font-size:0.72rem;color:#94a3b8;">
+          <i class="bi bi-info-circle me-1"></i>Klik marker atu haree detallu
+        </div>
+      </div>
+      <div id="psMap"></div>
+    </div>
+  </div>
+
   <!-- ══ TABLE CARD ═════════════════════════════════════════════════════════ -->
-  <div class="ps-table-card card">
+  <div id="tableSection" class="ps-table-card card">
 
     <!-- Card header -->
     <div class="card-header d-flex align-items-center flex-wrap gap-2">
@@ -450,20 +508,101 @@
     </div>
     {% endif %}
 
-  </div><!-- /ps-table-card -->
+  </div><!-- /tableSection -->
 
 </div><!-- /container-fluid -->
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+var _psMapData = {{ map_data_json|safe }};
+
+var _typeColors = {
+  government: '#2563eb', community: '#16a34a',
+  private: '#6d28d9',   playgroup: '#b45309'
+};
+var _typeBg = {
+  government: '#eff6ff', community: '#f0fdf4',
+  private: '#f5f3ff',   playgroup: '#fffbeb'
+};
+
+function makeMarkerIcon(type) {
+  var color = _typeColors[type] || '#475569';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">' +
+    '<ellipse cx="16" cy="39" rx="6" ry="3" fill="rgba(0,0,0,0.18)"/>' +
+    '<path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 28 12 28S28 21 28 12C28 5.4 22.6 0 16 0z" fill="' + color + '"/>' +
+    '<circle cx="16" cy="12" r="6" fill="#fff" opacity="0.9"/>' +
+    '</svg>';
+  return L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44] });
+}
+
+function switchView(view) {
+  var mapSec = document.getElementById('mapSection');
+  var tableSec = document.getElementById('tableSection');
+  var btnList = document.getElementById('btnViewList');
+  var btnMap = document.getElementById('btnViewMap');
+  if (view === 'map') {
+    mapSec.style.display = 'block';
+    tableSec.style.display = 'none';
+    btnMap.classList.add('active');
+    btnList.classList.remove('active');
+  } else {
+    mapSec.style.display = 'none';
+    tableSec.style.display = 'block';
+    btnList.classList.add('active');
+    btnMap.classList.remove('active');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Bootstrap tooltips
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
     new bootstrap.Tooltip(el, { trigger: 'hover' });
   });
-  // Auto-submit on municipality change
   document.querySelector('select[name="municipality"]')?.addEventListener('change', function() {
     this.closest('form').submit();
   });
+
+  // Initialize Leaflet map — container is always in DOM so size is calculable
+  var map = L.map('psMap', { zoomControl: true });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(map);
+
+  var bounds = [];
+  _psMapData.forEach(function(p) {
+    var color = _typeColors[p.type] || '#475569';
+    var bg = _typeBg[p.type] || '#f8fafc';
+    var popup = '<div class="map-popup">' +
+      '<div class="map-popup-title">' + p.name + '</div>' +
+      '<span class="map-popup-type" style="background:' + bg + ';color:' + color + ';">' + p.type_display + '</span>' +
+      (p.municipality ? '<div class="map-popup-muni"><i class="bi bi-geo-alt" style="color:#94a3b8;margin-right:3px;"></i>' + p.municipality + '</div>' : '') +
+      '<a href="/preschool/detail/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
+      '</div>';
+    L.marker([p.lat, p.lng], { icon: makeMarkerIcon(p.type) })
+      .bindPopup(popup, { maxWidth: 240 })
+      .addTo(map);
+    bounds.push([p.lat, p.lng]);
+  });
+
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 13);
+  } else if (bounds.length > 1) {
+    map.fitBounds(bounds, { padding: [40, 40] });
+  } else {
+    map.setView([-8.874, 125.727], 9);
+  }
+
+  // Handle toggle: invalidate size when map section becomes visible
+  document.getElementById('btnViewMap').addEventListener('click', function() {
+    switchView('map');
+    setTimeout(function() { map.invalidateSize(); }, 50);
+  });
+  document.getElementById('btnViewList').addEventListener('click', function() {
+    switchView('list');
+  });
+
+  // Start in list view; map section is visible for init but will be hidden
+  switchView('list');
 });
 </script>
 {% endblock %}

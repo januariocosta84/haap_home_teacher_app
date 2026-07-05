@@ -27,14 +27,15 @@ class Equipment(models.Model):
 
     equipment_type = models.CharField(
         max_length=30,
-        choices=TYPE_CHOICES
+        choices=TYPE_CHOICES,
+        db_index=True,
     )
 
     model_number = models.CharField(max_length=100)
 
     serial_number = models.CharField(
         max_length=100,
-        unique=True
+        unique=True,
     )
 
     preschool = models.ForeignKey(
@@ -65,7 +66,8 @@ class Equipment(models.Model):
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
-        default='active'
+        default='active',
+        db_index=True,
     )
 
     notes = models.TextField(blank=True, null=True)

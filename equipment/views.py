@@ -21,7 +21,7 @@ class AdminOnlyMixin(UserPassesTestMixin):
         return self.request.user.role == 'moe_admin'
 
 
-class EquipmentCreateView(AdminOnlyMixin, LoginRequiredMixin, CreateView):
+class EquipmentCreateView(LoginRequiredMixin, AdminOnlyMixin, CreateView):
 
     model = Equipment
     form_class = EquipmentForm
@@ -34,9 +34,12 @@ class EquipmentCreateView(AdminOnlyMixin, LoginRequiredMixin, CreateView):
             'Ekipamentu konsege rejistu ho susesu.'
         )
         return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, form.errors)
+        return super().form_invalid(form)
 
 
-class EquipmentListView(AdminOnlyMixin, LoginRequiredMixin, ListView):
+class EquipmentListView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 
     model = Equipment
     template_name = 'equipment/equipment_list.html'
@@ -80,10 +83,13 @@ class EquipmentListView(AdminOnlyMixin, LoginRequiredMixin, ListView):
         context['equipment_types'] = Equipment.TYPE_CHOICES
         context['statuses'] = Equipment.STATUS_CHOICES
         context['preschools'] = Preschool.objects.all()
+        query = self.request.GET.copy()
+        query.pop('page', None)
+        context['querystring'] = query.urlencode()
         return context
 
 
-class EquipmentDetailView(AdminOnlyMixin, LoginRequiredMixin, DetailView):
+class EquipmentDetailView(LoginRequiredMixin, AdminOnlyMixin, DetailView):
 
     model = Equipment
     template_name = 'equipment/equipment_detail.html'
@@ -98,7 +104,7 @@ class EquipmentDetailView(AdminOnlyMixin, LoginRequiredMixin, DetailView):
         return context
 
 
-class EquipmentUpdateView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
+class EquipmentUpdateView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
 
     model = Equipment
     form_class = EquipmentForm
@@ -142,7 +148,7 @@ class EquipmentUpdateView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
             return super().form_valid(form)
 
 
-class EquipmentAssignmentChangeView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
+class EquipmentAssignmentChangeView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
 
     model = Equipment
     form_class = EquipmentAssignmentForm
@@ -155,7 +161,9 @@ class EquipmentAssignmentChangeView(AdminOnlyMixin, LoginRequiredMixin, UpdateVi
 
     def form_valid(self, form):
         action = form.cleaned_data.get('action')
-        old_equipment = Equipment.objects.get(pk=self.object.pk)
+        # self.object is the Equipment instance fetched by get_object() before
+        # form_valid runs, so it still holds the original assignment values here.
+        old_equipment = self.object
 
         try:
             if action == 'reassign':
@@ -242,18 +250,18 @@ class EquipmentAssignmentChangeView(AdminOnlyMixin, LoginRequiredMixin, UpdateVi
         return reverse_lazy('equipment-detail', kwargs={'pk': self.object.pk})
 
 
-class EquipmentDeleteView(AdminOnlyMixin, LoginRequiredMixin, DeleteView):
+class EquipmentDeleteView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
 
     model = Equipment
     template_name = 'equipment/equipment_confirm_delete.html'
     success_url = reverse_lazy('equipment-list')
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(request, 'Ekipamentu deleta ho susesu.')
-        return super().delete(request, *args, **kwargs)
+    def form_valid(self, form):
+        messages.success(self.request, 'Ekipamentu deleta ho susesu.')
+        return super().form_valid(form)
 
 
-class EquipmentByPreschoolView(AdminOnlyMixin, LoginRequiredMixin, ListView):
+class EquipmentByPreschoolView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 
     model = Equipment
     template_name = 'equipment/equipment_by_preschool.html'
@@ -273,7 +281,7 @@ class EquipmentByPreschoolView(AdminOnlyMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class EquipmentByClassroomView(AdminOnlyMixin, LoginRequiredMixin, ListView):
+class EquipmentByClassroomView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 
     model = Equipment
     template_name = 'equipment/equipment_by_classroom.html'
@@ -293,7 +301,7 @@ class EquipmentByClassroomView(AdminOnlyMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class EquipmentByTeacherView(AdminOnlyMixin, LoginRequiredMixin, ListView):
+class EquipmentByTeacherView(LoginRequiredMixin, AdminOnlyMixin, ListView):
 
     model = Equipment
     template_name = 'equipment/equipment_by_teacher.html'

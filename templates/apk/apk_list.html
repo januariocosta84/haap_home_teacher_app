@@ -1,112 +1,166 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}HAAP Mobile App{% endblock %}
+
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container-fluid mt-4">
-
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">Versaun HAAP</h3>
-
+  <!-- PAGE HEADER -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-android2 text-success me-2"></i>HAAP Mobile App
+      </h4>
+      <p class="text-muted small mb-0">Versaun app disponivel ba download</p>
+    </div>
     {% if user.role == 'moe_admin' %}
-      <a href="{% url 'core:upload_apk' %}" class="btn btn-success shadow-sm">
-        <i class="fas fa-plus"></i> Adisiona HAAP Foun
-      </a>
+    <a href="{% url 'core:upload_apk' %}" class="btn btn-success rounded-pill px-4 fw-semibold">
+      <i class="bi bi-plus-circle me-1"></i> Versaun Foun
+    </a>
     {% endif %}
   </div>
 
-  <!-- Card -->
-  <div class="card shadow-sm border-0">
+  {% if latest %}
+  <!-- LATEST VERSION HERO -->
+  <div class="card border-0 mb-4"
+       style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #0ea5e9 100%); border-radius: 20px;">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center g-4">
+
+        <!-- Icon + Info -->
+        <div class="col-auto d-none d-sm-block">
+          <div class="rounded-4 p-3 d-flex align-items-center justify-content-center"
+               style="background: rgba(255,255,255,0.15); width: 72px; height: 72px;">
+            <i class="bi bi-android2 text-white" style="font-size: 2.2rem;"></i>
+          </div>
+        </div>
+
+        <div class="col text-white">
+          <span class="badge rounded-pill mb-2"
+                style="background: rgba(255,255,255,0.25); font-size: 11px; letter-spacing: 0.04em;">
+            ✓ VERSAUN ATUAL
+          </span>
+          <h2 class="fw-bold mb-1">HAAP v{{ latest.version_name }}</h2>
+          <p class="mb-0 opacity-75 small">
+            <i class="bi bi-calendar3 me-1"></i>
+            {{ latest.released_at|date:"d F Y" }}
+          </p>
+        </div>
+
+        <!-- Download CTA -->
+        <div class="col-12 col-sm-auto">
+          <a href="{{ latest.get_download_url }}"
+             class="btn btn-white btn-lg rounded-pill px-4 fw-semibold shadow-sm"
+             style="background: white; color: #1d4ed8;"
+             download>
+            <i class="bi bi-download me-2"></i>Download APK
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if apks %}
+
+  <!-- VERSION TABLE CARD -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+
+    <div class="card-header bg-white border-bottom-0 px-4 pt-4 pb-0">
+      <h6 class="fw-bold text-muted mb-3" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+        <i class="bi bi-clock-history me-2"></i>Istoria Versaun
+      </h6>
+    </div>
 
     <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size: 0.875rem;">
 
-      {% if apks %}
-
-      <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
-        <table class="table table-hover mb-0" style="font-size:13px;" id="apkTable">
-
-          <!-- THEAD -->
-          <thead style="position:sticky; top:0; z-index:1;">
-            <tr style="background:#f8f9fa;">
-
-              <th class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888;">
+          <thead>
+            <tr style="background: #f8fafc;">
+              <th class="px-4 py-3 border-0"
+                  style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
                 Versaun
               </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888;">
-                Download
-              </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888;">
+              <th class="px-4 py-3 border-0"
+                  style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
                 Status
               </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888;">
-                Release
+              <th class="px-4 py-3 border-0"
+                  style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+                Data Release
               </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:11px; font-weight:500; color:#888;">
+              <th class="px-4 py-3 border-0"
+                  style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+                Download
+              </th>
+              {% if user.role == 'moe_admin' %}
+              <th class="px-4 py-3 border-0"
+                  style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
                 Aksaun
               </th>
-
+              {% endif %}
             </tr>
           </thead>
 
-          <!-- TBODY -->
           <tbody>
             {% for apk in apks %}
-            <tr>
+            <tr style="border-top: 1px solid #f1f5f9;">
 
               <!-- Version -->
-              <td class="px-3" style="font-weight:500;">
-                {{ apk.version_name }}
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                       style="width: 36px; height: 36px; background: {% if apk.is_latest %}#dbeafe{% else %}#f1f5f9{% endif %};">
+                    <i class="bi bi-android2"
+                       style="color: {% if apk.is_latest %}#1d4ed8{% else %}#94a3b8{% endif %}; font-size: 1rem;"></i>
+                  </div>
+                  <span class="fw-semibold">v{{ apk.version_name }}</span>
+                </div>
               </td>
 
-              <!-- Download -->
-              <td class="px-3">
-                <a href="{{ apk.get_download_url }}"
-                   class="btn btn-sm btn-outline-success {% if user.role == 'moe_admin' %}disabled{% endif %}"
-                   download>
-                  <i class="fas fa-download"></i>
-                </a>
-              </td>
-
-              <!-- Status Badge -->
-              <td class="px-3">
+              <!-- Status -->
+              <td class="px-4 py-3">
                 {% if apk.is_latest %}
-                  <span class="badge rounded-pill"
-                        style="background:#E1F5EE; color:#0F6E56; font-size:11px; font-weight:500;">
-                    Ikus
+                  <span class="badge rounded-pill px-3 py-2"
+                        style="background: #dcfce7; color: #15803d; font-size: 0.75rem;">
+                    <i class="bi bi-check-circle-fill me-1"></i>Versaun Ikus
                   </span>
                 {% else %}
-                  <span class="badge rounded-pill"
-                        style="background:#F1F3F5; color:#666; font-size:11px; font-weight:500;">
-                    Arkivadu
+                  <span class="badge rounded-pill px-3 py-2"
+                        style="background: #f1f5f9; color: #64748b; font-size: 0.75rem;">
+                    <i class="bi bi-archive me-1"></i>Arkivadu
                   </span>
                 {% endif %}
               </td>
 
               <!-- Date -->
-              <td class="px-3 text-muted"
-                  style="font-size:12px; white-space:nowrap;">
-                {{ apk.released_at|date:"d M Y H:i" }}
+              <td class="px-4 py-3 text-muted" style="white-space: nowrap; font-size: 0.8rem;">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ apk.released_at|date:"d M Y, H:i" }}
               </td>
 
-              <!-- Actions -->
-              <td class="px-3">
-                {% if user.role == 'moe_admin' %}
-                  <a href="{% url 'core:edit_apk' apk.id %}"
-                     class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                {% else %}
-                  <span class="text-muted fst-italic">N/A</span>
-                {% endif %}
+              <!-- Download -->
+              <td class="px-4 py-3">
+                <a href="{{ apk.get_download_url }}"
+                   class="btn btn-sm rounded-pill {% if apk.is_latest %}btn-success{% else %}btn-outline-secondary{% endif %} px-3"
+                   download>
+                  <i class="bi bi-download me-1"></i>
+                  {% if apk.is_latest %}Download{% else %}Download{% endif %}
+                </a>
               </td>
+
+              {% if user.role == 'moe_admin' %}
+              <!-- Edit -->
+              <td class="px-4 py-3">
+                <a href="{% url 'core:edit_apk' apk.id %}"
+                   class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                  <i class="bi bi-pencil me-1"></i>Edita
+                </a>
+              </td>
+              {% endif %}
 
             </tr>
             {% endfor %}
@@ -114,21 +168,30 @@
 
         </table>
       </div>
-
-      {% else %}
-
-      <!-- Empty State -->
-      <div class="text-center text-muted py-5">
-        <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
-        Sedauk iha versaun HAAP foun
-      </div>
-
-      {% endif %}
-
     </div>
 
   </div>
 
-</div>
+  {% else %}
 
+  <!-- EMPTY STATE -->
+  <div class="card border-0 shadow-sm text-center py-5" style="border-radius: 16px;">
+    <div class="card-body py-5">
+      <div class="mx-auto mb-4 rounded-circle d-flex align-items-center justify-content-center"
+           style="width: 80px; height: 80px; background: #f1f5f9;">
+        <i class="bi bi-android2" style="font-size: 2rem; color: #94a3b8;"></i>
+      </div>
+      <h5 class="fw-semibold text-muted mb-2">Sedauk iha versaun</h5>
+      <p class="text-muted small mb-4">HAAP APK seidauk iha. Upload versaun ida hodi hahu.</p>
+      {% if user.role == 'moe_admin' %}
+      <a href="{% url 'core:upload_apk' %}" class="btn btn-success rounded-pill px-4 fw-semibold">
+        <i class="bi bi-plus-circle me-1"></i>Upload Versaun Dahuluk
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% endif %}
+
+</div>
 {% endblock %}

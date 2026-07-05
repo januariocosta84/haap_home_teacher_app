@@ -1,128 +1,224 @@
 /* ============================================================
-   HAAP Platform — Authentication & Registration Page Styles
-   Loaded directly in standalone auth/registration templates.
+   HAAP Platform — Authentication & Registration shared styles
    ============================================================ */
 
-/* === Body === */
-body {
-  background: linear-gradient(135deg, #e3f2fd, #ffffff);
-}
-
-/* === Shared Card Wrappers === */
-.reset-card,
-.otp-card {
-  border-radius: 15px;
-  overflow: hidden;
-}
-
-/* === Gradient Headers === */
-.reset-header {
-  background: linear-gradient(135deg, #cdd1d6, #08951b);
-  padding: 20px;
-  text-align: center;
-}
-
-.otp-header {
-  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-  padding: 20px;
-  text-align: center;
-}
-
-.reset-header i,
-.otp-header i {
-  font-size: 30px;
-  margin-bottom: 8px;
-}
-
-/* === Form Controls === */
+/* ── Form controls (auth pages) ── */
 .form-control {
-  border: 1px solid #ddd;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 10px;
+  padding: 0.52rem 0.85rem;
+  font-size: 0.88rem;
+  background: #f8fafc;
+  color: #1e293b;
+  transition: border-color .15s, box-shadow .15s, background .15s;
   width: 100%;
 }
-
 .form-control:focus {
-  border-color: #4e73df;
-  box-shadow: 0 0 0 0.15rem rgba(78, 115, 223, 0.2);
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: #fff;
+  outline: none;
 }
+.form-control::placeholder { color: #94a3b8; }
 
+/* Input-group tweaks */
+.input-group .form-control { border-right: none; border-radius: 10px 0 0 10px; }
+.input-group .form-control:focus { z-index: 3; }
 .input-group-text {
-  background-color: #f8f9fa;
-  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: none;
+  border-radius: 0 10px 10px 0;
+  color: #64748b;
+  padding: 0 0.75rem;
 }
 
-/* === Input Icon (Forgot Password) === */
-.input-icon {
-  color: #6c757d;
-  left: 12px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+/* ── Form labels ── */
+.form-label, .label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 5px;
+  display: block;
 }
 
-.form-control.with-icon {
-  padding-left: 40px;
+/* ── Section divider inside registration cards ── */
+.reg-section-divider {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 6px;
+  margin: 1.1rem 0 0.9rem;
 }
 
-/* === Password Field (Reset Password) === */
-.password-wrapper {
+/* ── Auth card shared ── */
+.auth-card {
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 700px;
+  margin: auto;
+  border: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,.14), 0 1px 4px rgba(0,0,0,.08);
+}
+
+/* ── Auth card gradient header (title only — no logo) ── */
+.auth-card-header {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.1rem 1.75rem;
   position: relative;
+  overflow: hidden;
+}
+.auth-card-header::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: rgba(255,255,255,.08);
+}
+.auth-card-header::after {
+  content: '';
+  position: absolute; bottom: -50px; left: 35%;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.auth-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 2px;
+  letter-spacing: -0.2px;
+  position: relative; z-index: 1;
+}
+.auth-card-header p {
+  font-size: 0.76rem;
+  color: rgba(255,255,255,.72);
+  margin: 0;
+  position: relative; z-index: 1;
 }
 
-.password-icon {
-  color: #6c757d;
-  left: 12px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-}
+/* ── Auth card body ── */
+.auth-card-body { padding: 1.75rem 1.75rem 1.25rem; background: #fff; }
 
-.password-toggle {
-  color: #6c757d;
+/* ── Auth primary button ── */
+.auth-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.62rem 1.75rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: .01em;
   cursor: pointer;
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
+  transition: box-shadow .18s, transform .12s, opacity .15s;
+  box-shadow: 0 4px 14px rgba(37,99,235,.35);
 }
-
-.password-field input,
-input[type="password"],
-input[type="text"] {
-  border-radius: 10px;
-  height: 48px;
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-/* === OTP Input === */
-.otp-input {
-  border-radius: 10px;
-  font-size: 22px;
-  letter-spacing: 8px;
-  text-align: center;
-}
-
-/* === Buttons === */
-.btn-primary {
-  border-radius: 10px;
-  font-weight: 500;
-  padding: 10px;
-}
-
-/* === Validation === */
-.error-text {
-  font-size: 13px;
-}
-
-/* === Cards (Parent/Teacher Register hover) === */
-.card {
-  transition: 0.2s ease;
-}
-
-.card:hover {
+.auth-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(37,99,235,.4);
   transform: translateY(-1px);
+  opacity: .95;
+}
+.auth-btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ── Auth footer bar inside card ── */
+.auth-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0.5rem;
+}
+.auth-card-footer .auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+.auth-card-footer .auth-links a {
+  font-size: 0.82rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color .12s;
+}
+.auth-card-footer .auth-links a:hover { color: #1d4ed8; text-decoration: underline; }
+
+/* ── Phone error ── */
+#phone-error { font-size: 0.78rem; margin-top: 4px; }
+
+/* ── Reset/OTP cards ── */
+.reset-card, .otp-card { border-radius: 15px; overflow: hidden; }
+.reset-header {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  padding: 20px; text-align: center;
+}
+.otp-header {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  padding: 20px; text-align: center;
+}
+.reset-header i, .otp-header i { font-size: 30px; margin-bottom: 8px; }
+.otp-input { border-radius: 10px; font-size: 22px; letter-spacing: 8px; text-align: center; }
+
+/* ── Login card inputs ── */
+.login-container .form-control { height: 46px; font-size: 0.9rem; }
+.login-container .input-group .form-control { height: 46px; }
+.login-container .input-group-text { height: 46px; }
+
+/* ── Login submit button ── */
+.login-submit-btn {
+  width: 100%;
+  padding: 0.68rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: .02em;
+  box-shadow: 0 4px 14px rgba(37,99,235,.3);
+  transition: box-shadow .15s, transform .12s;
+}
+.login-submit-btn:hover { box-shadow: 0 6px 20px rgba(37,99,235,.4); transform: translateY(-1px); }
+.login-submit-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ── Login links row ── */
+.login-link-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid #f1f5f9;
+}
+.login-link-row a {
+  font-size: 0.8rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+.login-link-row a:hover { text-decoration: underline; }
+
+/* ── Card hover ── */
+.card { transition: 0.2s ease; }
+.card:hover { transform: translateY(-1px); }
+.auth-card:hover { transform: none; }
+
+/* ── Validation ── */
+.error-text { font-size: 13px; }
+.password-wrapper { position: relative; }
+.password-toggle {
+  color: #6c757d; cursor: pointer;
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2;
 }

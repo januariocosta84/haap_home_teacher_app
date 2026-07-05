@@ -3,29 +3,18 @@ import os
 
 from django.contrib.messages import constants as messages
 from pathlib import Path
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 from dotenv import load_dotenv
-import os
 
-load_dotenv()
-
-#SECRET_KEY = os.getenv('SECRET_KEY')
-#DEBUG = os.getenv('DEBUG') == 'True'
-#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
-
-#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%'
+load_dotenv(BASE_DIR / '.env')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%')
 
-ALLOWED_HOSTS = ['192.168.1.23', 'localhost', '127.0.0.1','154.26.155.43', '*']
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
+
+_allowed = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = _allowed.split(',') if _allowed else ['192.168.1.23', 'localhost', '127.0.0.1', '154.26.155.43']
 
 
 # Application definition
@@ -89,11 +78,11 @@ WSGI_APPLICATION = 'haap_platform.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': ("worldmosaic"),  # os.getenv("DB_NAME"),
-        'USER': ("root"),  # os.getenv("DB_USER"),
-        'PASSWORD': ("Paddington2025yoyo"),  # os.getenv("DB_PASSWORD"),
-        'HOST': ("localhost"),  # os.getenv("DB_HOST"),
-        'PORT': ("3306"),  # os.getenv("DB_PORT"),
+        'NAME': os.getenv('DB_NAME', 'worldmosaic'),
+        'USER': os.getenv('DB_USER', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'Paddington2025yoyo'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET NAMES utf8mb4 COLLATE utf8mb4_general_ci",
@@ -134,8 +123,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -181,27 +168,4 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")      
 EMAIL_USE_TLS = True
 
-FRONTEND_TOKEN = "fU3iADWKve58kdnaFNzh"  # Change this to a secure token for frontend-backend communication
-
-ROOT_URLCONF = 'haap_platform.urls'
-
-# BASE_DIR = Path(__file__).resolve().parent.parent
-
-# from pathlib import Path
-
-# BASE_DIR = Path(__file__).resolve().parent.parent
-
-# # URL (because app is under /new)
-# STATIC_URL = "/new/static/"
-# MEDIA_URL = "/new/media/"
-
-# # Where collectstatic will output files (VERY IMPORTANT)
-# STATIC_ROOT = BASE_DIR / "static"
-# MEDIA_ROOT = BASE_DIR / "media"
-
-# # ONLY for development (optional)
-# STATICFILES_DIRS = [
-#     # Put extra folders here ONLY if you have them
-#     # Example:
-#     # BASE_DIR / "assets",
-# ]
+FRONTEND_TOKEN = os.getenv('FRONTEND_TOKEN', 'fU3iADWKve58kdnaFNzh')

@@ -243,6 +243,20 @@ class ChildActivityView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["child"] = self.child
+
+        from django.db.models import Count, Q
+        stats = ActivityResult.objects.filter(
+            student=self.child, parent=self.child.parent
+        ).aggregate(
+            total=Count("id"),
+            achieved=Count("id", filter=Q(activity_result__isnull=False) & ~Q(activity_result="") & ~Q(activity_result="Tentadu")),
+            attempted=Count("id", filter=Q(activity_result="Tentadu")),
+        )
+        context["stat_total"] = stats["total"]
+        context["stat_achieved"] = stats["achieved"]
+        context["stat_attempted"] = stats["attempted"]
+        context["stat_rate"] = round(stats["achieved"] / stats["total"] * 100) if stats["total"] else 0
+
         return context
 
 

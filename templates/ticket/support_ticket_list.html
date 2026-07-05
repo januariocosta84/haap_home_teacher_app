@@ -118,11 +118,11 @@
           <tr>
             <th>Numeru Tiket</th>
             <th>Mestri</th>
-            <th>Pre-Escolar</th>
-            <th>Tipu</th>
-            <th>Prioridade</th>
+            <th class="col-hide-md">Pre-Escolar</th>
+            <th class="col-hide-sm">Tipu</th>
+            <th class="col-hide-sm">Prioridade</th>
             <th>Status</th>
-            <th>Kria</th>
+            <th class="col-hide-md">Kria</th>
             <th style="text-align:center;">Aksaun</th>
           </tr>
         </thead>
@@ -131,8 +131,8 @@
           <tr>
             <td><span class="ticket-num">{{ ticket.ticket_number }}</span></td>
             <td><div class="fw-semibold" style="font-size:0.85rem;">{{ ticket.teacher.first_name }} {{ ticket.teacher.last_name }}</div></td>
-            <td><span class="text-muted" style="font-size:0.83rem;">{{ ticket.preschool.name }}</span></td>
-            <td>
+            <td class="col-hide-md"><span class="text-muted" style="font-size:0.83rem;">{{ ticket.preschool.name }}</span></td>
+            <td class="col-hide-sm">
               {% if ticket.is_equipment_request and ticket.is_training_request %}
                 <span class="tbadge tbadge-both"><i class="bi bi-box-seam me-1"></i>Ekip + Form</span>
               {% elif ticket.is_equipment_request %}
@@ -141,7 +141,7 @@
                 <span class="tbadge tbadge-train"><i class="bi bi-mortarboard me-1"></i>Formasaun</span>
               {% endif %}
             </td>
-            <td>
+            <td class="col-hide-sm">
               {% if ticket.priority == 'urgent' %}<span class="pbadge pbadge-urgent">{{ ticket.get_priority_display }}</span>
               {% elif ticket.priority == 'high' %}<span class="pbadge pbadge-high">{{ ticket.get_priority_display }}</span>
               {% elif ticket.priority == 'medium' %}<span class="pbadge pbadge-medium">{{ ticket.get_priority_display }}</span>
@@ -155,7 +155,7 @@
               {% else %}<span class="sbadge sbadge-closed"><i class="bi bi-circle-fill" style="font-size:0.45rem;"></i>{{ ticket.get_status_display }}</span>
               {% endif %}
             </td>
-            <td><span class="text-muted" style="font-size:0.8rem;">{{ ticket.created_at|date:"d/m/Y" }}</span></td>
+            <td class="col-hide-md"><span class="text-muted" style="font-size:0.8rem;">{{ ticket.created_at|date:"d/m/Y" }}</span></td>
             <td style="text-align:center;">
               <a href="{% url 'ticket:support-ticket-detail' ticket.pk %}"
                  class="btn btn-sm rounded-pill fw-semibold"

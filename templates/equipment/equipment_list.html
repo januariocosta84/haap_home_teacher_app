@@ -1,71 +1,407 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/equipment.css' %}">{% endblock %}
 
 {% block title %}Lista Ekipamentu{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-
-        <h4>Lista Ekipamentu</h4>
-
-        <a href="{% url 'equipment-add' %}" class="btn btn-primary">
-            Adisiona Ekipamentu
+  <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+  <div class="eq-hero">
+    <div class="eq-hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="eq-hero-icon">
+          <i class="bi bi-laptop"></i>
+        </div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Jestaun Inventariu
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">Lista Ekipamentu</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Haree, buka, filtra, no jere ekipamentu sira iha sistema
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <!-- Total count chip -->
+        <span style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);
+                     border-radius:20px;padding:4px 12px;font-size:0.78rem;font-weight:600;">
+          <i class="bi bi-box-seam me-1"></i>
+          {% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ equipments|length }}{% endif %} Ekipamentu
+        </span>
+        <a href="{% url 'equipment-add' %}"
+           class="btn rounded-pill px-4 fw-semibold"
+           style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
+          <i class="bi bi-plus-lg me-1"></i>Adisiona Ekipamentu
         </a>
-
+      </div>
     </div>
+  </div>
 
-    <div class="card shadow-sm border-0">
+  <!-- ══ FILTER CARD ═══════════════════════════════════════════════════════ -->
+  <div class="eq-filter-card">
+    <form method="get" id="filterForm">
+      <div class="row g-2 align-items-end">
 
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>Tipu</th>
-                        <th>Modelu</th>
-                        <th>Serial</th>
-                        <th>Pre-Escolar</th>
-                        <th>Sala Aula</th>
-                        <th>Professor</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    {% for equipment in equipments %}
-
-                    <tr>
-                        <td>{{ equipment.get_equipment_type_display }}</td>
-                        <td>{{ equipment.model_number }}</td>
-                        <td>{{ equipment.serial_number }}</td>
-                        <td>{{ equipment.preschool }}</td>
-                        <td>{{ equipment.classroom }}</td>
-                        <td>{{ equipment.teacher }}</td>
-                        <td>{{ equipment.created_at|date:"d/m/Y" }}</td>
-                    </tr>
-
-                    {% empty %}
-
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            Laiha ekipamentu rejistu.
-                        </td>
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
+        <!-- Search -->
+        <div class="col-12 col-lg-4">
+          <label class="eq-filter-label">Buka Ekipamentu</label>
+          <div class="eq-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="search" name="search" value="{{ request.GET.search }}"
+                   placeholder="Serial ka modelu...">
+          </div>
         </div>
 
+        <!-- Type -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <label class="eq-filter-label">Tipu</label>
+          <select name="equipment_type" class="eq-filter-select form-control">
+            <option value="">Tipu hotu</option>
+            {% for value, label in equipment_types %}
+              <option value="{{ value }}" {% if request.GET.equipment_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div class="col-6 col-md-4 col-lg-2">
+          <label class="eq-filter-label">Status</label>
+          <select name="status" class="eq-filter-select form-control">
+            <option value="">Status hotu</option>
+            {% for value, label in statuses %}
+              <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Preschool -->
+        <div class="col-12 col-md-4 col-lg-2">
+          <label class="eq-filter-label">Pre-Eskolár</label>
+          <select name="preschool" class="eq-filter-select form-control">
+            <option value="">Pre-eskolár hotu</option>
+            {% for preschool in preschools %}
+              <option value="{{ preschool.id }}"
+                {% if request.GET.preschool == preschool.id|stringformat:"s" %}selected{% endif %}>
+                {{ preschool.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-12 col-md-4 col-lg-2 d-flex gap-2">
+          <button type="submit"
+                  class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
+            <i class="bi bi-funnel-fill me-1"></i>Filtra
+          </button>
+          <a href="{% url 'equipment-list' %}"
+             class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+             title="Hamoos filtru">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Active filter pills -->
+      {% if request.GET.search or request.GET.equipment_type or request.GET.status or request.GET.preschool %}
+      <div class="d-flex flex-wrap gap-2 mt-2 pt-2" style="border-top:1px dashed #e2e8f0;">
+        <span class="eq-section-label me-1" style="line-height:1.9;">Aktidu:</span>
+        {% if request.GET.search %}
+          <span class="eq-filter-pill"><i class="bi bi-search" style="font-size:.7rem;"></i>{{ request.GET.search }}</span>
+        {% endif %}
+        {% if request.GET.equipment_type %}
+          <span class="eq-filter-pill"><i class="bi bi-laptop" style="font-size:.7rem;"></i>{{ request.GET.equipment_type }}</span>
+        {% endif %}
+        {% if request.GET.status %}
+          <span class="eq-filter-pill"><i class="bi bi-circle-fill" style="font-size:.55rem;"></i>{{ request.GET.status }}</span>
+        {% endif %}
+        {% if request.GET.preschool %}
+          <span class="eq-filter-pill"><i class="bi bi-building" style="font-size:.7rem;"></i>Pre-eskolár seleksionadu</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- ══ TABLE CARD ════════════════════════════════════════════════════════ -->
+  <div class="eq-table-card card">
+
+    <!-- Card header -->
+    <div class="card-header d-flex align-items-center flex-wrap gap-2">
+      <div>
+        <div style="font-weight:600;font-size:0.88rem;color:#1e293b;">Dadus Ekipamentu</div>
+        <div class="eq-section-label" style="margin-top:1px;">
+          {% if is_paginated %}
+            Hatudu {{ page_obj.start_index }}–{{ page_obj.end_index }} husi {{ page_obj.paginator.count }} rejistu
+          {% else %}
+            {{ equipments|length }} ekipamentu total
+          {% endif %}
+        </div>
+      </div>
+      <div class="flex-grow-1"></div>
+      <!-- Status summary chips -->
+      <div class="d-none d-md-flex gap-2 flex-wrap">
+        <span class="eq-stat-chip" style="background:#f0fdf4;color:#15803d;">
+          <i class="bi bi-check-circle-fill" style="font-size:.7rem;"></i>Aktivo
+        </span>
+        <span class="eq-stat-chip" style="background:#fef2f2;color:#dc2626;">
+          <i class="bi bi-exclamation-triangle-fill" style="font-size:.7rem;"></i>Aat
+        </span>
+        <span class="eq-stat-chip" style="background:#fff7ed;color:#c2410c;">
+          <i class="bi bi-archive-fill" style="font-size:.7rem;"></i>Reformadu
+        </span>
+      </div>
     </div>
 
-</div>
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table mb-0" id="eqTable">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">Tipu</th>
+            <th>Modelu</th>
+            <th>Serial</th>
+            <th>Pre-Eskolár</th>
+            <th>Sala Aula</th>
+            <th>Professor</th>
+            <th>Status</th>
+            <th>Data</th>
+            <th class="text-center" style="padding-right:1.5rem;">Aksaun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for equipment in equipments %}
+          <tr>
+            <!-- Type -->
+            <td style="padding-left:1.5rem;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="eq-type-icon
+                  {% if equipment.equipment_type == 'tablet' %}eq-type-tablet
+                  {% elif equipment.equipment_type == 'projector' %}eq-type-projector
+                  {% elif equipment.equipment_type == 'screen' %}eq-type-screen
+                  {% elif equipment.equipment_type == 'adapter' %}eq-type-adapter
+                  {% else %}eq-type-default{% endif %}">
+                  <i class="bi
+                    {% if equipment.equipment_type == 'tablet' %}bi-tablet
+                    {% elif equipment.equipment_type == 'projector' %}bi-projector
+                    {% elif equipment.equipment_type == 'screen' %}bi-display
+                    {% elif equipment.equipment_type == 'adapter' %}bi-plug
+                    {% else %}bi-box-seam{% endif %}">
+                  </i>
+                </div>
+                <span style="font-weight:600;color:#1e293b;font-size:0.84rem;">
+                  {{ equipment.get_equipment_type_display }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Model -->
+            <td>
+              <span style="font-size:0.83rem;color:#334155;">{{ equipment.model_number|default:"—" }}</span>
+            </td>
+
+            <!-- Serial -->
+            <td><span class="serial-pill">{{ equipment.serial_number|default:"—" }}</span></td>
+
+            <!-- Preschool -->
+            <td>
+              {% if equipment.preschool %}
+                <div class="eq-assign-name">{{ equipment.preschool.name }}</div>
+              {% else %}
+                <span class="eq-unassigned">Laiha</span>
+              {% endif %}
+            </td>
+
+            <!-- Classroom -->
+            <td>
+              {% if equipment.classroom %}
+                <div class="eq-assign-name">{{ equipment.classroom.name }}</div>
+              {% else %}
+                <span class="eq-unassigned">Laiha</span>
+              {% endif %}
+            </td>
+
+            <!-- Teacher -->
+            <td>
+              {% if equipment.teacher %}
+                <div class="eq-assign-name">
+                  {{ equipment.teacher.get_full_name|default:equipment.teacher.username }}
+                </div>
+                <div class="eq-assign-sub">
+                  <i class="bi bi-mortarboard me-1"></i>Formadór
+                </div>
+              {% else %}
+                <span class="eq-unassigned">Laiha</span>
+              {% endif %}
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span class="status-badge
+                {% if equipment.status == 'active' %}status-active
+                {% elif equipment.status == 'inactive' %}status-inactive
+                {% elif equipment.status == 'damaged' %}status-damaged
+                {% elif equipment.status == 'retired' %}status-retired
+                {% elif equipment.status == 'maintenance' %}status-maintenance
+                {% else %}status-other{% endif %}">
+                {{ equipment.get_status_display }}
+              </span>
+            </td>
+
+            <!-- Date -->
+            <td>
+              <div style="font-size:0.8rem;color:#334155;font-weight:500;">
+                {{ equipment.created_at|date:"d M Y" }}
+              </div>
+              <div style="font-size:0.71rem;color:#94a3b8;">
+                {{ equipment.created_at|date:"H:i" }}
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-center" style="padding-right:1.5rem;">
+              <div class="eq-action-wrap justify-content-center">
+                <a href="{% url 'equipment-detail' equipment.pk %}"
+                   class="eq-act-btn view"
+                   title="Haree Detallu"
+                   data-toggle="tooltip" data-placement="top">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'equipment-update' equipment.pk %}"
+                   class="eq-act-btn edit"
+                   title="Edita"
+                   data-toggle="tooltip" data-placement="top">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'equipment-assignment-change' equipment.pk %}"
+                   class="eq-act-btn assign"
+                   title="Atribui"
+                   data-toggle="tooltip" data-placement="top">
+                  <i class="bi bi-arrow-left-right"></i>
+                </a>
+                <a href="{% url 'equipment-delete' equipment.pk %}"
+                   class="eq-act-btn del"
+                   title="Hamos"
+                   data-toggle="tooltip" data-placement="top">
+                  <i class="bi bi-trash3"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="border-0 p-0">
+              <div class="eq-empty">
+                <i class="bi bi-laptop ei"></i>
+                <div class="et">Laiha ekipamentu rejistu</div>
+                <div class="es">
+                  {% if request.GET.search or request.GET.equipment_type or request.GET.status or request.GET.preschool %}
+                    Tenke hamoos filtru atu haree rekord hotu.
+                  {% else %}
+                    Sei laiha ekipamentu rejistadu iha sistema.
+                  {% endif %}
+                </div>
+                {% if request.GET.search or request.GET.equipment_type or request.GET.status or request.GET.preschool %}
+                  <a href="{% url 'equipment-list' %}"
+                     class="btn btn-outline-secondary rounded-pill px-4 mt-3 fw-semibold"
+                     style="font-size:0.83rem;">
+                    <i class="bi bi-x-circle me-1"></i>Hamoos Filtru
+                  </a>
+                {% else %}
+                  <a href="{% url 'equipment-add' %}"
+                     class="btn btn-primary rounded-pill px-4 mt-3 fw-semibold"
+                     style="font-size:0.83rem;">
+                    <i class="bi bi-plus-lg me-1"></i>Adisiona Ekipamentu
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="eq-pagination">
+      <div class="text-muted" style="font-size:0.78rem;">
+        Pajina <strong>{{ page_obj.number }}</strong> husi <strong>{{ page_obj.paginator.num_pages }}</strong>
+        &nbsp;·&nbsp; {{ page_obj.paginator.count }} rejistu total
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?{% if querystring %}{{ querystring }}&{% endif %}page=1">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link"
+               href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-left"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link"
+               href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.paginator.num_pages }}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-right"></i></span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+
+  </div><!-- /eq-table-card -->
+
+</div><!-- /container-fluid -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Bootstrap 4 tooltips
+  if (typeof $ !== 'undefined') {
+    $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' });
+  }
+  // Auto-submit on filter change
+  ['equipment_type', 'status', 'preschool'].forEach(function (name) {
+    var el = document.querySelector('select[name="' + name + '"]');
+    if (el) el.addEventListener('change', function () { document.getElementById('filterForm').submit(); });
+  });
+});
+</script>
 
 {% endblock %}

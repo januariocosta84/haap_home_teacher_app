@@ -1,143 +1,440 @@
 {% extends "core/base.html" %}
-<title>HAAP | {% block title %}Atividade Labarik{% endblock %}</title>
+{% load static %}
+
+{% block title %}Atividade — {{ child.first_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══ Hero ══════════════════════════════════════════════════════════════════ */
+.ca-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.85rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative; overflow: hidden;
+}
+.ca-hero::before {
+  content: ''; position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.ca-hero::after {
+  content: ''; position: absolute; bottom: -60px; left: 42%;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.ca-hero-content { position: relative; z-index: 1; }
+
+.ca-child-avatar {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: rgba(255,255,255,.22);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.45rem; font-weight: 800; color: #fff; flex-shrink: 0;
+  letter-spacing: -1px;
+}
+.ca-back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+  padding: 4px 14px; font-size: 0.78rem; font-weight: 600;
+  text-decoration: none; transition: all .15s;
+}
+.ca-back-btn:hover { background: rgba(255,255,255,.25); color: #fff; }
+.ca-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,.18); color: #fff;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 0.72rem; font-weight: 700;
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+/* ══ Stat cards ═════════════════════════════════════════════════════════════ */
+.ca-stat {
+  border-radius: 14px; border: 1px solid #e2e8f0;
+  background: #fff; padding: 1.1rem 1.25rem;
+  display: flex; align-items: center; gap: 12px;
+  transition: box-shadow .15s;
+}
+.ca-stat:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); }
+.ca-stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; flex-shrink: 0;
+}
+.ca-stat-num { font-size: 1.5rem; font-weight: 800; line-height: 1; color: #1e293b; }
+.ca-stat-lbl { font-size: 0.68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; margin-top: 2px; }
+
+/* Rate ring */
+.rate-ring {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(#2563eb calc(var(--pct) * 1%), #e2e8f0 0);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.rate-ring::after {
+  content: ''; position: absolute;
+  width: 30px; height: 30px; border-radius: 50%; background: #fff;
+}
+
+/* ══ Table card ═════════════════════════════════════════════════════════════ */
+.ca-table-card {
+  border-radius: 16px; border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden;
+}
+.ca-table-card .card-header {
+  background: #fff; border-bottom: 1px solid #f1f5f9;
+  padding: 0.85rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+}
+#caTable thead th {
+  background: #f8fafc;
+  font-size: 10.5px; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: .06em;
+  border-bottom: 2px solid #eef2f7;
+  padding: 0.75rem 1rem; white-space: nowrap; border-top: 0;
+}
+#caTable tbody tr { border-bottom: 1px solid #f8fafc; transition: background .1s; }
+#caTable tbody tr:hover { background: #f0f6ff; }
+#caTable tbody td {
+  padding: 0.72rem 1rem; font-size: 0.84rem; color: #334155;
+  vertical-align: middle; border-color: #f1f5f9;
+}
+.ca-act-name { font-weight: 600; color: #1e293b; font-size: 0.86rem; }
+.ca-cat { font-size: 0.75rem; color: #64748b; }
+
+/* ══ Result badges ══════════════════════════════════════════════════════════ */
+.res-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 20px; padding: 3px 10px;
+  font-size: 0.74rem; font-weight: 700; white-space: nowrap;
+}
+.res-achieved { background: #f0fdf4; color: #15803d; }
+.res-attempted { background: #fff7ed; color: #c2410c; }
+.res-none { background: #f8fafc; color: #94a3b8; }
+
+/* ══ Status badges ══════════════════════════════════════════════════════════ */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 2px 9px;
+  font-size: 0.7rem; font-weight: 700;
+}
+.status-completed  { background: #f0fdf4; color: #15803d; }
+.status-access     { background: #eff6ff; color: #1d4ed8; }
+.status-incompleted{ background: #fef2f2; color: #dc2626; }
+
+/* ══ Pagination ═════════════════════════════════════════════════════════════ */
+.ca-pagination .page-link {
+  border-radius: 8px !important; margin: 0 2px;
+  border: 1px solid #e2e8f0; color: #374151;
+  font-size: 0.8rem; min-width: 32px; text-align: center;
+  transition: all .12s;
+}
+.ca-pagination .page-item.active .page-link {
+  background: #2563eb; border-color: #2563eb; color: #fff;
+}
+.ca-pagination .page-link:hover {
+  background: #eff6ff; border-color: #93c5fd; color: #1d4ed8;
+}
+
+/* ══ Empty state ════════════════════════════════════════════════════════════ */
+.ca-empty { text-align: center; padding: 4rem 2rem; }
+.ca-empty-icon { font-size: 2.8rem; color: #cbd5e1; display: block; margin-bottom: .65rem; }
+
+/* ══ Responsive ═════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .ca-hero { padding: 1.3rem 1.25rem; }
+  .ca-child-avatar { width: 44px; height: 44px; font-size: 1.1rem; }
+  .col-hide-xs { display: none !important; }
+}
+@media (max-width: 768px) {
+  .col-hide-sm { display: none !important; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container-fluid mt-4">
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="ca-hero">
+    <div class="ca-hero-content">
 
-  <!-- Title -->
-  <h4 class="mb-3">
-    Rezultadu aprendizajen sira.<b>{{ child.first_name }} {{ child.last_name }} ...</b> 
-  </h4>
-
-  <!-- Card -->
-  <div class="card shadow-sm border-0">
-
-    <!-- Card Body -->
-    <div class="card-body p-0">
-
-      <div class="table-responsive" style="max-height:600px; overflow-y:auto;">
-        <table id="example1"
-               class="table table-hover mb-0"
-               style="font-size:14px;">
-
-          <!-- THEAD -->
-          <thead style="position:sticky; top:0; z-index:1;">
-            <tr style="background:#f8f9fa;">
-
-              <th class="px-3 py-2"
-                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
-                Rezultadu  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
-                Atividade  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
-                Tema  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
-                Tipu  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-
-              <th class="px-3 py-2"
-                  style="font-size:14px; font-weight:500; color:#888; white-space:nowrap;">
-                Data  <i class="fas fa-filter ms-1" style="font-size:9px;"></i>
-              </th>
-
-            </tr>
-          </thead>
-
-          <!-- TBODY -->
-          <tbody>
-            {% for act in activities %}
-            <tr>
-
-              <!-- Result Badge -->
-              <td class="px-3">
-                {% if act.activity_result and act.activity_result != 'Tentadu' %}
-                  <span class="badge rounded-pill"
-                        style="background:#E1F5EE; color:#0F6E56; font-size:14px; font-weight:500;">
-                    {{ act.activity_result }}
-                  </span>
-                {% elif act.activity_result == 'Tentadu' %}
-                  <span class="badge rounded-pill"
-                        style="background:#FAECE7; color:#993C1D; font-size:14px; font-weight:500;">
-                    {{ act.activity_result }}
-                  </span>
-                {% else %}
-                  <span class="text-muted">-</span>
-                {% endif %}
-              </td>
-
-              <!-- Activity -->
-              <td class="px-3" style="font-weight:500;">
-                {{ act.activity_name|default:"-" }}
-              </td>
-
-              <!-- Tema -->
-              <td class="px-3 text-muted" style="font-size:12px;">
-                {{ act.cat1_left|default:"-" }}
-              </td>
-
-              <!-- Tipu -->
-              <td class="px-3 text-muted" style="font-size:12px;">
-                {{ act.cat1_right|default:"-" }}
-              </td>
-
-              <!-- Date -->
-              <td class="px-3 text-muted"
-                  style="font-size:12px; white-space:nowrap;">
-                {{ act.created_at|date:"d M Y H:i" }}
-              </td>
-
-            </tr>
-
-            {% empty %}
-            <tr>
-              <td colspan="5" class="text-center text-muted py-5">
-                <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
-                Laiha atividade ne’ebé rejista
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-
-        </table>
+      <!-- Breadcrumb -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="javascript:history.back()" class="ca-back-btn">
+          <i class="bi bi-arrow-left"></i> Fila
+        </a>
+        <span style="color:rgba(255,255,255,.4);font-size:0.8rem;">/</span>
+        <span style="color:rgba(255,255,255,.65);font-size:0.78rem;">Atividade Labarik</span>
       </div>
 
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <!-- Left: child info -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="ca-child-avatar">
+            {{ child.first_name|first|upper }}
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+              <span class="ca-pill"><i class="bi bi-mortarboard-fill" style="font-size:.65rem;"></i>{{ child.get_age_group_display }}</span>
+              <span class="ca-pill" style="font-family:monospace;">{{ child.user_id }}</span>
+            </div>
+            <h3 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">
+              {{ child.first_name }}
+            </h3>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+              <i class="bi bi-person me-1"></i>{{ child.parent.get_full_name }}
+              &nbsp;&middot;&nbsp;
+              <i class="bi bi-calendar3 me-1"></i>{{ child.year_of_birth }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: quick stats in hero -->
+        <div class="d-none d-md-flex gap-3" style="position:relative;z-index:1;">
+          <div style="text-align:center;">
+            <div style="font-size:1.4rem;font-weight:800;color:#fff;line-height:1;">{{ stat_total }}</div>
+            <div style="font-size:0.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);">Total</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+          <div style="text-align:center;">
+            <div style="font-size:1.4rem;font-weight:800;color:#fff;line-height:1;">{{ stat_achieved }}</div>
+            <div style="font-size:0.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);">Hetan</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+          <div style="text-align:center;">
+            <div style="font-size:1.4rem;font-weight:800;color:#fff;line-height:1;">{{ stat_rate }}%</div>
+            <div style="font-size:0.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);">Suksesu</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ STAT CARDS ════════════════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-3">
+      <div class="ca-stat">
+        <div class="ca-stat-icon" style="background:#eff6ff;color:#2563eb;">
+          <i class="bi bi-collection-fill"></i>
+        </div>
+        <div>
+          <div class="ca-stat-num">{{ stat_total }}</div>
+          <div class="ca-stat-lbl">Total Atividade</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="ca-stat">
+        <div class="ca-stat-icon" style="background:#f0fdf4;color:#16a34a;">
+          <i class="bi bi-patch-check-fill"></i>
+        </div>
+        <div>
+          <div class="ca-stat-num" style="color:#16a34a;">{{ stat_achieved }}</div>
+          <div class="ca-stat-lbl">Hetan / Kumpre</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="ca-stat">
+        <div class="ca-stat-icon" style="background:#fff7ed;color:#c2410c;">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+        <div>
+          <div class="ca-stat-num" style="color:#c2410c;">{{ stat_attempted }}</div>
+          <div class="ca-stat-lbl">Tentadu</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="ca-stat">
+        <div class="rate-ring" style="--pct:{{ stat_rate }};"></div>
+        <div>
+          <div class="ca-stat-num" style="color:#2563eb;">{{ stat_rate }}%</div>
+          <div class="ca-stat-lbl">Taxa Suksesu</div>
+        </div>
+      </div>
     </div>
 
   </div>
 
+  <!-- ══ TABLE CARD ════════════════════════════════════════════════════════ -->
+  <div class="ca-table-card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div>
+        <span style="font-weight:700;font-size:0.88rem;color:#1e293b;">
+          <i class="bi bi-list-check me-1" style="color:#2563eb;"></i>Rezultadu Aprendizajen
+        </span>
+        <div style="font-size:0.72rem;color:#94a3b8;margin-top:1px;">
+          {% if is_paginated %}
+            Hatudu {{ page_obj.start_index }}–{{ page_obj.end_index }} husi {{ paginator.count }} rekord
+          {% else %}
+            {{ activities|length }} rekord total
+          {% endif %}
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <span class="badge rounded-pill" style="background:#f0fdf4;color:#15803d;font-size:0.72rem;padding:5px 10px;">
+          <i class="bi bi-check-circle-fill me-1"></i>{{ stat_achieved }} Hetan
+        </span>
+        <span class="badge rounded-pill" style="background:#fff7ed;color:#c2410c;font-size:0.72rem;padding:5px 10px;">
+          <i class="bi bi-arrow-repeat me-1"></i>{{ stat_attempted }} Tentadu
+        </span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table mb-0" id="caTable">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;width:130px;">Rezultadu</th>
+            <th>Naran Atividade</th>
+            <th class="col-hide-sm">Tema</th>
+            <th class="col-hide-sm">Tipu</th>
+            <th class="col-hide-xs">Status</th>
+            <th style="padding-right:1.5rem;">Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for act in activities %}
+          <tr>
+
+            <!-- Result -->
+            <td style="padding-left:1.5rem;">
+              {% if act.activity_result and act.activity_result != 'Tentadu' %}
+                <span class="res-badge res-achieved">
+                  <i class="bi bi-check-circle-fill" style="font-size:.6rem;"></i>
+                  {{ act.activity_result }}
+                </span>
+              {% elif act.activity_result == 'Tentadu' %}
+                <span class="res-badge res-attempted">
+                  <i class="bi bi-arrow-repeat" style="font-size:.7rem;"></i>
+                  Tentadu
+                </span>
+              {% else %}
+                <span class="res-badge res-none">
+                  <i class="bi bi-dash" style="font-size:.75rem;"></i>
+                  —
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Activity name -->
+            <td>
+              <div class="ca-act-name">{{ act.activity_name|default:"—" }}</div>
+              {% if act.cat2_left %}
+              <div class="ca-cat">{{ act.cat2_left }}</div>
+              {% endif %}
+            </td>
+
+            <!-- Tema (cat1_left) -->
+            <td class="col-hide-sm">
+              <span class="ca-cat">{{ act.cat1_left|default:"—" }}</span>
+            </td>
+
+            <!-- Tipu (cat1_right) -->
+            <td class="col-hide-sm">
+              {% if act.cat1_right %}
+              <span style="display:inline-block;background:#eff6ff;color:#1d4ed8;border-radius:20px;padding:1px 8px;font-size:0.7rem;font-weight:700;">
+                {{ act.cat1_right }}
+              </span>
+              {% else %}
+              <span class="ca-cat">—</span>
+              {% endif %}
+            </td>
+
+            <!-- Status -->
+            <td class="col-hide-xs">
+              {% if act.status == 'completed' %}
+                <span class="status-badge status-completed"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{{ act.get_status_display }}</span>
+              {% elif act.status == 'access' %}
+                <span class="status-badge status-access"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>Asesu</span>
+              {% else %}
+                <span class="status-badge status-incompleted"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{{ act.get_status_display }}</span>
+              {% endif %}
+            </td>
+
+            <!-- Date -->
+            <td style="padding-right:1.5rem;">
+              <div style="font-size:0.8rem;color:#334155;font-weight:500;white-space:nowrap;">
+                {{ act.created_at|date:"d M Y" }}
+              </div>
+              <div style="font-size:0.7rem;color:#94a3b8;">
+                {{ act.created_at|date:"H:i" }}
+              </div>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="border-0 p-0">
+              <div class="ca-empty">
+                <i class="bi bi-journal-x ca-empty-icon"></i>
+                <div style="font-weight:700;color:#475569;margin-bottom:.3rem;">Laiha atividade rejistadu</div>
+                <div style="font-size:0.83rem;color:#94a3b8;">
+                  {{ child.first_name }} seidauk iha rekord atividade iha sistema.
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding:0.85rem 1.5rem;border-top:1px solid #f1f5f9;background:#fff;">
+      <div style="font-size:0.78rem;color:#64748b;">
+        Pajina <strong>{{ page_obj.number }}</strong> husi <strong>{{ paginator.num_pages }}</strong>
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0 ca-pagination">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1"><i class="bi bi-chevron-double-left" style="font-size:.65rem;"></i></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="bi bi-chevron-left" style="font-size:.65rem;"></i></a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-left" style="font-size:.65rem;"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left" style="font-size:.65rem;"></i></span></li>
+          {% endif %}
+
+          {% for num in paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+              <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="bi bi-chevron-right" style="font-size:.65rem;"></i></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ paginator.num_pages }}"><i class="bi bi-chevron-double-right" style="font-size:.65rem;"></i></a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right" style="font-size:.65rem;"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-right" style="font-size:.65rem;"></i></span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+
+  </div><!-- /ca-table-card -->
+
 </div>
-
-<script>
-  $(function () {
-    $("#example1").DataTable({
-      responsive: true,
-      lengthChange: false,
-      autoWidth: false,
-      searching: false,
-      pageLength: 10,
-
-      language: {
-        info: "Hare'e _START_ to’o _END_ husi _TOTAL_ dadus",
-        infoEmpty: "Laiha dadus disponivel",
-        paginate: {
-          previous: "⬅ Anterior",
-          next: "Próximu ➡"
-        }
-      },
-
-      buttons: ["copy", "csv", "excel", "pdf", "print"]
-
-    }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-  });
-</script>
 {% endblock %}

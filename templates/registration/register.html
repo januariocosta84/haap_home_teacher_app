@@ -1,5 +1,35 @@
 {% extends "./layout.html" %}
 <title>{% block title %}Pajina Rejistrasaun{% endblock %}</title>
+
+{% block extra_css %}
+<style>
+/* Compact card for mobile registration form */
+.card {
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 8px;
+  font-size: 0.8rem;
+}
+.form-control {
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  height: 30px;
+}
+.form-group label { font-size: 0.75rem; margin-bottom: 2px; }
+.form-group { margin-bottom: 5px; }
+@media (max-width: 768px) {
+  .login-title { display: flex; align-items: center; justify-content: center; }
+  .login-title img { height: 35px; }
+  .login-title h1 { font-size: 14px; white-space: nowrap; margin-left: 5px; }
+  .card { width: 95%; max-height: 85vh; padding: 8px; }
+  .overlay-container { max-height: 92vh; overflow-y: auto; padding: 6px; }
+  .form-control { font-size: 0.7rem; padding: 3px 5px; height: 26px; }
+  #submit-button img { height: 50px; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- Background Carousel -->
@@ -138,76 +168,3 @@
   });
 </script>
 
-<style>
-/* Adjust Card Size for Mobile */
-.card {
-  width: 90%;
-  max-height: 80vh; /* Ensures it fits on small screens */
-  overflow-y: auto; /* Enables scrolling inside the card */
-  padding: 8px;
-  font-size: 0.8rem;
-}
-
-/* Reduce Input Field Size */
-.form-control {
-  font-size: 0.75rem;
-  padding: 4px 6px;
-  height: 30px;
-  width: 100%;
-}
-
-/* Make Labels Smaller */
-.form-group label {
-  font-size: 0.75rem;
-  margin-bottom: 2px;
-}
-
-/* Reduce Space Between Form Fields */
-.form-group {
-  margin-bottom: 5px;
-}
-
-/* Ensure Full View on Small Screens */
-@media (max-width: 768px) {
-  .login-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .login-title img {
-    height: 35px; /* Smaller logo */
-  }
-  
-  .login-title h1 {
-    font-size: 14px;
-    white-space: nowrap;
-    margin-left: 5px;
-  }
-
-  .card {
-    width: 95%;
-    max-height: 85vh;
-    padding: 8px;
-  }
-  
-  /* Make the form scrollable */
-  .overlay-container {
-    max-height: 92vh;
-    overflow-y: auto;
-    padding: 6px;
-  }
-  
-  /* Reduce input size */
-  .form-control {
-    font-size: 0.7rem;
-    padding: 3px 5px;
-    height: 26px;
-  }
-
-  /* Adjust Buttons */
-  #submit-button img {
-    height: 50px; /* Make the button smaller */
-  }
-}
-</style>

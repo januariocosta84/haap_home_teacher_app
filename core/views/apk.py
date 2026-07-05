@@ -54,10 +54,13 @@ def edit_apk(request, apk_id):
 
 @login_required
 def apk_list(request):
-    user = request.user
-    print(f"User {user.username} accessed the APK list." f"Is staff: {user.is_staff}, Is superuser: {user.is_superuser}","Role: {user.role}",user.role)
     apks = ApkVersion.objects.order_by('-released_at')
-    return render(request, 'apk/apk_list.html', {'apks': apks, 'user': user})
+    latest = apks.filter(is_latest=True).first()
+    return render(request, 'apk/apk_list.html', {
+        'apks': apks,
+        'latest': latest,
+        'user': request.user,
+    })
 
 
 class LatestApkView(ListView):

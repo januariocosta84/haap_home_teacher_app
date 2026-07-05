@@ -1,231 +1,485 @@
 {% extends "core/base.html" %}
-{% block content %}
+{% load static %}
 
+{% block title %}{{ preschool.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══ Hero ══════════════════════════════════════════════════════════════════ */
+.pd-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.85rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.pd-hero::before {
+  content: '';
+  position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.pd-hero::after {
+  content: '';
+  position: absolute; bottom: -70px; left: 40%;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.pd-hero-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: rgba(255,255,255,.18);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: #fff; flex-shrink: 0;
+}
+.pd-hero-content { position: relative; z-index: 1; }
+.pd-type-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.18); color: #fff;
+  border-radius: 20px; padding: 3px 12px;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: .03em;
+  border: 1px solid rgba(255,255,255,.25);
+}
+.pd-back-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+  padding: 4px 14px; font-size: 0.78rem; font-weight: 600;
+  text-decoration: none; transition: all .15s;
+}
+.pd-back-btn:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+/* ══ Stat card ══════════════════════════════════════════════════════════════ */
+.stat-block {
+  text-align: center; padding: 1rem 0.5rem;
+  border-right: 1px solid #f1f5f9;
+}
+.stat-block:last-child { border-right: 0; }
+.stat-num { font-size: 1.75rem; font-weight: 800; color: #1e293b; line-height: 1; }
+.stat-lbl { font-size: 0.7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; margin-top: 4px; }
+
+/* ══ Info rows ══════════════════════════════════════════════════════════════ */
+.info-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 0.6rem 0; border-bottom: 1px solid #f8fafc;
+}
+.info-row:last-child { border-bottom: 0; }
+.info-row-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: #eff6ff; color: #2563eb;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; flex-shrink: 0; margin-top: 1px;
+}
+.info-lbl { font-size: 0.68rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #94a3b8; }
+.info-val { font-size: 0.85rem; font-weight: 600; color: #1e293b; }
+
+/* ══ Section header ═════════════════════════════════════════════════════════ */
+.section-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-size: 0.88rem; font-weight: 700; color: #1e293b;
+}
+.section-badge {
+  background: #eff6ff; color: #1d4ed8;
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 0.72rem; font-weight: 700;
+}
+
+/* ══ Classroom cards ════════════════════════════════════════════════════════ */
+.klase-card {
+  border: 1px solid #e2e8f0; border-radius: 14px;
+  background: #fff; overflow: hidden;
+  transition: box-shadow .15s, transform .15s;
+}
+.klase-card:hover { box-shadow: 0 4px 20px rgba(37,99,235,.12); transform: translateY(-2px); }
+.klase-card-top {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  padding: 1rem 1.1rem 0.8rem;
+}
+.klase-card-body { padding: 0.9rem 1.1rem; }
+.klase-group-pill {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,.2); color: #fff;
+  border-radius: 20px; padding: 1px 9px; font-size: 0.68rem; font-weight: 700;
+}
+.klase-name { font-weight: 700; font-size: 0.92rem; color: #fff; }
+.teacher-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.78rem; color: #1e293b; font-weight: 600;
+}
+.teacher-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #eff6ff; color: #2563eb;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 700; flex-shrink: 0;
+}
+.klase-act {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid #e2e8f0; background: #fff; color: #475569;
+  font-size: 0.8rem; text-decoration: none; transition: all .12s;
+}
+.klase-act:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.klase-act.view:hover  { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+.klase-act.edit:hover  { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+
+/* ══ Mini map ═══════════════════════════════════════════════════════════════ */
+#detailMap { height: 200px; width: 100%; border-radius: 0 0 12px 12px; }
+
+/* ══ Empty state ════════════════════════════════════════════════════════════ */
+.empty-klase {
+  text-align: center; padding: 3.5rem 2rem;
+  border: 2px dashed #e2e8f0; border-radius: 14px;
+}
+.empty-klase-icon { font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: .6rem; }
+
+/* ══ Type colors ════════════════════════════════════════════════════════════ */
+.t-government { background: #eff6ff; color: #1d4ed8; }
+.t-community  { background: #f0fdf4; color: #15803d; }
+.t-private    { background: #f5f3ff; color: #6d28d9; }
+.t-playgroup  { background: #fffbeb; color: #b45309; }
+</style>
+{% if preschool.latitude and preschool.longitude %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+{% endif %}
+{% endblock %}
+
+{% block content %}
 <div class="container-fluid py-4">
 
-    <!-- MODERN HEADER (APPLIED SAME STYLE) -->
-    <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="pd-hero">
+    <div class="pd-hero-content">
 
-        <div class="card-body p-4">
+      <!-- Breadcrumb / back -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'preschools:preschool_list' %}" class="pd-back-btn">
+          <i class="bi bi-arrow-left"></i> Lista
+        </a>
+        <span style="color:rgba(255,255,255,.4);font-size:0.8rem;">/</span>
+        <span style="color:rgba(255,255,255,.65);font-size:0.78rem;">Detallu</span>
+      </div>
 
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-                <!-- LEFT -->
-                <div>
-
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <span class="badge bg-primary rounded-pill px-3 py-2">
-                            Pre-Eskolár
-                        </span>
-                    </div>
-
-                    <h3 class="fw-bold mb-1">
-                        {{ preschool.name }}
-                    </h3>
-
-                    <p class="text-muted mb-0">
-                        {{ preschool.municipality }} • {{ preschool.administrative_post }} • {{ preschool.suco }}
-                    </p>
-
-                </div>
-
-                <!-- RIGHT ACTION -->
-                <div>
-
-                    <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
-                        class="btn btn-success rounded-pill px-4 shadow-sm">
-                                <i class="bi bi-plus-circle me-1"></i>
-                                 Adisiona klase
-
-                    </a>
-
-                </div>
-
+        <!-- Left: icon + info -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="pd-hero-icon">
+            {% if preschool.preschool_type == 'government' %}<i class="bi bi-bank2"></i>
+            {% elif preschool.preschool_type == 'community' %}<i class="bi bi-people-fill"></i>
+            {% elif preschool.preschool_type == 'private' %}<i class="bi bi-briefcase-fill"></i>
+            {% else %}<i class="bi bi-stars"></i>{% endif %}
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="pd-type-badge">
+                {{ preschool.get_preschool_type_display }}
+              </span>
             </div>
-
+            <h3 class="fw-bold text-white mb-1" style="letter-spacing:-0.3px;">{{ preschool.name }}</h3>
+            <div style="font-size:0.8rem;color:rgba(255,255,255,.7);">
+              <i class="bi bi-geo-alt me-1"></i>
+              {{ preschool.municipality|default:"—" }}{% if preschool.administrative_post %} &middot; {{ preschool.administrative_post }}{% endif %}
+            </div>
+          </div>
         </div>
 
-        <!-- gradient accent -->
-        <div style="height:4px; background: linear-gradient(90deg,#0d6efd,#20c997,#6610f2);"></div>
+        <!-- Right: actions -->
+        {% if user.role == 'moe_admin' %}
+        <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1;">
+          <a href="{% url 'preschools:preschool_edit' preschool.pk %}"
+             class="btn rounded-pill px-4 fw-semibold"
+             style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.82rem;">
+            <i class="bi bi-pencil me-1"></i>Edita
+          </a>
+          <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+             class="btn rounded-pill px-4 fw-semibold"
+             style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
+            <i class="bi bi-plus-lg me-1"></i>Adisiona Klase
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- ══ LEFT SIDEBAR ════════════════════════════════════════════════════ -->
+    <div class="col-12 col-lg-4">
+
+      <!-- Stats -->
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;overflow:hidden;">
+        <div class="row g-0">
+          <div class="col-4 stat-block">
+            <div class="stat-num text-primary">{{ classrooms|length }}</div>
+            <div class="stat-lbl">Klase</div>
+          </div>
+          <div class="col-4 stat-block">
+            <div class="stat-num text-success">{{ approved_teacher_count }}</div>
+            <div class="stat-lbl">Profesór</div>
+          </div>
+          <div class="col-4 stat-block">
+            <div class="stat-num" style="color:#b45309;">{{ student_count }}</div>
+            <div class="stat-lbl">Estudante</div>
+          </div>
+        </div>
+        <div style="height:3px;background:linear-gradient(90deg,#2563eb,#1e40af,#1d4ed8);"></div>
+      </div>
+
+      <!-- Location info -->
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+        <div class="card-body p-3">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:.75rem;">
+            <i class="bi bi-geo-alt-fill me-1" style="color:#2563eb;"></i>Lokalizasaun
+          </div>
+
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-building"></i></div>
+            <div>
+              <div class="info-lbl">Munisípiu</div>
+              <div class="info-val">{{ preschool.municipality|default:"—" }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-map"></i></div>
+            <div>
+              <div class="info-lbl">Postu Administrativu</div>
+              <div class="info-val">{{ preschool.administrative_post|default:"—" }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-pin-map"></i></div>
+            <div>
+              <div class="info-lbl">Suco</div>
+              <div class="info-val">{{ preschool.suco|default:"—" }}</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-house"></i></div>
+            <div>
+              <div class="info-lbl">Aldeia</div>
+              <div class="info-val">{{ preschool.aldeia|default:"—" }}</div>
+            </div>
+          </div>
+
+          {% if preschool.latitude and preschool.longitude %}
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-crosshair"></i></div>
+            <div>
+              <div class="info-lbl">Koordenadas</div>
+              <div class="info-val" style="font-family:monospace;font-size:0.78rem;">
+                {{ preschool.latitude }}, {{ preschool.longitude }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if preschool.latitude and preschool.longitude %}
+        <div id="detailMap"></div>
+        {% endif %}
+      </div>
+
+      <!-- Contact info -->
+      {% if preschool.whatsapp_contact or preschool.email %}
+      <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
+        <div class="card-body p-3">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:.75rem;">
+            <i class="bi bi-telephone-fill me-1" style="color:#2563eb;"></i>Kontaktu
+          </div>
+
+          {% if preschool.whatsapp_contact %}
+          <div class="info-row">
+            <div class="info-row-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-whatsapp"></i></div>
+            <div>
+              <div class="info-lbl">WhatsApp</div>
+              <div class="info-val">
+                <a href="https://wa.me/{{ preschool.whatsapp_contact }}" target="_blank"
+                   style="color:#16a34a;text-decoration:none;">
+                  {{ preschool.whatsapp_contact }}
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if preschool.email %}
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-envelope"></i></div>
+            <div>
+              <div class="info-lbl">Email</div>
+              <div class="info-val">
+                <a href="mailto:{{ preschool.email }}"
+                   style="color:#2563eb;text-decoration:none;">
+                  {{ preschool.email }}
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Meta info -->
+      <div class="card border-0 shadow-sm" style="border-radius:16px;">
+        <div class="card-body p-3">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:.75rem;">
+            <i class="bi bi-info-circle-fill me-1" style="color:#2563eb;"></i>Informasaun
+          </div>
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-person-check"></i></div>
+            <div>
+              <div class="info-lbl">Kria husi</div>
+              <div class="info-val">{{ preschool.created_by.get_full_name|default:"—" }}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-calendar3"></i></div>
+            <div>
+              <div class="info-lbl">Data kria</div>
+              <div class="info-val">{{ preschool.created_at|date:"d M Y" }}</div>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-row-icon"><i class="bi bi-arrow-repeat"></i></div>
+            <div>
+              <div class="info-lbl">Atualiza</div>
+              <div class="info-val">{{ preschool.updated_at|date:"d M Y, H:i" }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
 
-    <div class="row g-4">
+    <!-- ══ MAIN CONTENT ════════════════════════════════════════════════════ -->
+    <div class="col-12 col-lg-8">
 
-        <!-- SIDEBAR -->
-        <div class="col-lg-3">
-
-            <!-- OVERVIEW -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4">
-                <div class="card-body">
-
-                    <h5 class="fw-bold mb-3"> Rezumu Eskola</h5>
-                    <hr>
-
-                    <div class="mb-3">
-                        <small class="text-muted">Total Klase</small>
-                        <h4 class="fw-bold text-primary mb-0">
-                            {{ classrooms|length }}
-                        </h4>
-                    </div>
-
-                    <div class="mb-3">
-                        <small class="text-muted">Total Profesór</small>
-                        <h4 class="fw-bold text-success mb-0">
-                            {{ preschool.teachers.count }}
-                        </h4>
-                    </div>
-
-                    <div>
-                        <small class="text-muted">Estadu</small><br>
-                        <span class="badge bg-success rounded-pill px-3 py-2">
-                            Aktivu
-                        </span>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- LOCATION -->
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body">
-
-                    <h5 class="fw-bold mb-3">📍 Informasaun Fatin</h5>
-                    <hr>
-
-                    <p class="mb-2"><strong>Munisípiu:</strong> {{ preschool.municipality }}</p>
-                    <p class="mb-2"><strong>Postu Administrativu:</strong> {{ preschool.administrative_post }}</p>
-                    <p class="mb-2"><strong>Suco:</strong> {{ preschool.suco }}</p>
-                    <p class="mb-0"><strong>Aldeia:</strong> {{ preschool.aldeia }}</p>
-
-                </div>
-            </div>
-
+      <!-- Classrooms header -->
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="section-title"><i class="bi bi-door-open me-1" style="color:#2563eb;"></i>Lista Klase</div>
+          <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">{{ classrooms|length }} klase rejista</div>
         </div>
+        {% if user.role == 'moe_admin' %}
+        <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+           class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">
+          <i class="bi bi-plus-lg me-1"></i>Klase Foun
+        </a>
+        {% endif %}
+      </div>
 
-        <!-- MAIN -->
-        <div class="col-lg-9">
+      {% if classrooms %}
+      <div class="row g-3">
+        {% for classroom in classrooms %}
+        <div class="col-12 col-sm-6 col-xl-4">
+          <div class="klase-card h-100">
 
-            <!-- TITLE BAR -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4">
-                <div class="card-body d-flex justify-content-between align-items-center">
-
-                    <h5 class="fw-bold mb-0"> Lista Klase Sira</h5>
-
-                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
-                        {{ classrooms|length }} Klase
-                    </span>
-
+            <!-- Card top / header -->
+            <div class="klase-card-top">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="klase-group-pill">Grupo {{ classroom.group }}</span>
+                <div class="d-flex gap-1">
+                  <a href="{% url 'klase:classroom-detail' classroom.id %}" class="klase-act view" title="Haree">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{% url 'preschools:edit_classroom' id=classroom.id %}" class="klase-act edit" title="Edita">
+                    <i class="bi bi-pencil"></i>
+                  </a>
                 </div>
+              </div>
+              <div class="klase-name">{{ classroom.name }}</div>
             </div>
 
-            {% if classrooms %}
-            <div class="row g-4">
-
-                {% for classroom in classrooms %}
-                <div class="col-md-6 col-xl-4">
-
-                    <div class="card border-0 shadow-sm rounded-4 h-100 classroom-card">
-
-                        <div class="card-body d-flex flex-column">
-
-                            <div class="mb-3">
-                                <h5 class="fw-bold mb-1">
-                                    <a href="{% url 'klase:classroom-detail' classroom.id %}"
-                                       class="text-decoration-none text-dark">
-                                        {{ classroom.name }}
-                                    </a>
-                                </h5>
-
-                                <small class="text-muted">
-                                    Grup: {{ classroom.group }}
-                                </small>
-                            </div>
-
-                            <div class="mb-3">
-                                <strong>Profesór:</strong><br>
-
-                                {% if classroom.teacher %}
-                                    <span class="text-success fw-semibold">
-                                        {{ classroom.teacher.get_full_name }}
-                                    </span>
-                                {% else %}
-                                    <span class="badge bg-danger rounded-pill">
-                                        Seidauk iha profesór
-                                    </span>
-                                {% endif %}
-
-                            </div>
-
-                            <!-- ACTIONS -->
-                            <div class="mt-auto d-flex gap-2">
-
-                                <a href="{% url 'klase:classroom-detail' classroom.id %}"
-                                   class="btn btn-outline-primary btn-sm rounded-pill flex-fill">
-                                    Haree
-                                </a>
-
-                                <a href="{% url 'preschools:edit_classroom' id=classroom.id %}"
-                                   class="btn btn-outline-secondary btn-sm rounded-pill flex-fill">
-                                    Edita
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+            <!-- Card body -->
+            <div class="klase-card-body">
+              <div style="font-size:0.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;">Profesór</div>
+              {% if classroom.teacher %}
+              <div class="teacher-chip">
+                <div class="teacher-avatar">
+                  {{ classroom.teacher.first_name|first|upper }}{{ classroom.teacher.last_name|first|upper }}
                 </div>
-                {% endfor %}
+                {{ classroom.teacher.get_full_name }}
+              </div>
+              {% else %}
+              <span style="display:inline-flex;align-items:center;gap:5px;background:#fef2f2;color:#dc2626;border-radius:20px;padding:2px 10px;font-size:0.72rem;font-weight:700;">
+                <i class="bi bi-exclamation-circle" style="font-size:0.65rem;"></i>Laiha profesór
+              </span>
+              {% endif %}
 
+              <div class="mt-3">
+                <a href="{% url 'klase:classroom-detail' classroom.id %}"
+                   class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold w-100"
+                   style="font-size:0.78rem;">
+                  <i class="bi bi-arrow-right-circle me-1"></i>Haree Klase
+                </a>
+              </div>
             </div>
 
-            {% else %}
-
-            <!-- EMPTY STATE -->
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body text-center py-5">
-
-
-                    <h5 class="fw-bold">Seidauk iha klase rejista</h5>
-
-                    <p class="text-muted">
-                        Klik iha <strong>Aumenta Klase Foun</strong> atu kria klase.
-                    </p>
-
-                    <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
-                       class="btn btn-primary rounded-pill px-4">
-                         Aumenta Klase
-                    </a>
-
-                </div>
-            </div>
-
-            {% endif %}
-
+          </div>
         </div>
+        {% endfor %}
+      </div>
+
+      {% else %}
+      <!-- Empty state -->
+      <div class="empty-klase">
+        <i class="bi bi-door-open empty-klase-icon"></i>
+        <div style="font-weight:700;color:#475569;margin-bottom:.3rem;">Seidauk iha klase rejista</div>
+        <div style="font-size:0.83rem;color:#94a3b8;margin-bottom:1.25rem;">
+          Adisiona klase primeiru atu organizasaun pre-eskolár ne'e hahú funsiona.
+        </div>
+        {% if user.role == 'moe_admin' %}
+        <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+           class="btn btn-primary rounded-pill px-5 fw-semibold">
+          <i class="bi bi-plus-lg me-1"></i>Adisiona Klase Foun
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
     </div>
+  </div>
+
 </div>
 
-<!-- STYLE -->
-<style>
-    .classroom-card {
-        transition: all 0.25s ease;
-    }
-
-    .classroom-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 25px rgba(0,0,0,0.08);
-    }
-
-    .card {
-        overflow: hidden;
-    }
-
-    h2, h3, h4, h5 {
-        letter-spacing: -0.3px;
-    }
-</style>
+{% if preschool.latitude and preschool.longitude %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var lat = {{ preschool.latitude }};
+  var lng = {{ preschool.longitude }};
+  var map = L.map('detailMap', { zoomControl: false, scrollWheelZoom: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(map);
+  var color = {
+    government: '#2563eb', community: '#16a34a',
+    private: '#6d28d9', playgroup: '#b45309'
+  }['{{ preschool.preschool_type }}'] || '#2563eb';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">' +
+    '<ellipse cx="16" cy="39" rx="6" ry="3" fill="rgba(0,0,0,0.18)"/>' +
+    '<path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 28 12 28S28 21 28 12C28 5.4 22.6 0 16 0z" fill="' + color + '"/>' +
+    '<circle cx="16" cy="12" r="6" fill="#fff" opacity="0.9"/>' +
+    '</svg>';
+  var icon = L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44] });
+  L.marker([lat, lng], { icon: icon })
+    .addTo(map)
+    .bindPopup('<strong>{{ preschool.name }}</strong>')
+    .openPopup();
+  map.setView([lat, lng], 14);
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+});
+</script>
+{% endif %}
 
 {% endblock %}

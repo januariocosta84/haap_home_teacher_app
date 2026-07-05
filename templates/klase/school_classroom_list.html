@@ -1,4 +1,8 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/klase.css' %}">{% endblock %}
+
 {% block content %}
 
 <div class="d-flex" style="min-height: calc(100vh - 60px);">
@@ -132,20 +136,5 @@
     </div>
 </div>
 
-<style>
-.hover-card {
-    transition: all 0.3s ease;
-}
-
-.hover-card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-2px);
-}
-
-.alert-sm {
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.875rem;
-}
-</style>
 
 {% endblock %}

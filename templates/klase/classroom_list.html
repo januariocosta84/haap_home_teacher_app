@@ -1,66 +1,86 @@
 {% extends 'core/base.html' %}
-    <div class="container mt-4">
+{% load static %}
 
-    <div class="row justify-content-center">
+{% block title %}Sala Aula{% endblock %}
 
-        <div class="col-12 col-md-10 col-lg-8">
+{% block content %}
+<div class="container-fluid py-4">
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="mb-0">📚 My Classrooms</h3>
-            </div>
-
-            <div class="card shadow-sm">
-
-                <div class="card-body p-0">
-
-                    <ul class="list-group list-group-flush">
-{% for preschool in preschools %}
-
-<div class="card mb-2">
-
-    <div class="card-body d-flex justify-content-between align-items-center">
-
-        <div>
-            <h5>{{ preschool.name }}</h5>
+  <!-- ══ HERO ══ -->
+  <div class="haap-hero">
+    <div class="haap-hero-content d-flex align-items-center gap-3">
+      <div class="haap-hero-icon"><i class="bi bi-door-open"></i></div>
+      <div>
+        <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+          Jestaun Sala Aula
         </div>
-
-        <div>
-
-            {% if preschool.id in claimed_ids %}
-
-                <a href="{% url 'preschool_classrooms' preschool.id %}"
-                   class="btn btn-success btn-sm">
-                    Open
-                </a>
-
-            {% else %}
-
-                <form method="post" action="{% url 'claim_preschool' preschool.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-primary btn-sm">
-                        Claim
-                    </button>
-                </form>
-
-            {% endif %}
-
+        <h4 class="fw-bold text-white mb-0">Sala Aula Hau</h4>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+          Haree no jere sala aula iha pre-eskolár ita nian
         </div>
-
+      </div>
     </div>
+  </div>
 
-</div>
-
-{% endfor %}
-
-                    </ul>
-
+  <!-- ══ PRESCHOOL CARDS ══ -->
+  <div class="row g-3">
+    {% for preschool in preschools %}
+    <div class="col-12 col-sm-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100" style="border-radius:16px;transition:all .2s ease;">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-start justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+              <div style="width:44px;height:44px;border-radius:12px;background:#eff6ff;
+                          display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="bi bi-building" style="color:#2563eb;font-size:1.15rem;"></i>
+              </div>
+              <div style="min-width:0;">
+                <div style="font-weight:700;color:#1e293b;font-size:0.9rem;
+                            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  {{ preschool.name }}
                 </div>
-
+                {% if preschool.id in claimed_ids %}
+                  <span style="font-size:0.72rem;font-weight:600;background:#f0fdf4;color:#15803d;
+                               border-radius:20px;padding:1px 8px;display:inline-block;margin-top:3px;">
+                    <i class="bi bi-check-circle-fill me-1"></i>Reklamadu
+                  </span>
+                {% else %}
+                  <span style="font-size:0.72rem;font-weight:600;background:#f8fafc;color:#64748b;
+                               border-radius:20px;padding:1px 8px;display:inline-block;margin-top:3px;">
+                    Disponível
+                  </span>
+                {% endif %}
+              </div>
             </div>
-
+          </div>
+          <div class="mt-3 d-flex gap-2">
+            {% if preschool.id in claimed_ids %}
+              <a href="{% url 'preschool_classrooms' preschool.id %}"
+                 class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
+                <i class="bi bi-door-open me-1"></i>Tama
+              </a>
+            {% else %}
+              <form method="post" action="{% url 'claim_preschool' preschool.id %}" class="flex-grow-1">
+                {% csrf_token %}
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-semibold w-100">
+                  <i class="bi bi-plus-circle me-1"></i>Reklamar
+                </button>
+              </form>
+            {% endif %}
+          </div>
         </div>
-
+      </div>
     </div>
+    {% empty %}
+    <div class="col-12">
+      <div style="text-align:center;padding:4rem 2rem;">
+        <i class="bi bi-building-x" style="font-size:3rem;color:#cbd5e1;display:block;margin-bottom:.75rem;"></i>
+        <div style="font-weight:600;color:#475569;margin-bottom:.3rem;">Laiha pre-eskolár disponível</div>
+        <div style="font-size:0.83rem;color:#94a3b8;">Kontaktu administradór atu selu pre-eskolár.</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 
 </div>
-{% block content % }
+{% endblock %}

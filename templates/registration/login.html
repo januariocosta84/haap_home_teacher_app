@@ -1,72 +1,106 @@
-
 {% extends "./layout.html" %}
-{%block content%}
-   <!-- Background Carousel -->
-   <div id="backgroundCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="/static/img/Background 1_Transport.png" alt="Background 1">
-      </div>
-      <div class="carousel-item">
-        <img src="/static/img/Background 2_Me.png" alt="Background 2">
-      </div>
-      <div class="carousel-item">
-        <img src="/static/img/Background 3_Culture.png" alt="Background 3">
-      </div>
+{% load static %}
+
+{% block title %}HAAP | Login{% endblock %}
+
+{% block content %}
+
+<!-- Full-screen background carousel -->
+<div id="backgroundCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/static/img/Background 1_Transport.png" alt="Background 1">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 2_Me.png" alt="Background 2">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 3_Culture.png" alt="Background 3">
+    </div>
+  </div>
+</div>
+
+<!-- Overlay: column layout — header on top, form area below -->
+<div class="overlay-container">
+
+  <!-- ── Top header bar with logo ── -->
+  <div class="auth-header">
+    <img src="/static/img/logo-ori.png" alt="HAAP Logo">
+    <div>
+      <div class="auth-header-title">HAAP Platform</div>
+      <div class="auth-header-sub">Home Activity Assessment Program</div>
     </div>
   </div>
 
-  <!-- Login Form Overlay -->
-  <div class="overlay-container">
-    <div class="container w-100 pt-3">
-    <div class="login-title d-flex align-items-center">
-        <img src="/static/img/logo-ori.png" alt="Logo" class="logo">
-        <h1>Bemvindo Mai hahu App!</h1>
-    </div>
+  <!-- ── Main area: login card on the right ── -->
+  <div class="auth-body">
     <div class="login-container">
-     
+
+      <!-- Card title (no logo here) -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="login-card-title">Bem-vindo de volta</div>
+        <div class="login-card-sub">Tama ho ita nia numeru no password</div>
+      </div>
+
+      {% include 'dashboard/messaging.html' %}
+
       <form action="{% url 'login' %}" method="POST">
         {% csrf_token %}
-        <div class="form-group">
-          {% include 'dashboard/messaging.html' %}
-          <label for="username" class="label">Numeru Telefone</label>
+
+        <div class="form-group mb-3">
+          <label for="username" class="label">
+            <i class="bi bi-phone me-1 text-primary"></i>Numeru Telefone
+          </label>
           <div class="input-group">
             {{ form.username }}
-            <div class="input-group-append">
-              <span class="input-group-text">
-                <i class="mdi mdi-check-circle-outline"></i>
-              </span>
-            </div>
+            <span class="input-group-text">
+              <i class="bi bi-phone"></i>
+            </span>
           </div>
+          <small id="phone-error" class="text-danger d-none"></small>
         </div>
-        <div class="form-group">
-          <label for="password" class="label">Palavras Passe</label>
+
+        <div class="form-group mb-4">
+          <label for="password" class="label">
+            <i class="bi bi-lock me-1 text-primary"></i>Palavras Passe
+          </label>
           <div class="input-group">
             {{ form.password }}
-            <div class="input-group-append">
-              <span class="input-group-text">
-                <i class="mdi mdi-check-circle-outline"></i>
-              </span>
-            </div>
+            <span class="input-group-text" style="cursor:pointer;" onclick="toggleLoginPassword()">
+              <i class="bi bi-eye" id="loginEyeIcon"></i>
+            </span>
           </div>
         </div>
-        <div class="form-group">
-          <button id="submit-button" style="border: none; background: none; padding: 0;">
-            <img src="/static/img/Button 1_Login.png" alt="Rejistu" style="height: 70px; border: none; outline: none;">
+
+        <div class="form-group mb-2">
+          <button id="submit-button" type="submit" class="login-submit-btn">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Tama / Login
           </button>
         </div>
-        <div class="text-block text-center my-3">
-          <span class="text-small font-weight-semibold" style="color: rgb(115, 99, 92);">Laos Membro ?</span>
-          <a href="{% url 'regist' %}" class="text-black text-small">Rejistu Konta Foun</a>
+
+        <div class="login-link-row">
+          <a href="{% url 'core:forgot_password' %}">
+            <i class="bi bi-key me-1"></i>Haluan Password?
+          </a>
+          <a href="{% url 'core:parent_register' %}">
+            Laos Membro? <strong>Rejistu</strong>
+          </a>
         </div>
-        
-        <div class="text-center">
-          <span class="text-small font-weight-semibold "  style="color: rgb(115, 99, 92);">Haluan Password ?</span>
-          <a href="{% url 'reset_password_sms' %}">Haluan Password?</a>
-        </div>
+
       </form>
     </div>
-  </div>
-{% endblock %}
+  </div><!-- /auth-body -->
 
- 
+</div><!-- /overlay-container -->
+
+<script>
+function toggleLoginPassword() {
+  const f = document.querySelector('[name=password]');
+  const i = document.getElementById('loginEyeIcon');
+  if (!f) return;
+  if (f.type === 'password') { f.type = 'text'; i.classList.replace('bi-eye','bi-eye-slash'); }
+  else { f.type = 'password'; i.classList.replace('bi-eye-slash','bi-eye'); }
+}
+</script>
+
+{% endblock %}

@@ -30,7 +30,7 @@
 
         <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
              id="notif-panel"
-             style="width:340px;border-radius:14px;overflow:hidden;">
+             style="width:clamp(280px,340px,95vw);border-radius:14px;overflow:hidden;">
           <!-- Header -->
           <div class="d-flex align-items-center justify-content-between px-3 py-2"
                style="background:#2563eb;">
@@ -108,9 +108,11 @@
               <i class="bi bi-person"></i> Profile
             </a>
 
+            {% comment %}
             <a href="{% url 'core:update_profile_image' %}" class="dropdown-item modern-item">
               <i class="bi bi-image"></i> Foto
             </a>
+            {% endcomment %}
 
             {% if user.role == "moe_admin" %}
             <a href="#" class="dropdown-item modern-item">

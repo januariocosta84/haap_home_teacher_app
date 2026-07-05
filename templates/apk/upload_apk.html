@@ -1,113 +1,195 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Upload APK Foun{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-  <h3>Upload APK Foun</h3>
-  <p class="text-muted mb-4">
-    Ba APK boot, dalan diak liu mak upload file ba Google Drive, S3, ka storage seluk, depois hatama link iha Download URL.
-    Upload direta bele uza, maibe presiza internet/server suporta file boot.
-  </p>
+<div class="container-fluid py-4">
 
-  <form id="apkUploadForm" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div id="uploadErrors" class="alert alert-danger d-none" role="alert"></div>
-
-    <div class="mb-3">
-      <label class="form-label">Versaun APK</label>
-      {{ form.version_name }}
+  <!-- BACK + HEADER -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'core:apk_list' %}" class="btn btn-outline-secondary rounded-circle p-2 lh-1">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Upload Versaun APK Foun</h4>
+      <p class="text-muted small mb-0">Adisiona versaun foun HAAP Mobile App</p>
     </div>
+  </div>
 
-    <div class="mb-3">
-      <label class="form-label">Upload APK File</label>
-      {{ form.apk_file }}
-      <small class="form-text text-muted">
-        Opcional. Se file boot liu, uza Download URL iha kraik.
-      </small>
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+
+      <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+
+        <!-- CARD HEADER -->
+        <div class="p-4"
+             style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #0ea5e9 100%);">
+          <div class="d-flex align-items-center gap-3 text-white">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 52px; height: 52px; background: rgba(255,255,255,0.2);">
+              <i class="bi bi-android2" style="font-size: 1.6rem;"></i>
+            </div>
+            <div>
+              <div class="fw-bold">HAAP Mobile App</div>
+              <div class="small opacity-75">Android APK — Upload versaun foun</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="card-body p-4">
+
+          <form id="apkUploadForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Error box -->
+            <div id="uploadErrors" class="alert alert-danger rounded-3 d-none" role="alert"></div>
+
+            <!-- Version name -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-tag-fill me-1 text-primary"></i>
+                Versaun APK <span class="text-danger">*</span>
+              </label>
+              {{ form.version_name }}
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>Ezemplu: 1.0.0, 2.3.1
+              </div>
+            </div>
+
+            <!-- File upload -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-file-earmark-arrow-up-fill me-1 text-primary"></i>
+                Upload APK File
+              </label>
+              {{ form.apk_file }}
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Opcional. Ba APK boot liu, uza Download URL iha kraik.
+              </div>
+            </div>
+
+            <!-- Download URL -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-link-45deg me-1 text-primary"></i>
+                Download URL
+              </label>
+              {{ form.download_url }}
+              <div class="rounded-3 mt-2 p-3 small"
+                   style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8;">
+                <i class="bi bi-lightbulb-fill me-1"></i>
+                <strong>Rekomendadu:</strong> Upload APK ba Google Drive ka storage seluk, depois kopia link iha ne'e. Dalan ne'e mak diak liu ba APK boot.
+              </div>
+            </div>
+
+            <!-- Is latest toggle -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                   style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="flex-grow-1">
+                  <div class="fw-semibold small">Marka hanesan Versaun Atual</div>
+                  <div class="text-muted" style="font-size: 0.78rem;">
+                    Versaun ida ne'e mak nebe disponivel ba download ba utilizador sira
+                  </div>
+                </div>
+                <div>
+                  {{ form.is_latest }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress bar (hidden until upload starts) -->
+            <div class="mb-4 d-none" id="progressContainer">
+              <div class="d-flex justify-content-between small text-muted mb-2">
+                <span><i class="bi bi-cloud-upload me-1"></i>Upload hela...</span>
+                <span id="progressPercent" class="fw-semibold">0%</span>
+              </div>
+              <div class="progress rounded-pill" style="height: 8px;">
+                <div id="uploadProgress"
+                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                     role="progressbar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2 pt-2 border-top">
+              <button type="submit" id="submitBtn"
+                      class="btn btn-success rounded-pill px-4 fw-semibold">
+                <i class="bi bi-cloud-upload me-1"></i>Upload APK
+              </button>
+              <a href="{% url 'core:apk_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                Kansela
+              </a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
     </div>
-
-    <div class="mb-3">
-      <label class="form-label">Download URL</label>
-      {{ form.download_url }}
-      <small class="form-text text-muted">
-        Link direta ba APK hosi storage externo. Ida ne'e mak rekomendadu ba APK boot.
-      </small>
-    </div>
-
-    <div class="form-check mb-3">
-      {{ form.is_latest }}
-      <label class="form-check-label ms-1">Ne'e mak versaun foun-liu?</label>
-    </div>
-
-    <!-- ⭐ Progress bar -->
-    <div class="progress mb-3" style="height:25px;">
-      <div id="uploadProgress" class="progress-bar progress-bar-striped progress-bar-animated"
-           role="progressbar" style="width:0%">0%</div>
-    </div>
-
-    <button type="submit" class="btn btn-success">Hatudu / Upload</button>
-    <a href="{% url 'core:apk_list' %}" class="btn btn-secondary">Kansela</a>
-  </form>
+  </div>
 </div>
+
 <script>
-document.getElementById('apkUploadForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+document.getElementById('apkUploadForm').addEventListener('submit', function(e) {
+  e.preventDefault();
 
-    const formData = new FormData(this);
-    const xhr = new XMLHttpRequest();
-    const submitButton = this.querySelector('button[type="submit"]');
-    const progressBar = document.getElementById('uploadProgress');
-    const errorBox = document.getElementById('uploadErrors');
+  const formData   = new FormData(this);
+  const xhr        = new XMLHttpRequest();
+  const submitBtn  = document.getElementById('submitBtn');
+  const bar        = document.getElementById('uploadProgress');
+  const pct        = document.getElementById('progressPercent');
+  const container  = document.getElementById('progressContainer');
+  const errorBox   = document.getElementById('uploadErrors');
 
-    errorBox.classList.add('d-none');
-    errorBox.innerHTML = '';
-    submitButton.disabled = true;
-    submitButton.textContent = 'Upload hela...';
-    progressBar.classList.add('progress-bar-animated');
+  errorBox.classList.add('d-none');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Upload hela...';
+  container.classList.remove('d-none');
 
-    xhr.open('POST', '', true);
+  xhr.open('POST', '', true);
 
-    // Progress bar
-    xhr.upload.addEventListener('progress', function(e) {
-        if (e.lengthComputable) {
-            const percentComplete = Math.round((e.loaded / e.total) * 100);
-            progressBar.style.width = percentComplete + '%';
-            progressBar.textContent = percentComplete + '%';
-        }
-    });
+  xhr.upload.addEventListener('progress', function(ev) {
+    if (ev.lengthComputable) {
+      const p = Math.round((ev.loaded / ev.total) * 100);
+      bar.style.width = p + '%';
+      pct.textContent = p + '%';
+    }
+  });
 
-    // ⭐ AFTER UPLOAD FINISHED
-    xhr.onload = function() {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Hatudu / Upload';
-        progressBar.classList.remove('progress-bar-animated');
+  xhr.onload = function() {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i> Upload APK';
+    bar.classList.remove('progress-bar-animated');
 
-        let response = null;
-        try {
-            response = JSON.parse(xhr.responseText);
-        } catch (error) {
-            response = null;
-        }
+    let response = null;
+    try { response = JSON.parse(xhr.responseText); } catch(_) {}
 
-        if ((xhr.status === 200 || xhr.status === 302) && response && response.success) {
-            window.location.href = "{% url 'core:apk_list' %}";
-            return;
-        }
+    if ((xhr.status === 200 || xhr.status === 302) && response && response.success) {
+      window.location.href = "{% url 'core:apk_list' %}";
+      return;
+    }
 
-        const errors = response && response.errors ? response.errors : { upload: ['Upload la konsege. Haree koneksaun ka tamanho file.'] };
-        errorBox.innerHTML = Object.entries(errors)
-            .map(([field, messages]) => `<div><strong>${field}</strong>: ${messages.join ? messages.join(', ') : messages}</div>`)
-            .join('');
-        errorBox.classList.remove('d-none');
-    };
+    container.classList.add('d-none');
+    const errors = (response && response.errors) || { upload: ['Upload la konsege. Haree koneksaun ka tamanho file.'] };
+    errorBox.innerHTML = Object.entries(errors)
+      .map(([f, msgs]) => `<div><i class="bi bi-exclamation-circle me-1"></i><strong>${f}:</strong> ${Array.isArray(msgs) ? msgs.join(', ') : msgs}</div>`)
+      .join('');
+    errorBox.classList.remove('d-none');
+  };
 
-    xhr.onerror = function() {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Hatudu / Upload';
-        progressBar.classList.remove('progress-bar-animated');
-        errorBox.textContent = 'Upload la konsege. Se APK boot, uza Download URL ka aumenta limite upload iha server.';
-        errorBox.classList.remove('d-none');
-    };
+  xhr.onerror = function() {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i> Upload APK';
+    container.classList.add('d-none');
+    errorBox.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Upload la konsege. Se APK boot, uza Download URL.';
+    errorBox.classList.remove('d-none');
+  };
 
-    xhr.send(formData);
+  xhr.send(formData);
 });
 </script>
-  {% endblock %}
+{% endblock %}

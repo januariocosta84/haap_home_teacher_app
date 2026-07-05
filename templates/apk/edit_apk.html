@@ -1,51 +1,139 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Edita APK {{ apk.version_name }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
 
-  {# ✅ Success / error messages — shows after redirect if "messages.success" is triggered #}
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <!-- BACK + HEADER -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{% url 'core:apk_list' %}" class="btn btn-outline-secondary rounded-circle p-2 lh-1">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <div>
+      <h4 class="fw-bold mb-0">Edita APK</h4>
+      <p class="text-muted small mb-0">Altera detalhe versaun HAAP Mobile App</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-xl-6">
+
+      <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+
+        <!-- CARD HEADER — shows current version info -->
+        <div class="p-4"
+             style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+          <div class="d-flex align-items-center gap-3 text-white">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width: 52px; height: 52px; background: rgba(255,255,255,0.12);">
+              <i class="bi bi-android2" style="font-size: 1.6rem;"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-bold fs-6">HAAP v{{ apk.version_name }}</div>
+              <div class="small opacity-60">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ apk.released_at|date:"d F Y" }}
+              </div>
+            </div>
+            {% if apk.is_latest %}
+            <span class="badge rounded-pill px-3 py-2"
+                  style="background: rgba(34,197,94,0.2); color: #4ade80; font-size: 0.7rem; border: 1px solid rgba(74,222,128,0.3);">
+              <i class="bi bi-check-circle-fill me-1"></i>Versaun Ikus
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- FORM BODY -->
+        <div class="card-body p-4">
+
+          {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle me-1"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          {% endfor %}
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Version name -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-tag-fill me-1 text-primary"></i>
+                Versaun APK <span class="text-danger">*</span>
+              </label>
+              {{ form.version_name }}
+            </div>
+
+            <!-- File upload -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-file-earmark-arrow-up-fill me-1 text-primary"></i>
+                Upload APK File Foun
+              </label>
+              {{ form.apk_file }}
+              {% if apk.apk_file %}
+              <div class="mt-2 p-2 rounded-3 small"
+                   style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;">
+                <i class="bi bi-file-earmark-check-fill me-1"></i>
+                File atual: <strong>{{ apk.apk_file.name|slice:"12:" }}</strong>
+              </div>
+              {% endif %}
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Lao fali hosi ne'e karik ita hakarak troka file.
+              </div>
+            </div>
+
+            <!-- Download URL -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold small">
+                <i class="bi bi-link-45deg me-1 text-primary"></i>
+                Download URL
+              </label>
+              {{ form.download_url }}
+              <div class="form-text mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Link direta ba APK hosi storage externo (Google Drive, etc.)
+              </div>
+            </div>
+
+            <!-- Is latest toggle -->
+            <div class="mb-4">
+              <div class="d-flex align-items-center gap-3 p-3 rounded-3"
+                   style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="flex-grow-1">
+                  <div class="fw-semibold small">Versaun Atual</div>
+                  <div class="text-muted" style="font-size: 0.78rem;">
+                    Marka hanesan versaun foun-liu nebe ativo ba download
+                  </div>
+                </div>
+                <div>
+                  {{ form.is_latest }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2 pt-2 border-top">
+              <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+                <i class="bi bi-check-lg me-1"></i>Rai Mudansa
+              </button>
+              <a href="{% url 'core:apk_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                Kansela
+              </a>
+            </div>
+
+          </form>
+        </div>
       </div>
-    {% endfor %}
-  {% endif %}
 
-  <h3>Altera APK: {{ apk.version_name }}</h3>
-
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <div class="mb-3">
-      <label class="form-label">Versaun APK</label>
-      {{ form.version_name }}
     </div>
-
-    <div class="mb-3">
-      <label class="form-label">Upload APK File</label>
-      {{ form.apk_file }}
-      <small class="form-text text-muted">
-        Opcional. Se file boot liu, uza Download URL iha kraik.
-      </small>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Download URL</label>
-      {{ form.download_url }}
-      <small class="form-text text-muted">
-        Link direta ba APK hosi storage externo. Ida ne'e mak rekomendadu ba APK boot.
-      </small>
-    </div>
-
-    <div class="form-check mb-3">
-      {{ form.is_latest }}
-      <label class="form-check-label ms-1">Ne'e mak versaun foun-liu?</label>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Rai Mudansa</button>
-    <a href="{% url 'core:apk_list' %}" class="btn btn-secondary">Kansela</a>
-  </form>
+  </div>
 </div>
 {% endblock %}

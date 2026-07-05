@@ -4,30 +4,33 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <div class="row justify-content-center">
-    <div class="col-12">
+    <div class="col-12 col-xl-10">
 
-      <div class="card border shadow-sm" style="border-radius: 12px; overflow: hidden;">
+      <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
 
-        <!-- Header: Avatar + Name + Role -->
-        <div class="card-body border-bottom d-flex align-items-center gap-4 flex-wrap">
+        <!-- Cover banner -->
+        <div style="height: 110px; background: linear-gradient(135deg, var(--haap-primary, #2563eb), #1d4ed8);"></div>
 
-          <!-- Avatar / Photo -->
-          <div class="text-center">
+        <!-- Header: Avatar + Name + Role + Actions -->
+        <div class="card-body px-4 pb-4" style="margin-top: -52px;">
+
+          <!-- Avatar / Photo (overlaps the banner on its own) -->
+          <div class="flex-shrink-0">
             {% if user.image %}
               <img src="{{ user.image.url }}"
                    id="previewImg"
                    alt="Foto Perfil"
                    class="rounded-circle"
-                   style="width:100px; height:100px; object-fit:cover; border: 2px solid #e0e0e0;">
+                   style="width:104px; height:104px; object-fit:cover; border: 4px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.12);">
             {% else %}
               <div id="avatarInitials"
-                   class="rounded-circle d-flex align-items-center justify-content-center mx-auto"
-                   style="width:100px; height:100px; background:#E6F1FB; font-size:32px; font-weight:500; color:#185FA5;">
+                   class="rounded-circle d-flex align-items-center justify-content-center"
+                   style="width:104px; height:104px; background:#E6F1FB; font-size:34px; font-weight:600; color:#185FA5; border: 4px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.12);">
                 {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
               </div>
             {% endif %}
 
-            <!-- Hidden file input + Tetum button -->
+            {% comment %} Photo upload disabled: core:update_profile_image route is inactive
             <form method="post" enctype="multipart/form-data" id="photoForm" action="{% url 'core:update_profile_image' %}">
               {% csrf_token %}
               <input type="file"
@@ -43,40 +46,61 @@
                 &#8593; Hili foto
               </button>
             </form>
+            {% endcomment %}
           </div>
 
-          <!-- Name + number + badge -->
-          <div>
-            <h5 class="mb-0 fw-semibold">{{ user.get_full_name|default:user.username }}</h5>
-            <p class="text-muted mb-2" style="font-size:13px;">{{ user.whatsapp_number }}</p>
-            {% if user.is_superuser %}
-              <span class="badge" style="background:#E6F1FB; color:#0C447C; font-weight:500; font-size:11px;">Administrator</span>
-            {% elif user.is_staff %}
-              <span class="badge" style="background:#EAF3DE; color:#27500A; font-weight:500; font-size:11px;">Staff</span>
-            {% else %}
-              <span class="badge" style="background:#F1EFE8; color:#444441; font-weight:500; font-size:11px;">{{ user.get_role_display }}</span>
-            {% endif %}
+          <!-- Name + number + badge + actions (clear of the banner) -->
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mt-3">
+            <div>
+              <h5 class="mb-1 fw-semibold">{{ user.get_full_name|default:user.username }}</h5>
+              <p class="text-muted mb-2 d-flex align-items-center gap-1" style="font-size:13px;">
+                <i class="bi bi-whatsapp"></i> {{ user.whatsapp_number|default:"—" }}
+              </p>
+              {% if user.is_superuser %}
+                <span class="badge" style="background:#E6F1FB; color:#0C447C; font-weight:500; font-size:11px;">Administrator</span>
+              {% elif user.is_staff %}
+                <span class="badge" style="background:#EAF3DE; color:#27500A; font-weight:500; font-size:11px;">Staff</span>
+              {% else %}
+                <span class="badge" style="background:#F1EFE8; color:#444441; font-weight:500; font-size:11px;">{{ user.get_role_display }}</span>
+              {% endif %}
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-2 flex-wrap">
+              <a href="{% url 'core:edit_user' user.id %}" class="btn btn-primary btn-sm px-3">
+                <i class="fas fa-edit me-1"></i> Editar perfil
+              </a>
+              <a href="{% url 'core:change_password' %}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="fas fa-key me-1"></i> Troka password
+              </a>
+            </div>
           </div>
         </div>
+
+        <hr class="m-0">
 
         <!-- Fields -->
-        <div class="card-body px-4 py-0">
-          {% include "partials/_profile_field.html" with label="Naran Kompletu" value=user.get_full_name|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Email" value=user.email|default:"—" %}
-          {% include "partials/_profile_field.html" with label="WhatsApp" value=user.whatsapp_number|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Munisípiu" value=user.municipality|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Loron tama" value=user.date_joined|date:"d M Y"|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Login Ikus" value=user.last_login|date:"d M Y H:i"|default:"—" %}
-        </div>
-
-        <!-- Action buttons -->
-        <div class="card-footer bg-white border-top d-flex gap-2 flex-wrap">
-          <a href="{% url 'core:edit_user' user.id %}" class="btn btn-primary btn-sm px-3">
-            <i class="fas fa-edit me-1"></i> Editar perfil
-          </a>
-          <a href="{% url 'core:change_password' %}" class="btn btn-outline-secondary btn-sm px-3">
-            <i class="fas fa-key me-1"></i> Troka password
-          </a>
+        <div class="card-body px-4 pt-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-person-fill" label="Naran Kompletu" value=user.get_full_name|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-envelope-fill" label="Email" value=user.email|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-whatsapp" label="WhatsApp" value=user.whatsapp_number|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-geo-alt-fill" label="Munisípiu" value=user.municipality|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-calendar-check-fill" label="Loron tama" value=user.date_joined|date:"d M Y"|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-clock-history" label="Login Ikus" value=user.last_login|date:"d M Y H:i"|default:"—" %}
+            </div>
+          </div>
         </div>
 
       </div>

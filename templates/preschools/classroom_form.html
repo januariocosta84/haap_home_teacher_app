@@ -1,76 +1,132 @@
 {% extends "core/base.html" %}
 
 {% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-xl-10">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 p-lg-5" style="background: linear-gradient(135deg, #f7fbff 0%, #eef6ff 100%);">
+          <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+            <div>
+              <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-3">
+                Preparasaun sala aula
+              </span>
+              <h2 class="fw-bold mb-2">
+                {% if object %}
+                  Edita sala aula
+                {% else %}
+                  Kria sala aula foun
+                {% endif %}
+              </h2>
+              <p class="text-muted mb-0">
+                Halo informasaun sala aula klaru, diak, no fasil atu ekipa pre-eskolár bele jere.
+              </p>
+            </div>
 
-<div class="container mt-4">
-
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h3 class="mb-0">
-        {% if object %}
-          ✏️ Edit Classroom
-        {% else %}
-          ➕ Create Classroom
-        {% endif %}
-      </h3>
-      <small class="text-muted">
-        Manage classroom information inside preschool system
-      </small>
-    </div>
-
-    <a href="{% if object %}{% url 'preschools:preschool_detail' id=object.preschool.id %}{% else %}{% url 'preschools:preschool_detail' id=preschool.id %}{% endif %}" class="btn btn-outline-secondary">
-      ← Back to Preschool
-    </a>
-  </div>
-
-  <!-- Form Card -->
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-
-      <form method="post">
-        {% csrf_token %}
-
-        <div class="row">
-
-          <!-- Classroom Name -->
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Classroom Name</label>
-            {{ form.name }}
+            <a href="{% url 'preschools:preschool_detail' id=preschool.id %}"
+               class="btn btn-outline-secondary rounded-pill px-4">
+              <i class="bi bi-arrow-left me-2"></i>Fila ba pre-eskolár
+            </a>
           </div>
+        </div>
+      </div>
 
-          <!-- Group -->
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Group</label>
-            {{ form.group }}
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                  <i class="bi bi-info-circle-fill text-primary"></i>
+                </div>
+                <h5 class="fw-bold mb-0">Saida mak ita bele atualiza</h5>
+              </div>
+
+              <ul class="list-unstyled mb-0">
+                <li class="d-flex gap-2 mb-3">
+                  <span class="text-primary">•</span>
+                  <span>Hatama naran sala aula ne'ebe klaru atu sala ida-idak fasil atu identifika.</span>
+                </li>
+                <li class="d-flex gap-2 mb-3">
+                  <span class="text-primary">•</span>
+                  <span>Atribui profesór no tau sala aula iha grupu idade ne'ebe loos.</span>
+                </li>
+                <li class="d-flex gap-2">
+                  <span class="text-primary">•</span>
+                  <span>Mantein rejistu pre-eskolár organizadu no profesional.</span>
+                </li>
+              </ul>
+            </div>
           </div>
-
-          <!-- Teacher -->
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Assign Teacher</label>
-            {{ form.teacher }}
-          </div>
-
         </div>
 
-        <!-- Buttons -->
-        <div class="d-flex justify-content-end gap-2 mt-3">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-lg-5">
+              <div class="alert alert-light border rounded-3 mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <h6 class="fw-bold mb-1">Pre-eskolár</h6>
+                    <div class="text-muted">
+                      {{ preschool.name }}
+                    </div>
+                  </div>
+                  <span class="badge bg-success rounded-pill px-3 py-2">Prontu atu rai</span>
+                </div>
+              </div>
 
-          <a href="{% if object %}{% url 'preschools:preschool_detail' id=object.preschool.id %}{% else %}{% url 'preschools:preschool_detail' id=preschool.id %}{% endif %}" class="btn btn-light">
-            Cancel
-          </a>
+              <form method="post" class="row g-4">
+                {% csrf_token %}
 
-          <button type="submit" class="btn btn-primary">
-            {% if object %}Update{% else %}Save{% endif %}
-          </button>
+                {% if form.non_field_errors %}
+                  <div class="col-12">
+                    <div class="alert alert-danger rounded-3">
+                      {{ form.non_field_errors }}
+                    </div>
+                  </div>
+                {% endif %}
 
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" for="{{ form.name.id_for_label }}">Naran sala aula</label>
+                  {{ form.name }}
+                  {% if form.name.errors %}
+                    <div class="text-danger small mt-2">{{ form.name.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold" for="{{ form.group.id_for_label }}">Grupu</label>
+                  {{ form.group }}
+                  {% if form.group.errors %}
+                    <div class="text-danger small mt-2">{{ form.group.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-semibold" for="{{ form.teacher.id_for_label }}">Atribui profesór</label>
+                  {{ form.teacher }}
+                  {% if form.teacher.errors %}
+                    <div class="text-danger small mt-2">{{ form.teacher.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="col-12 d-flex justify-content-end gap-2 pt-2">
+                  <a href="{% url 'preschools:preschool_detail' id=preschool.id %}"
+                     class="btn btn-light rounded-pill px-4">
+                    Kansela
+                  </a>
+                  <button type="submit" class="btn btn-primary rounded-pill px-4">
+                    {% if object %}Atualiza sala aula{% else %}Rai sala aula{% endif %}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-
-      </form>
-
+      </div>
     </div>
   </div>
-
 </div>
+
 
 {% endblock %}

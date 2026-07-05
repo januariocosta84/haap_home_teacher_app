@@ -1,147 +1,312 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Lista Parentes{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Table ── */
+#parentTable thead th {
+  background: #f8fafc;
+  font-size: 10.5px; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 2px solid #eef2f7;
+  padding: 0.7rem 1rem; white-space: nowrap; border-top: none;
+}
+#parentTable tbody tr { border-bottom: 1px solid #f8fafc; transition: background .12s; }
+#parentTable tbody tr:hover { background: #f0f6ff; }
+#parentTable tbody td {
+  padding: 0.78rem 1rem;
+  font-size: 0.83rem; color: #334155;
+  vertical-align: middle; border-color: #f1f5f9;
+}
+/* ── Pagination ── */
+.pt-pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .75rem;
+  padding: 0.85rem 1.5rem; border-top: 1px solid #f1f5f9;
+}
+.pt-pagination .page-link {
+  border-radius: 8px !important; margin: 0 1px;
+  border: 1px solid #e2e8f0; color: #374151;
+  font-size: 0.8rem; min-width: 32px; text-align: center;
+  transition: all .15s; padding: 0.3rem 0.6rem;
+}
+.pt-pagination .page-item.active .page-link { background: #2563eb; border-color: #2563eb; color: #fff; }
+.pt-pagination .page-link:hover { background: #eff6ff; border-color: #93c5fd; color: #1d4ed8; }
+.pt-pagination .page-item.disabled .page-link { color: #cbd5e1; background: #f8fafc; }
+/* ── Avatar initials ── */
+.pt-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #eff6ff; color: #2563eb;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Lista Parentes </h2>
-<hr>
+<div class="container-fluid py-4">
 
-<!-- Municipality Filter -->
-<div class="row mb-3">
-  <div class="col-md-4">
-    <form method="GET" class="d-flex align-items-center">
-      <select name="municipality" class="form-select form-select-sm" onchange="this.form.submit()">
-        <option value="">-- Selesiona Munisipiu --</option>
-        {% for municipality in municipalities %}
-          <option value="{{ municipality.id }}" {% if request.GET.municipality|add:"" == municipality.id|add:"" %}selected{% endif %}>
-            {{ municipality.name }}
-          </option>
-        {% endfor %}
-      </select>
-
-      <div class="ms-2 d-flex">
-        {% if request.GET.municipality %}
-          <a href="{% url 'core:parent_list' %}" class="btn btn-outline-secondary btn-sm me-2">Limpa</a>
-        {% endif %}
-
-        {# Export button inline with Limpa; show only to MoE admins #}
+  <!-- ══ HERO ══ -->
+  <div class="haap-hero">
+    <div class="haap-hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="haap-hero-icon"><i class="bi bi-person-hearts"></i></div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Jestaun Utilizadores
+          </div>
+          <h4 class="fw-bold text-white mb-0">Lista Parentes</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Haree no jere inan-aman hotu iha sistema
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <span style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);
+                     border-radius:20px;padding:4px 12px;font-size:0.78rem;font-weight:600;">
+          <i class="bi bi-people me-1"></i>{{ page_obj.paginator.count }} Parentes
+        </span>
         {% if request.user.is_authenticated and request.user.role == 'moe_admin' %}
-          <button type="button"
-                  class="btn btn-danger btn-sm d-flex align-items-center"
-                  id="exportPdfBtn"
-                  data-export-url="{% url 'core:export_parents_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exportConfirmModal">
-            <i class="bi bi-file-earmark-pdf-fill me-1"></i>
-            Descarrega PDF
-          </button>
+        <button type="button"
+                class="btn rounded-pill fw-semibold"
+                style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;"
+                id="exportPdfBtn"
+                data-export-url="{% url 'core:export_parents_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
+                data-bs-toggle="modal"
+                data-bs-target="#exportConfirmModal">
+          <i class="bi bi-file-earmark-pdf-fill me-1"></i>Descarrega PDF
+        </button>
         {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FILTER ══ -->
+  <div class="haap-filter-card">
+    <form method="GET" id="filterForm">
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-md-5">
+          <div class="haap-search-wrap">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" value="{{ request.GET.search }}"
+                   placeholder="Buka naran parentes...">
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <select name="municipality" class="form-select form-select-sm"
+                  style="border-radius:10px;background:#f8fafc;border-color:#e2e8f0;font-size:0.85rem;"
+                  onchange="this.form.submit()">
+            <option value="">Munisípiu hotu</option>
+            {% for municipality in municipalities %}
+              <option value="{{ municipality.id }}"
+                {% if request.GET.municipality|add:"" == municipality.id|add:"" %}selected{% endif %}>
+                {{ municipality.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
+            <i class="bi bi-search me-1"></i>Buka
+          </button>
+          <a href="{% url 'core:parent_list' %}"
+             class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Hamoos filtru">
+            <i class="bi bi-x-lg"></i>
+          </a>
+        </div>
       </div>
     </form>
   </div>
-</div>
-{# Floating export button aligned to the right of the table for emphasis #}
-<a href="#"  class="btn btn-primary">+ Register Parent</a>
-<table class="table mt-3">
-    <thead>
-        <tr>
-            <th>Naran</th>
+
+  <!-- ══ TABLE CARD ══ -->
+  <div class="haap-table-card card">
+
+    <div class="card-header d-flex align-items-center flex-wrap gap-2">
+      <div>
+        <div style="font-weight:600;font-size:0.88rem;color:#1e293b;">Dadus Parentes</div>
+        <div class="haap-section-label" style="margin-top:1px;">
+          {% if page_obj.paginator.count %}
+            Hatudu {{ page_obj.start_index }}–{{ page_obj.end_index }} husi {{ page_obj.paginator.count }} rejistu
+          {% else %}
+            Laiha rejistu
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table mb-0" id="parentTable">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">Parentes</th>
             <th>WhatsApp</th>
-            <th>Email</th>
-            <th>Munisipiu</th>
-            <th>Aksaun</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for parent in page_obj.object_list %}
-        <tr>
-            <td>{{ parent.first_name }} {{ parent.last_name }}</td>
-            <td>{{ parent.whatsapp_number }}</td>
-            <td>{{ parent.email }}</td>
-            <td>{{ parent.municipality }}</td>
-            <td>
-                <a href="#" class="btn btn-sm btn-warning">Editar</a>
-                <a href="#" class="btn btn-sm btn-danger">Eliminar</a>
+            <th class="col-hide-sm">Email</th>
+            <th class="col-hide-md">Munisípiu</th>
+            <th class="text-center" style="padding-right:1.5rem;">Aksaun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for parent in page_obj.object_list %}
+          <tr>
+            <td style="padding-left:1.5rem;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="pt-avatar">
+                  {{ parent.first_name|slice:":1"|upper }}{{ parent.last_name|slice:":1"|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:600;color:#1e293b;font-size:0.85rem;">
+                    {{ parent.first_name }} {{ parent.last_name }}
+                  </div>
+                  <div class="col-hide-sm" style="font-size:0.73rem;color:#94a3b8;">
+                    <i class="bi bi-geo-alt me-1"></i>{{ parent.municipality|default:"—" }}
+                  </div>
+                </div>
+              </div>
             </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="5">No parents found</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+            <td>
+              {% if parent.whatsapp_number %}
+                <span style="font-size:0.82rem;color:#334155;">
+                  <i class="bi bi-whatsapp text-success me-1"></i>{{ parent.whatsapp_number }}
+                </span>
+              {% else %}
+                <span style="color:#cbd5e1;font-size:0.8rem;">—</span>
+              {% endif %}
+            </td>
+            <td class="col-hide-sm">
+              <span style="font-size:0.82rem;color:#475569;">{{ parent.email|default:"—" }}</span>
+            </td>
+            <td class="col-hide-md">
+              <span style="font-size:0.82rem;color:#334155;">{{ parent.municipality|default:"—" }}</span>
+            </td>
+            <td class="text-center" style="padding-right:1.5rem;">
+              <div class="d-flex justify-content-center gap-1">
+                <a href="{% url 'core:edit_user' parent.id %}"
+                   class="haap-act-btn edit" title="Edita"
+                   data-bs-toggle="tooltip" data-bs-placement="top">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'core:confirm_delete_user' parent.id %}"
+                   class="haap-act-btn del" title="Hamos"
+                   data-bs-toggle="tooltip" data-bs-placement="top">
+                  <i class="bi bi-trash3"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="border-0 p-0">
+              <div style="text-align:center;padding:4rem 2rem;">
+                <i class="bi bi-person-x" style="font-size:3rem;color:#cbd5e1;display:block;margin-bottom:.75rem;"></i>
+                <div style="font-weight:600;color:#475569;margin-bottom:.3rem;">Laiha parentes iha sistema</div>
+                <div style="font-size:0.83rem;color:#94a3b8;">
+                  {% if request.GET.search or request.GET.municipality %}
+                    Tenke hamoos filtru atu haree rekord hotu.
+                  {% else %}
+                    Sei laiha parentes rejistadu.
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-<!-- Pagination controls -->
-<nav>
-  <ul class="pagination justify-content-center mt-4">
-    {% if page_obj.has_previous %}
-      <li class="page-item me-2">
-        <a class="page-link" href="?page=1">First</a>
-      </li>
-      <li class="page-item me-2">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled me-2">
-        <span class="page-link">First</span>
-      </li>
-      <li class="page-item disabled me-2">
-        <span class="page-link">Previous</span>
-      </li>
-    {% endif %}
-    
-    <li class="page-item active mx-2">
-      <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-    </li>
-    
-    {% if page_obj.has_next %}
-      <li class="page-item ms-2">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-      </li>
-      <li class="page-item ms-2">
-        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
-      </li>
-    {% else %}
-      <li class="page-item disabled ms-2">
-        <span class="page-link">Next</span>
-      </li>
-      <li class="page-item disabled ms-2">
-        <span class="page-link">Last</span>
-      </li>
-    {% endif %}
-  </ul>
-</nav>
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="pt-pagination">
+      <div class="text-muted" style="font-size:0.78rem;">
+        Pajina <strong>{{ page_obj.number }}</strong> husi <strong>{{ page_obj.paginator.num_pages }}</strong>
+        &nbsp;·&nbsp; {{ page_obj.paginator.count }} rejistu total
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-left"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left"></i></span></li>
+          {% endif %}
 
-{# Export confirmation modal (re-uses page_obj.paginator.count for total) #}
-<div class="modal fade" id="exportConfirmModal" tabindex="-1" aria-labelledby="exportConfirmModalLabel" aria-hidden="true">
+          <li class="page-item active">
+            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+          </li>
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.municipality %}&municipality={{ request.GET.municipality }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-right"></i></span></li>
+          <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-double-right"></i></span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<!-- Export confirmation modal -->
+<div class="modal fade" id="exportConfirmModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exportConfirmModalLabel">Konfirma Export</h5>
+    <div class="modal-content" style="border-radius:16px;border:0;">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Konfirma Export</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Deskarrega PDF hosi lista atual?</p>
-        <p><strong>Total Parentes:</strong> {{ page_obj.paginator.count }}</p>
+        <p style="font-size:0.9rem;color:#475569;">Deskarrega PDF hosi lista atual?</p>
+        <p style="font-size:0.88rem;"><strong>Total Parentes:</strong> {{ page_obj.paginator.count }}</p>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kansela</button>
-        <a id="confirmExportLink" class="btn btn-danger btn-sm" href="#">Descarrega PDF</a>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Kansela</button>
+        <a id="confirmExportLink" class="btn btn-danger rounded-pill px-4 fw-semibold" href="#">
+          <i class="bi bi-file-earmark-pdf-fill me-1"></i>Descarrega PDF
+        </a>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
 {% block extra_js %}
 <script>
-  // Wire the export modal confirm link to the button's data-export-url
-  document.addEventListener('DOMContentLoaded', function () {
-    var exportBtn = document.getElementById('exportPdfBtn');
-    var confirmLink = document.getElementById('confirmExportLink');
-    if (exportBtn && confirmLink) {
-      exportBtn.addEventListener('click', function () {
-        var url = exportBtn.getAttribute('data-export-url');
-        confirmLink.setAttribute('href', url);
-      });
-    }
+document.addEventListener('DOMContentLoaded', function () {
+  var exportBtn = document.getElementById('exportPdfBtn');
+  var confirmLink = document.getElementById('confirmExportLink');
+  if (exportBtn && confirmLink) {
+    exportBtn.addEventListener('click', function () {
+      confirmLink.setAttribute('href', exportBtn.getAttribute('data-export-url'));
+    });
+  }
+  // Tooltips
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+    new bootstrap.Tooltip(el, { trigger: 'hover' });
   });
+});
 </script>
-{% endblock %}
-{# extra_js not needed for inline buttons #}
 {% endblock %}

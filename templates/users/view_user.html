@@ -53,11 +53,23 @@
 
         <!-- User Detail Fields -->
         <div class="card-body px-4 py-0">
-          {% include "partials/_profile_field.html" with label="Naran Kompletu" value=obj.first_name|add:" "|add:obj.last_name %}
-          {% include "partials/_profile_field.html" with label="Email" value=obj.email|default:"—" %}
-          {% include "partials/_profile_field.html" with label="WhatsApp" value=obj.whatsapp_number|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Role" value=obj.get_role_display|default:"—" %}
-          {% include "partials/_profile_field.html" with label="Munisípiu" value=obj.municipality.name|default:"—" %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-person-fill" label="Naran Kompletu" value=obj.first_name|add:" "|add:obj.last_name %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-envelope-fill" label="Email" value=obj.email|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-whatsapp" label="WhatsApp" value=obj.whatsapp_number|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-shield-fill" label="Role" value=obj.get_role_display|default:"—" %}
+            </div>
+            <div class="col-md-6">
+              {% include "partials/_profile_field.html" with icon="bi-geo-alt-fill" label="Munisípiu" value=obj.municipality.name|default:"—" %}
+            </div>
+          </div>
         </div>
 
         <!-- Action Buttons -->

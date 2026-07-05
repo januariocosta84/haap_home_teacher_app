@@ -76,17 +76,17 @@
             Haree rezumu estatístika sistema HAAP.
           </p>
         </div>
-        <div class="col-auto d-none d-md-block">
-          <div class="d-flex gap-3">
+        <div class="col-12 col-md-auto mt-2 mt-md-0">
+          <div class="d-flex flex-wrap gap-2">
             {% if pending_teacher_requests > 0 %}
             <a href="{% url 'preschools:preschool_teacher_requests' %}"
-               class="btn btn-warning fw-semibold rounded-pill px-4">
+               class="btn btn-warning fw-semibold rounded-pill px-3">
               <i class="bi bi-bell-fill me-1"></i>
               {{ pending_teacher_requests }} Pedidu
             </a>
             {% endif %}
             <a href="{% url 'ticket:support-ticket-list' %}"
-               class="btn btn-light fw-semibold rounded-pill px-4"
+               class="btn btn-light fw-semibold rounded-pill px-3"
                style="color: #1d4ed8;">
               <i class="bi bi-ticket-perforated me-1"></i>Tickets
             </a>

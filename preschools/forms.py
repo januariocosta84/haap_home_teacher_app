@@ -170,13 +170,13 @@ class ClassroomForm(forms.ModelForm):
         fields = ['name', 'teacher', 'group']
         widgets = {
             'name': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'form-control form-control-lg',
                 'placeholder': 'Enter classroom name'
             }),
             'teacher': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'form-select form-select-lg'
             }),
             'group': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'form-select form-select-lg'
             }),
         }

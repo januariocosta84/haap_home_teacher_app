@@ -1,8 +1,13 @@
-<div class="d-flex align-items-start py-2 border-bottom">
-  <span class="text-muted" style="font-size:12px; width:140px; flex-shrink:0; padding-top:1px;">
-    {{ label }}
-  </span>
-  <span style="font-size:13px; font-weight:500; color: inherit;">
-    {{ value }}
-  </span>
+<div class="d-flex align-items-center gap-3 p-3 mb-3 h-100" style="background: var(--haap-light-bg, #f8fafc); border: 1px solid var(--haap-border, #e2e8f0); border-radius: 12px;">
+  <div class="row-icon flex-shrink-0" style="background: #eff6ff; color: var(--haap-primary, #2563eb); font-size: 15px;">
+    <i class="bi {{ icon|default:'bi-info-circle' }}"></i>
+  </div>
+  <div style="min-width: 0;">
+    <div class="text-uppercase" style="font-size: 11px; font-weight: 600; letter-spacing: .4px; color: var(--haap-text-secondary, #64748b);">
+      {{ label }}
+    </div>
+    <div style="font-size: 14.5px; font-weight: 600; color: var(--haap-text-primary, #1e293b); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ value }}">
+      {{ value }}
+    </div>
+  </div>
 </div>

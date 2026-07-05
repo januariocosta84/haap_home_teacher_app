@@ -12,7 +12,7 @@ class Classroom(models.Model):
         ('B', 'Grupo B'),
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     preschool = models.ForeignKey(
         Preschool,
@@ -56,7 +56,7 @@ class Classroom(models.Model):
 
 
 class ClassroomChild(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     classroom = models.ForeignKey(
         Classroom,

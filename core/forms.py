@@ -125,8 +125,8 @@ class TeacherRegistrationForm(forms.ModelForm):
     whatsapp_number = forms.CharField(
         validators=[whatsapp_regex],
         max_length=15,
-        label="WhatsApp Number",
-        help_text="Use the WhatsApp number you will login with."
+        label="Numeru whatsapp",
+        help_text="Utiliza numeru whatsapp ne'ebé válidu."
     )
 
     municipality = forms.ModelChoiceField(
@@ -199,19 +199,19 @@ class TeacherRegistrationForm(forms.ModelForm):
 
         # Placeholders
         self.fields['first_name'].widget.attrs.update({
-            'placeholder': 'First Name'
+            'placeholder': 'Naran Primeiru'
         })
         self.fields['last_name'].widget.attrs.update({
-            'placeholder': 'Last Name'
+            'placeholder': 'Apelidu'
         })
         self.fields['address'].widget.attrs.update({
-            'placeholder': 'Address'
+            'placeholder': 'Hela fatin (e.g., Rua, Bairro)'
         })
         self.fields['whatsapp_number'].widget.attrs.update({
             'placeholder': '+67077XXXXXX'
         })
         self.fields['email'].widget.attrs.update({
-            'placeholder': 'Email Address'
+            'placeholder': 'Email (opcional)'
         })
 
         # Dynamic queryset loading

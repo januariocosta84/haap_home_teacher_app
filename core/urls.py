@@ -42,7 +42,7 @@ urlpatterns = [
     path("register/parent/", ParentRegisterView.as_view(), name="parent_register"),
     path("register/teacher/", TeacherRegisterView.as_view(), name="teacher_register"),
     path("dashboard/profile/", profile_view, name="profile"),
-    path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
+    # path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
     path("dashboard/profile/change-password/", change_password, name="change_password"),
 
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),

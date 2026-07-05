@@ -1,109 +1,607 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
-{% block title %}Adisiona Ekipamentu{% endblock %}
+{% block title %}{% if object %}Edita Ekipamentu{% else %}Adisiona Ekipamentu{% endif %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/equipment.css' %}">
+<style>
+/* ══ Section icon ═══════════════════════════════════════════════════════════ */
+.ef-section-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; flex-shrink: 0;
+}
+.ef-section-title { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0 0 2px; }
+.ef-section-sub   { font-size: 0.75rem; color: #94a3b8; margin: 0; }
+
+/* ══ Form card ══════════════════════════════════════════════════════════════ */
+.ef-card {
+  background: #fff; border-radius: 16px; border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);
+  overflow: hidden; margin-bottom: 1.25rem;
+  transition: box-shadow .2s;
+}
+.ef-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+.ef-card-header {
+  padding: 1.25rem 1.5rem 0;
+}
+.ef-card-header-inner {
+  display: flex; align-items: center; gap: 12px;
+  padding-bottom: 1rem; border-bottom: 1px solid #f1f5f9;
+}
+.ef-card-body { padding: 1.25rem 1.5rem 1.5rem; }
+
+/* ══ Labels ═════════════════════════════════════════════════════════════════ */
+.ef-label {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: .055em;
+  text-transform: uppercase; color: #64748b;
+  margin-bottom: 6px; display: block;
+}
+.ef-required { color: #ef4444; margin-left: 1px; }
+
+/* ══ Form controls (targets Django-rendered widgets) ════════════════════════ */
+#equipmentForm .form-control,
+#equipmentForm .form-select {
+  border: 1.5px solid #e2e8f0; border-radius: 10px;
+  padding: 0.575rem 0.875rem; font-size: 0.85rem; color: #1e293b;
+  background: #f8fafc;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  box-shadow: none;
+}
+#equipmentForm .form-control:focus,
+#equipmentForm .form-select:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: #fff; outline: none;
+}
+#equipmentForm .form-control::placeholder { color: #cbd5e1; }
+#equipmentForm textarea.form-control { resize: vertical; min-height: 90px; }
+
+/* Field with left icon */
+.ef-field-wrap { position: relative; }
+.ef-field-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: #94a3b8; font-size: 0.82rem; pointer-events: none; z-index: 2;
+}
+.ef-field-wrap textarea ~ .ef-field-icon,
+.ef-field-wrap .ef-field-icon-top {
+  top: 14px; transform: none;
+}
+.ef-field-wrap .form-control,
+.ef-field-wrap .form-select { padding-left: 2.1rem; }
+
+.ef-help  { font-size: 0.72rem; color: #94a3b8; margin-top: 4px; }
+.ef-error { font-size: 0.72rem; color: #ef4444; margin-top: 5px;
+            display: flex; align-items: center; gap: 5px; }
+.ef-error::before {
+  content: ''; display: inline-block;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: #ef4444; flex-shrink: 0;
+}
+
+/* ══ Type visual card grid ══════════════════════════════════════════════════ */
+.ef-type-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+@media (max-width: 576px) { .ef-type-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.ef-type-card {
+  border: 2px solid #e2e8f0; border-radius: 12px;
+  padding: 14px 8px 12px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  background: #f8fafc; position: relative; user-select: none;
+}
+.ef-type-card:hover { border-color: #93c5fd; background: #eff6ff; }
+.ef-type-card.selected {
+  border-color: #2563eb; background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+.ef-tc-check {
+  position: absolute; top: 5px; right: 5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #2563eb; color: #fff;
+  display: none; align-items: center; justify-content: center;
+  font-size: 0.5rem;
+}
+.ef-type-card.selected .ef-tc-check { display: flex; }
+.ef-tc-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; line-height: 1; }
+.ef-tc-label { font-size: 0.72rem; font-weight: 700; color: #475569; display: block; }
+.ef-type-card.selected .ef-tc-label { color: #1d4ed8; }
+
+/* ══ Status visual grid ═════════════════════════════════════════════════════ */
+.ef-status-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+@media (max-width: 576px) { .ef-status-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.ef-status-opt {
+  border: 2px solid #e2e8f0; border-radius: 10px;
+  padding: 10px 12px; cursor: pointer;
+  transition: border-color .15s, background .15s;
+  background: #f8fafc;
+  display: flex; align-items: center; gap: 8px;
+  user-select: none;
+}
+.ef-status-opt:hover { border-color: #cbd5e1; background: #f1f5f9; }
+.ef-status-opt.selected {
+  border-color: var(--sc);
+  background: var(--sb);
+}
+.ef-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--sc); flex-shrink: 0;
+}
+.ef-status-label { font-size: 0.78rem; font-weight: 700; color: #64748b; }
+.ef-status-opt.selected .ef-status-label { color: var(--sc); }
+
+/* ══ Alert ══════════════════════════════════════════════════════════════════ */
+.ef-alert {
+  border-radius: 12px; padding: 1rem 1.25rem;
+  border: 1px solid #fca5a5; background: #fef2f2;
+  display: flex; gap: 12px; align-items: flex-start; margin-bottom: 1.25rem;
+}
+.ef-alert-icon { color: #ef4444; font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.ef-alert-title { font-weight: 700; color: #991b1b; font-size: 0.85rem; margin-bottom: 3px; }
+.ef-alert-body  { font-size: 0.78rem; color: #b91c1c; }
+
+/* ══ Sidebar ════════════════════════════════════════════════════════════════ */
+.ef-sidebar {
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.03);
+  overflow: hidden; position: sticky; top: 1rem;
+}
+@media (max-width: 1199.98px) { .ef-sidebar { position: static; } }
+
+.ef-sidebar-head {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.35rem 1.5rem; position: relative; overflow: hidden;
+}
+.ef-sidebar-head::before {
+  content: ''; position: absolute; top: -35px; right: -35px;
+  width: 130px; height: 130px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.ef-sidebar-head::after {
+  content: ''; position: absolute; bottom: -50px; left: 30%;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.ef-sidebar-body { padding: 1.25rem 1.5rem; }
+
+/* ══ Submit / cancel buttons ════════════════════════════════════════════════ */
+.ef-btn-primary {
+  width: 100%; border: 0; border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff; font-size: 0.88rem; font-weight: 700;
+  padding: 0.72rem 1.25rem; cursor: pointer;
+  transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 2px 8px rgba(37,99,235,.25);
+  text-decoration: none;
+}
+.ef-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(37,99,235,.35);
+}
+.ef-btn-primary:active { transform: translateY(0); }
+
+.ef-btn-secondary {
+  width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px;
+  background: #f8fafc; color: #64748b; font-size: 0.85rem; font-weight: 600;
+  padding: 0.65rem 1.25rem; cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  text-decoration: none;
+}
+.ef-btn-secondary:hover {
+  background: #f1f5f9; border-color: #cbd5e1; color: #475569;
+  text-decoration: none;
+}
+
+/* ══ Tips ═══════════════════════════════════════════════════════════════════ */
+.ef-tip {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 9px 0; border-bottom: 1px dashed #f1f5f9;
+}
+.ef-tip:last-child { border-bottom: 0; padding-bottom: 0; }
+.ef-tip-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; flex-shrink: 0; margin-top: 1px;
+}
+.ef-tip-text { font-size: 0.78rem; color: #64748b; line-height: 1.45; }
+
+/* ══ Responsive ═════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .ef-card-body { padding: 1rem; }
+  .ef-card-header { padding: 1rem 1rem 0; }
+  .ef-sidebar-body { padding: 1rem; }
+  .ef-sidebar-head { padding: 1.1rem 1rem; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container mt-4">
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="eq-hero mb-4">
+    <div class="eq-hero-content d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-    <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-                Adisiona Ekipamentu
-            </h5>
+      <div class="d-flex align-items-center gap-3">
+        <div class="eq-hero-icon">
+          <i class="bi bi-{% if object %}pencil-square{% else %}plus-lg{% endif %}"></i>
         </div>
-
-        <div class="card-body">
-
-            <form method="POST">
-
-                {% csrf_token %}
-
-                <div class="row">
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.equipment_type.label }}
-                        </label>
-                        {{ form.equipment_type }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.model_number.label }}
-                        </label>
-                        {{ form.model_number }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.serial_number.label }}
-                        </label>
-                        {{ form.serial_number }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.preschool.label }}
-                        </label>
-                        {{ form.preschool }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.classroom.label }}
-                        </label>
-                        {{ form.classroom }}
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">
-                            {{ form.teacher.label }}
-                        </label>
-                        {{ form.teacher }}
-                    </div>
-
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    Rai Ekipamentu
-                </button>
-
-            </form>
-
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">
+            Jestaun Ekipamentu
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-0.3px;">
+            {% if object %}Edita Ekipamentu{% else %}Adisiona Ekipamentu{% endif %}
+          </h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Rejista ekipamentu, atribui ba pre-eskolár, sala aula, ka profesór, no rai status atual
+          </div>
         </div>
+      </div>
 
+      <a href="{% if object %}{% url 'equipment-detail' object.pk %}{% else %}{% url 'equipment-list' %}{% endif %}"
+         style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;
+                padding:7px 18px;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;
+                transition:background .15s;position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;">
+        <i class="bi bi-arrow-left"></i>Fila
+      </a>
     </div>
+  </div>
 
-</div>
+  <!-- ══ ERROR ALERT ════════════════════════════════════════════════════════ -->
+  {% if form.errors %}
+  <div class="ef-alert">
+    <i class="bi bi-exclamation-triangle-fill ef-alert-icon"></i>
+    <div>
+      <div class="ef-alert-title">Favor haree fila fali informasaun</div>
+      <div class="ef-alert-body">{{ form.errors }}</div>
+    </div>
+  </div>
+  {% endif %}
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <form method="POST" novalidate id="equipmentForm">
+    {% csrf_token %}
 
+    <div class="row g-4">
+
+      <!-- ══ MAIN COLUMN ═══════════════════════════════════════════════════ -->
+      <div class="col-xl-8">
+
+        <!-- ── Card 1: Equipment Identity ─────────────────────────────────── -->
+        <div class="ef-card">
+          <div class="ef-card-header">
+            <div class="ef-card-header-inner">
+              <div class="ef-section-icon" style="background:#eff6ff;color:#2563eb;">
+                <i class="bi bi-laptop"></i>
+              </div>
+              <div>
+                <p class="ef-section-title">Identidade Ekipamentu</p>
+                <p class="ef-section-sub">Tipu, modelu, no númeru serial ekipamentu nian</p>
+              </div>
+            </div>
+          </div>
+          <div class="ef-card-body">
+
+            <!-- Equipment type — visual card picker -->
+            <div class="mb-4">
+              <label class="ef-label">Tipu Ekipamentu <span class="ef-required">*</span></label>
+              <div class="ef-type-grid" id="typeGrid">
+                <div class="ef-type-card" data-value="tablet">
+                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
+                  <span class="ef-tc-icon">💻</span>
+                  <span class="ef-tc-label">Tablet</span>
+                </div>
+                <div class="ef-type-card" data-value="projector">
+                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
+                  <span class="ef-tc-icon">📽️</span>
+                  <span class="ef-tc-label">Projector</span>
+                </div>
+                <div class="ef-type-card" data-value="screen">
+                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
+                  <span class="ef-tc-icon">🖥️</span>
+                  <span class="ef-tc-label">Screen</span>
+                </div>
+                <div class="ef-type-card" data-value="adapter">
+                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
+                  <span class="ef-tc-icon">🔌</span>
+                  <span class="ef-tc-label">Adapter</span>
+                </div>
+              </div>
+              <!-- real <select> hidden — value synced via JS -->
+              <div style="display:none;">{{ form.equipment_type }}</div>
+              {% if form.equipment_type.errors %}
+              <div class="ef-error">{{ form.equipment_type.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row g-3">
+
+              <!-- Model number -->
+              <div class="col-md-6">
+                <label class="ef-label" for="{{ form.model_number.id_for_label }}">
+                  Modelu <span class="ef-required">*</span>
+                </label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-tag ef-field-icon"></i>
+                  {{ form.model_number }}
+                </div>
+                {% if form.model_number.errors %}
+                <div class="ef-error">{{ form.model_number.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Serial number -->
+              <div class="col-md-6">
+                <label class="ef-label" for="{{ form.serial_number.id_for_label }}">
+                  Numeru Serial <span class="ef-required">*</span>
+                </label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-upc-scan ef-field-icon"></i>
+                  {{ form.serial_number }}
+                </div>
+                {% if form.serial_number.errors %}
+                <div class="ef-error">{{ form.serial_number.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Card 2: Status ──────────────────────────────────────────────── -->
+        <div class="ef-card">
+          <div class="ef-card-header">
+            <div class="ef-card-header-inner">
+              <div class="ef-section-icon" style="background:#f0fdf4;color:#16a34a;">
+                <i class="bi bi-activity"></i>
+              </div>
+              <div>
+                <p class="ef-section-title">Status Ekipamentu</p>
+                <p class="ef-section-sub">Kondisaun atual ekipamentu nian</p>
+              </div>
+            </div>
+          </div>
+          <div class="ef-card-body">
+            <label class="ef-label">Status <span class="ef-required">*</span></label>
+            <div class="ef-status-grid" id="statusGrid">
+              <div class="ef-status-opt" data-value="active"   style="--sc:#16a34a;--sb:#f0fdf4;">
+                <span class="ef-status-dot"></span>
+                <span class="ef-status-label">Active</span>
+              </div>
+              <div class="ef-status-opt" data-value="inactive" style="--sc:#64748b;--sb:#f1f5f9;">
+                <span class="ef-status-dot"></span>
+                <span class="ef-status-label">Inactive</span>
+              </div>
+              <div class="ef-status-opt" data-value="damaged"  style="--sc:#dc2626;--sb:#fef2f2;">
+                <span class="ef-status-dot"></span>
+                <span class="ef-status-label">Damaged</span>
+              </div>
+              <div class="ef-status-opt" data-value="retired"  style="--sc:#c2410c;--sb:#fff7ed;">
+                <span class="ef-status-dot"></span>
+                <span class="ef-status-label">Retired</span>
+              </div>
+            </div>
+            <!-- real <select> hidden — value synced via JS -->
+            <div style="display:none;">{{ form.status }}</div>
+            {% if form.status.errors %}
+            <div class="ef-error">{{ form.status.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- ── Card 3: Assignment ─────────────────────────────────────────── -->
+        <div class="ef-card">
+          <div class="ef-card-header">
+            <div class="ef-card-header-inner">
+              <div class="ef-section-icon" style="background:#f5f3ff;color:#6d28d9;">
+                <i class="bi bi-geo-alt"></i>
+              </div>
+              <div>
+                <p class="ef-section-title">Atribuisaun</p>
+                <p class="ef-section-sub">Liga ekipamentu ba fatin no utilizadór ne'ebé loos</p>
+              </div>
+            </div>
+          </div>
+          <div class="ef-card-body">
+            <div class="row g-3">
+
+              <!-- Preschool -->
+              <div class="col-md-6">
+                <label class="ef-label" for="{{ form.preschool.id_for_label }}">Pre-Eskolár</label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-building ef-field-icon"></i>
+                  {{ form.preschool }}
+                </div>
+                {% if form.preschool.errors %}
+                <div class="ef-error">{{ form.preschool.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Classroom -->
+              <div class="col-md-6">
+                <label class="ef-label" for="{{ form.classroom.id_for_label }}">Sala Aula</label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-door-open ef-field-icon"></i>
+                  {{ form.classroom }}
+                </div>
+                <div class="ef-help">Sala aula sei muda tuir pre-eskolár ne'ebé hili</div>
+                {% if form.classroom.errors %}
+                <div class="ef-error">{{ form.classroom.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Teacher -->
+              <div class="col-12">
+                <label class="ef-label" for="{{ form.teacher.id_for_label }}">Profesór / Utilizadór</label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-person ef-field-icon"></i>
+                  {{ form.teacher }}
+                </div>
+                {% if form.teacher.errors %}
+                <div class="ef-error">{{ form.teacher.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <!-- Notes -->
+              <div class="col-12">
+                <label class="ef-label" for="{{ form.notes.id_for_label }}">Notas</label>
+                <div class="ef-field-wrap">
+                  <i class="bi bi-pencil-square ef-field-icon" style="top:14px;transform:none;"></i>
+                  {{ form.notes }}
+                </div>
+                {% if form.notes.errors %}
+                <div class="ef-error">{{ form.notes.errors|striptags }}</div>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /col-xl-8 -->
+
+      <!-- ══ SIDEBAR ════════════════════════════════════════════════════════ -->
+      <div class="col-xl-4">
+        <div class="ef-sidebar">
+
+          <!-- Sidebar head -->
+          <div class="ef-sidebar-head">
+            <div style="position:relative;z-index:1;">
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:4px;">
+                Aksa&#245;es
+              </div>
+              <div style="font-size:1rem;font-weight:700;color:#fff;margin-bottom:2px;">
+                {% if object %}Atualiza Ekipamentu{% else %}Rai Ekipamentu{% endif %}
+              </div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,.65);">
+                Konfirma dadus molok rai
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar body -->
+          <div class="ef-sidebar-body">
+
+            <div class="d-grid gap-2 mb-4">
+              <button type="submit" class="ef-btn-primary">
+                <i class="bi bi-{% if object %}pencil-square{% else %}save{% endif %}"></i>
+                {% if object %}Atualiza Ekipamentu{% else %}Rai Ekipamentu{% endif %}
+              </button>
+              <a href="{% if object %}{% url 'equipment-detail' object.pk %}{% else %}{% url 'equipment-list' %}{% endif %}"
+                 class="ef-btn-secondary">
+                <i class="bi bi-x-lg"></i>Kansela
+              </a>
+            </div>
+
+            <div style="height:1px;background:#f1f5f9;margin-bottom:1rem;"></div>
+
+            <div style="font-size:0.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8;margin-bottom:.75rem;">
+              Dika
+            </div>
+
+            <div class="ef-tip">
+              <div class="ef-tip-icon" style="background:#eff6ff;color:#2563eb;">
+                <i class="bi bi-upc-scan"></i>
+              </div>
+              <div class="ef-tip-text">Numeru serial ajuda atu hetan ekipamentu lalais iha sistema.</div>
+            </div>
+            <div class="ef-tip">
+              <div class="ef-tip-icon" style="background:#f0fdf4;color:#16a34a;">
+                <i class="bi bi-building"></i>
+              </div>
+              <div class="ef-tip-text">Hili pre-eskolár uluk atu filtra lista sala aula ne'ebé disponivel.</div>
+            </div>
+            <div class="ef-tip">
+              <div class="ef-tip-icon" style="background:#fffbeb;color:#b45309;">
+                <i class="bi bi-activity"></i>
+              </div>
+              <div class="ef-tip-text">Status hatudu kondisaun ekipamentu — aktiva, inativu, estraga ka retiradu.</div>
+            </div>
+
+          </div>
+        </div>
+      </div><!-- /col-xl-4 -->
+
+    </div><!-- /row -->
+  </form>
+
+</div><!-- /container-fluid -->
+{% endblock %}
+
+{% block extra_js %}
 <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-    document.getElementById('id_preschool').addEventListener('change', function () {
+  /* ── Equipment type card picker ─────────────────────────────────────────── */
+  var typeSelect = document.getElementById('id_equipment_type');
+  var typeCards  = document.querySelectorAll('#typeGrid .ef-type-card');
 
-        const preschoolId = this.value;
-
-        fetch(`/equipment/ajax/load-classrooms/?preschool_id=${preschoolId}`)
-
-            .then(response => response.json())
-
-            .then(data => {
-
-                let classroomSelect = document.getElementById('id_classroom');
-
-                classroomSelect.innerHTML = '<option value="">Hili Sala Aula</option>';
-
-                data.forEach(function (item) {
-
-                    classroomSelect.innerHTML +=
-                        `<option value="${item.id}">${item.name}</option>`;
-                });
-            });
+  function setType(value) {
+    if (typeSelect) typeSelect.value = value;
+    typeCards.forEach(function (card) {
+      card.classList.toggle('selected', card.dataset.value === value);
     });
+  }
 
+  typeCards.forEach(function (card) {
+    card.addEventListener('click', function () { setType(card.dataset.value); });
+  });
+
+  /* Initialise from Django value (edit mode or failed POST resubmit) */
+  if (typeSelect && typeSelect.value) {
+    setType(typeSelect.value);
+  }
+
+  /* ── Status visual picker ───────────────────────────────────────────────── */
+  var statusSelect = document.getElementById('id_status');
+  var statusOpts   = document.querySelectorAll('#statusGrid .ef-status-opt');
+
+  function setStatus(value) {
+    if (statusSelect) statusSelect.value = value;
+    statusOpts.forEach(function (opt) {
+      opt.classList.toggle('selected', opt.dataset.value === value);
+    });
+  }
+
+  statusOpts.forEach(function (opt) {
+    opt.addEventListener('click', function () { setStatus(opt.dataset.value); });
+  });
+
+  /* Initialise — default to 'active' on blank create form */
+  if (statusSelect) {
+    setStatus(statusSelect.value || 'active');
+  }
+
+  /* ── Preschool → classroom AJAX cascade ─────────────────────────────────── */
+  var preschoolField = document.getElementById('id_preschool');
+  var classroomField = document.getElementById('id_classroom');
+
+  if (preschoolField && classroomField) {
+    preschoolField.addEventListener('change', function () {
+      var preschoolId = this.value;
+      classroomField.innerHTML = '<option value="">Hili Sala Aula</option>';
+      if (!preschoolId) return;
+
+      fetch('/equipment/ajax/load-classrooms/?preschool_id=' + preschoolId)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          data.forEach(function (item) {
+            classroomField.insertAdjacentHTML(
+              'beforeend',
+              '<option value="' + item.id + '">' + item.name + '</option>'
+            );
+          });
+        });
+    });
+  }
+
+});
 </script>
-
 {% endblock %}

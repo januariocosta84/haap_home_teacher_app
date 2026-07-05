@@ -185,6 +185,21 @@ class EquipmentAssignmentForm(forms.Form):
         label='Razaun ba Mudansa'
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['action'].initial = 'reassign'
+        self.fields['classroom'].queryset = Classroom.objects.none()
+
+        if 'preschool' in self.data:
+            try:
+                preschool_id = self.data.get('preschool')
+                self.fields['classroom'].queryset = Classroom.objects.filter(
+                    preschool_id=preschool_id
+                )
+            except (ValueError, TypeError):
+                pass
+
     def clean(self):
         cleaned_data = super().clean()
         action = cleaned_data.get('action')

@@ -1,18 +1,78 @@
 {% for log in logs %}
 <tr>
-  <td class="px-3 py-2 text-muted" style="white-space:nowrap;">{{ log.created_at|date:"d MMM Y H:i" }}</td>
-  <td class="px-3 py-2">{{ log.teacher.get_full_name|default:log.teacher.username }}</td>
-  <td class="px-3 py-2">{{ log.preschool.name|default:"-" }}</td>
-  <td class="px-3 py-2">{{ log.theme|default:"-" }}</td>
-  <td class="px-3 py-2">{{ log.sub_theme|default:"-" }}</td>
-  <td class="px-3 py-2">{{ log.activity_name|default:"-" }}</td>
-  <td class="px-3 py-2">{{ log.get_status_display }}</td>
+
+  <!-- Date -->
+  <td style="padding-left:1.25rem;white-space:nowrap;">
+    <div style="font-size:0.82rem;font-weight:600;color:#1e293b;">{{ log.created_at|date:"d M Y" }}</div>
+    <div style="font-size:0.7rem;color:#94a3b8;">{{ log.created_at|date:"H:i" }}</div>
+  </td>
+
+  <!-- Teacher -->
+  <td>
+    <div class="teacher-chip">
+      <div class="teacher-av">
+        {{ log.teacher.first_name|first|upper }}{{ log.teacher.last_name|first|upper }}
+      </div>
+      <span class="teacher-name">{{ log.teacher.get_full_name|default:log.teacher.username }}</span>
+    </div>
+  </td>
+
+  <!-- Preschool -->
+  <td class="col-hide-sm">
+    {% if log.preschool %}
+    <span style="font-size:0.82rem;color:#334155;">{{ log.preschool.name }}</span>
+    {% else %}
+    <span style="color:#cbd5e1;">—</span>
+    {% endif %}
+  </td>
+
+  <!-- Theme -->
+  <td class="col-hide-sm">
+    {% if log.theme %}
+    <span class="theme-pill">{{ log.theme }}</span>
+    {% else %}
+    <span style="color:#cbd5e1;">—</span>
+    {% endif %}
+  </td>
+
+  <!-- Sub-theme -->
+  <td class="col-hide-xs">
+    <span style="font-size:0.78rem;color:#64748b;">{{ log.sub_theme|default:"—" }}</span>
+  </td>
+
+  <!-- Activity (hidden from frontend)
+  <td>
+    <span style="font-size:0.84rem;color:#1e293b;font-weight:500;">{{ log.activity_name|default:"—" }}</span>
+  </td>
+  -->
+
+  <!-- Status (hidden from frontend)
+  <td>
+    {% if log.status == 'success' %}
+      <span class="tl-status tl-success"><i class="bi bi-check-circle-fill" style="font-size:.55rem;"></i>Success</span>
+    {% elif log.status == 'completed' %}
+      <span class="tl-status tl-completed"><i class="bi bi-check2-all" style="font-size:.65rem;"></i>Completed</span>
+    {% elif log.status == 'started' %}
+      <span class="tl-status tl-started"><i class="bi bi-play-circle-fill" style="font-size:.6rem;"></i>Started</span>
+    {% elif log.status == 'pending' %}
+      <span class="tl-status tl-pending"><i class="bi bi-clock-fill" style="font-size:.55rem;"></i>Pending</span>
+    {% elif log.status == 'failed' %}
+      <span class="tl-status tl-failed"><i class="bi bi-x-circle-fill" style="font-size:.55rem;"></i>Failed</span>
+    {% else %}
+      <span class="tl-status tl-pending">{{ log.get_status_display }}</span>
+    {% endif %}
+  </td>
+  -->
+
 </tr>
 {% empty %}
 <tr>
-  <td colspan="7" class="text-center text-muted py-5">
-    <i class="fas fa-inbox fa-2x d-block mb-2 opacity-50"></i>
-    Laiha rejistu atividade.
+  <td colspan="5" class="border-0 p-0">
+    <div style="text-align:center;padding:4rem 2rem;">
+      <i class="bi bi-journal-x" style="font-size:2.8rem;color:#cbd5e1;display:block;margin-bottom:.65rem;"></i>
+      <div style="font-weight:700;color:#475569;margin-bottom:.3rem;">Laiha rejistu atividade</div>
+      <div style="font-size:0.82rem;color:#94a3b8;">Seidauk iha log atividade profesór ne'ebé koresponde ho filtru ne'e.</div>
+    </div>
   </td>
 </tr>
 {% endfor %}

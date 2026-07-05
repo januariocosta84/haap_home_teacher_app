@@ -1,12 +1,11 @@
 from django.contrib import admin
-from django.http import HttpResponse
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from preschools.views import PreschoolListView
-from django.urls import path, include
+from preschools.views import TeacherPreschoolListView
+
 # ----------------------------
 # Import views from modular files
 # ----------------------------
@@ -21,13 +20,6 @@ from core.views.user_management import user_list, add_user, edit_user, delete_us
 from core.views.profile import profile_view
 from core.views.apk import download_apk
 from core.views.ajax_loads import get_children_by_parent, get_parents_by_municipality
-from preschools.views import TeacherPreschoolListView
-
-# project/urls.py
-handler404 = 'haap_app.core.views.custom_404'
-
-
-# project/urls.py
 
 # ----------------------------
 # Root redirect based on user role
@@ -46,10 +38,11 @@ def root_redirect(request):
     else:
         return redirect("login")  # fallback
 
+handler404 = 'core.views.custom_404'
+
 # ----------------------------
 # URL Patterns
 # ----------------------------
-handler404 = 'core.views.custom_404'  # ✅ must be here
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),

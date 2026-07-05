@@ -1,6 +1,7 @@
 from django.views.generic import DetailView, ListView, CreateView, TemplateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
+import json
 
 from core.models import Municipality
 from klase.models import Classroom
@@ -47,6 +48,24 @@ class PreschoolListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['municipalities'] = Municipality.objects.all()
+
+        map_qs = Preschool.objects.select_related('municipality').filter(
+            latitude__isnull=False,
+            longitude__isnull=False
+        )
+        context['map_data_json'] = json.dumps([
+            {
+                'name': p.name,
+                'lat': float(p.latitude),
+                'lng': float(p.longitude),
+                'type': p.preschool_type,
+                'type_display': p.get_preschool_type_display(),
+                'municipality': p.municipality.name if p.municipality else '',
+                'pk': str(p.pk),
+            }
+            for p in map_qs
+        ])
+        context['map_count'] = map_qs.count()
         return context
 
 
@@ -106,11 +125,16 @@ class PreschoolDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['classrooms'] = self.object.classrooms.select_related(
-            'teacher'
-        ).all()
-
+        classrooms = self.object.classrooms.select_related('teacher').all()
+        context['classrooms'] = classrooms
+        from klase.models import ClassroomChild
+        classroom_ids = classrooms.values_list('id', flat=True)
+        context['student_count'] = ClassroomChild.objects.filter(
+            classroom_id__in=classroom_ids
+        ).count()
+        context['approved_teacher_count'] = self.object.teachers.filter(
+            is_approved=True
+        ).count()
         return context
 
 """Claim the preschool as a teacher. This allows the user to manage the preschool's classrooms and students."""
