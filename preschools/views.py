@@ -49,23 +49,25 @@ class PreschoolListView(ListView):
         context = super().get_context_data(**kwargs)
         context['municipalities'] = Municipality.objects.all()
 
-        map_qs = Preschool.objects.select_related('municipality').filter(
-            latitude__isnull=False,
-            longitude__isnull=False
-        )
-        context['map_data_json'] = json.dumps([
-            {
+        all_qs = Preschool.objects.select_related('municipality').order_by('name')
+        map_entries = []
+        for p in all_qs:
+            has_gps = bool(p.latitude and p.longitude)
+            map_entries.append({
                 'name': p.name,
-                'lat': float(p.latitude),
-                'lng': float(p.longitude),
+                'lat': float(p.latitude) if has_gps else None,
+                'lng': float(p.longitude) if has_gps else None,
                 'type': p.preschool_type,
                 'type_display': p.get_preschool_type_display(),
                 'municipality': p.municipality.name if p.municipality else '',
                 'pk': str(p.pk),
-            }
-            for p in map_qs
-        ])
-        context['map_count'] = map_qs.count()
+                'has_gps': has_gps,
+            })
+        context['map_data_json'] = json.dumps(map_entries)
+        context['map_count'] = all_qs.count()
+        context['gps_count'] = all_qs.filter(
+            latitude__isnull=False, longitude__isnull=False
+        ).count()
         return context
 
 

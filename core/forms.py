@@ -627,6 +627,7 @@ class UserRegistrationForm(forms.ModelForm):
             ("teacher", "Teacher"),
             ("parent", "Parent"),
             ("moe_admin", "MoE Admin"),
+            ("moe_auditing", "MoE Auditing"),
         ],
         widget=forms.Select(attrs={"class": "form-select"})
     )
@@ -657,6 +658,9 @@ class UserRegistrationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # whatsapp_number is conditionally required — enforce in clean() instead
+        self.fields["whatsapp_number"].required = False
 
         # Municipality dropdown
         self.fields["municipality"].queryset = Municipality.objects.all()
@@ -708,9 +712,33 @@ class UserRegistrationForm(forms.ModelForm):
                     Aldeia.objects.filter(suco=self.instance.suco)
                 )
 
+    def clean(self):
+        cleaned = super().clean()
+        role = cleaned.get('role')
+        if role == 'moe_auditing':
+            if not cleaned.get('email'):
+                self.add_error('email', 'Email obrigatóriu ba papel MoE Auditing.')
+            if not cleaned.get('password'):
+                self.add_error('password', 'Password obrigatóriu ba papel MoE Auditing.')
+        else:
+            # For all other roles, whatsapp_number is mandatory
+            if not cleaned.get('whatsapp_number'):
+                self.add_error('whatsapp_number', 'Numeru WhatsApp obrigatóriu.')
+        return cleaned
+
     def save(self, commit=True):
+        import uuid as _uuid
         user = super().save(commit=False)
-        user.username = self.cleaned_data["whatsapp_number"]
+        role = self.cleaned_data.get('role', '')
+
+        if role == 'moe_auditing':
+            # Auditing users login with email; whatsapp_number is a unique placeholder
+            placeholder = 'aud' + _uuid.uuid4().hex[:12]
+            user.whatsapp_number = placeholder
+            user.username = placeholder
+            user.is_active = True
+        else:
+            user.username = self.cleaned_data["whatsapp_number"]
 
         if self.cleaned_data.get("password"):
             user.set_password(self.cleaned_data["password"])

@@ -222,3 +222,168 @@
   color: #6c757d; cursor: pointer;
   position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 2;
 }
+
+/* ══ Recovery flow card (forgot-password + verify-otp) ══════════════════════ */
+.rp-card {
+  background: rgba(255,255,255,.97);
+  border-radius: 20px;
+  padding: 2rem 2.25rem 1.75rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,.22);
+  max-width: 420px;
+  width: 100%;
+  animation: rpFadeIn .22s ease;
+}
+@keyframes rpFadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.rp-card-head { text-align:center; margin-bottom:1.5rem; }
+.rp-icon-wrap {
+  width:60px; height:60px; border-radius:16px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1.5rem; color:#fff;
+  margin-bottom:.85rem;
+  box-shadow:0 4px 14px rgba(37,99,235,.3);
+}
+.rp-card-title { font-size:1.05rem; font-weight:700; color:#0f172a; margin-bottom:4px; }
+.rp-card-sub   { font-size:.78rem; color:#64748b; line-height:1.5; margin:0; }
+
+/* Inline alerts */
+.rp-alert {
+  display:flex; align-items:flex-start; gap:9px;
+  border-radius:10px; padding:.7rem .9rem;
+  font-size:.82rem; font-weight:500;
+  margin-bottom:1rem; line-height:1.45;
+}
+.rp-alert i       { font-size:.95rem; flex-shrink:0; margin-top:1px; }
+.rp-alert-error   { background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; }
+.rp-alert-success { background:#f0fdf4; color:#15803d; border:1px solid #86efac; }
+.rp-alert-warning { background:#fffbeb; color:#b45309; border:1px solid #fcd34d; }
+
+/* Field */
+.rp-field { margin-bottom:1.1rem; }
+.rp-label {
+  font-size:.7rem; font-weight:700; letter-spacing:.055em;
+  text-transform:uppercase; color:#64748b;
+  display:block; margin-bottom:5px;
+}
+.rp-input-wrap { position:relative; }
+.rp-input-icon {
+  position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  font-size:.95rem; pointer-events:none; z-index:2;
+}
+.rp-input-wrap .form-control { padding-left:2.2rem; }
+.rp-field-error {
+  font-size:.72rem; color:#ef4444; margin-top:4px;
+  display:flex; align-items:center; gap:4px;
+}
+.rp-field-error::before {
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:#ef4444; display:inline-block; flex-shrink:0;
+}
+
+/* Submit button */
+.rp-btn-primary {
+  width:100%; padding:.7rem;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:#fff; border:0; border-radius:10px;
+  font-size:.9rem; font-weight:700; cursor:pointer;
+  letter-spacing:.01em;
+  box-shadow:0 4px 14px rgba(37,99,235,.3);
+  transition:box-shadow .15s, transform .12s, opacity .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:.9rem;
+}
+.rp-btn-primary:hover:not(:disabled) {
+  box-shadow:0 6px 20px rgba(37,99,235,.4);
+  transform:translateY(-1px);
+}
+.rp-btn-primary:disabled { opacity:.55; cursor:not-allowed; transform:none; }
+
+/* Footer links row */
+.rp-links {
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:6px;
+}
+.rp-links a {
+  font-size:.8rem; color:#2563eb; text-decoration:none;
+  font-weight:500; display:inline-flex; align-items:center; gap:4px;
+  transition:color .12s;
+}
+.rp-links a:hover { color:#1d4ed8; text-decoration:underline; }
+.rp-links a.rp-link-muted { color:#64748b; }
+.rp-links a.rp-link-muted:hover { color:#475569; }
+
+/* ── OTP 6-box input ────────────────────────────────────────────────────── */
+.otp-boxes-wrap { margin-bottom:1.4rem; }
+.otp-boxes {
+  display:flex; gap:9px; justify-content:center; margin-bottom:.5rem;
+}
+.otp-box {
+  width:48px; height:58px;
+  border:2px solid #e2e8f0; border-radius:12px;
+  text-align:center; font-size:1.5rem; font-weight:700; color:#1e293b;
+  background:#f8fafc; outline:none;
+  transition:border-color .15s, box-shadow .15s, background .15s;
+  -moz-appearance:textfield;
+}
+.otp-box::-webkit-outer-spin-button,
+.otp-box::-webkit-inner-spin-button { -webkit-appearance:none; }
+.otp-box:focus {
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  background:#fff;
+}
+.otp-box.otp-filled { border-color:#2563eb; background:#eff6ff; }
+.otp-box.otp-error  { border-color:#ef4444; background:#fef2f2; }
+.otp-hint {
+  font-size:.7rem; color:#94a3b8; text-align:center;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+
+@keyframes rpShake {
+  0%,100% { transform:translateX(0); }
+  20%      { transform:translateX(-5px); }
+  60%      { transform:translateX(5px); }
+}
+.otp-shake { animation:rpShake .3s ease; }
+
+@media (max-width:420px) {
+  .rp-card { padding:1.5rem 1.1rem 1.25rem; border-radius:16px; }
+  .otp-box { width:40px; height:48px; font-size:1.2rem; border-radius:9px; }
+  .otp-boxes { gap:6px; }
+}
+
+/* ── Password field with icon + show/hide toggle (reset-password page) ─── */
+.rp-pw-wrap {
+  position:relative;
+}
+.rp-pw-wrap .form-control {
+  padding-left:2.2rem;
+  padding-right:2.6rem;
+}
+.rp-pw-icon {
+  position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  font-size:.95rem; color:#94a3b8; pointer-events:none; z-index:2;
+}
+.rp-pw-toggle {
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  font-size:.95rem; color:#94a3b8; background:none; border:none;
+  cursor:pointer; padding:0; line-height:1; z-index:2;
+  transition:color .12s;
+}
+.rp-pw-toggle:hover { color:#2563eb; }
+
+/* Password strength bar */
+.pw-strength { margin-top:6px; }
+.pw-strength-track {
+  height:4px; border-radius:4px; background:#e2e8f0; overflow:hidden;
+}
+.pw-strength-bar {
+  height:100%; width:0; border-radius:4px;
+  transition:width .25s, background .25s;
+}
+.pw-strength-label {
+  font-size:.65rem; font-weight:600; margin-top:3px;
+  color:#94a3b8; letter-spacing:.03em; text-transform:uppercase;
+}

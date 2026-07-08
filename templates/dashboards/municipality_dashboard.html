@@ -1,185 +1,702 @@
 {% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Munisípiu — {{ municipality.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Shared patterns (mirrors moe_admin.html) ── */
+.stat-card {
+  border-radius: 16px;
+  border: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+  overflow: hidden;
+  position: relative;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.12) !important;
+}
+.stat-card .card-bg-icon {
+  position: absolute;
+  right: -8px; bottom: -10px;
+  font-size: 5rem;
+  opacity: .08;
+  pointer-events: none;
+}
+.section-label {
+  font-size: .68rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: #94a3b8;
+}
+.th-sm {
+  font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: #64748b; background: #f8fafc !important;
+}
+
+/* ── Tabs ── */
+.mun-tabs .nav-link {
+  font-size: .82rem; font-weight: 600; color: #64748b;
+  border: none; border-bottom: 2px solid transparent;
+  padding: .6rem 1rem; border-radius: 0;
+  transition: color .15s, border-color .15s;
+}
+.mun-tabs .nav-link:hover { color: #1d4ed8; }
+.mun-tabs .nav-link.active {
+  color: #1d4ed8;
+  border-bottom-color: #1d4ed8;
+  background: transparent;
+}
+.mun-tabs { border-bottom: 1px solid #e2e8f0; }
+
+/* ── Avatar initials ── */
+.av {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 700; flex-shrink: 0;
+  user-select: none;
+}
+.av-blue   { background: #dbeafe; color: #1d4ed8; }
+.av-green  { background: #dcfce7; color: #15803d; }
+.av-purple { background: #ede9fe; color: #7c3aed; }
+.av-orange { background: #fff7ed; color: #c2410c; }
+
+/* ── Search box ── */
+.tab-search {
+  border-radius: 10px; border: 1px solid #e2e8f0;
+  font-size: .82rem; padding: .42rem .85rem .42rem 2.2rem;
+  background: #f8fafc; transition: border-color .15s, background .15s;
+}
+.tab-search:focus {
+  border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+  outline: none;
+}
+.tab-search-wrap { position: relative; }
+.tab-search-wrap .bi-search {
+  position: absolute; left: .7rem; top: 50%;
+  transform: translateY(-50%); color: #94a3b8; font-size: .8rem;
+}
+
+/* ── Empty state ── */
+.empty-state { padding: 3rem 1rem; text-align: center; }
+.empty-state i { font-size: 2.5rem; color: #cbd5e1; display: block; margin-bottom: .75rem; }
+.empty-state p { color: #94a3b8; font-size: .85rem; margin: 0; }
+
+/* ── Badge pill ── */
+.age-badge {
+  font-size: .68rem; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; white-space: nowrap;
+}
+.age-a { background: #dbeafe; color: #1d4ed8; }
+.age-b { background: #ede9fe; color: #7c3aed; }
+
+/* ── No result row ── */
+.no-result { display: none; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
+<div class="container-fluid py-4">
 
-  <!-- Header -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card border shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
-        <div class="card-body">
-          <h4 class="fw-semibold mb-1"> Dashboard Munisipiu - {{ municipality.name }}</h4>
-          <p class="text-muted mb-0">
-            Rezumu estatístika ba munisipiu ne'e inklui parentes, formadores no labarik sira.
+  <!-- ═══ HERO HEADER ═══ -->
+  <div class="card border-0 mb-4"
+       style="border-radius:20px;background:linear-gradient(135deg,#0f4c81 0%,#1d4ed8 60%,#0ea5e9 100%);">
+    <div class="card-body p-4 p-md-5">
+      <div class="row align-items-center g-3">
+        <div class="col">
+          <div class="section-label text-white opacity-75 mb-2">
+            <i class="bi bi-building me-1"></i>Dashboard Munisípiu
+          </div>
+          <h3 class="fw-bold text-white mb-1">{{ municipality.name }}</h3>
+          <p class="text-white opacity-75 mb-0 small">
+            <i class="bi bi-person-badge me-1"></i>
+            Bem-vindu, {{ request.user.get_full_name|default:request.user.username }}.
+            Haree rezumu estatístika ba munisípiu ne'e.
           </p>
         </div>
+        <div class="col-auto d-none d-md-block">
+          <div class="rounded-4 d-flex align-items-center justify-content-center"
+               style="width:72px;height:72px;background:rgba(255,255,255,.15);">
+            <i class="bi bi-geo-alt-fill text-white" style="font-size:2rem;"></i>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Stats Cards -->
-  <div class="row g-4">
+  <!-- ═══ STAT CARDS ═══ -->
+  <div class="row g-3 mb-4">
 
-    <!-- Parents -->
-    <div class="col-lg-4 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
-        <div class="card-body d-flex flex-column justify-content-between">
-
-          <div>
-            <h3 class="fw-bold text-success counter" data-target="{{ parents_count }}">0</h3>
-            <p class="text-muted mb-2">Parentes</p>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center">
-            <i class="bi bi-person-hearts text-success" style="font-size:32px;"></i>
-          </div>
-
+    <div class="col-6 col-sm-3">
+      <div class="card stat-card shadow-sm h-100" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">
+        <div class="card-body p-4">
+          <div class="section-label mb-2" style="color:#065f46;">Parentes</div>
+          <h2 class="fw-bold mb-1 counter" data-target="{{ parents_count }}" style="color:#064e3b;">0</h2>
+          <p class="mb-0 small" style="color:#065f46;">Inan-aman / Guardião</p>
         </div>
+        <i class="bi bi-person-hearts card-bg-icon" style="color:#059669;"></i>
       </div>
     </div>
 
-    <!-- Teachers -->
-    <div class="col-lg-4 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
-        <div class="card-body d-flex flex-column justify-content-between">
-
-          <div>
-            <h3 class="fw-bold text-warning counter" data-target="{{ teachers_count }}">0</h3>
-            <p class="text-muted mb-2">Formadores</p>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center">
-            <i class="bi bi-mortarboard-fill text-warning" style="font-size:32px;"></i>
-          </div>
-
+    <div class="col-6 col-sm-3">
+      <div class="card stat-card shadow-sm h-100" style="background:linear-gradient(135deg,#fef3c7,#fde68a);">
+        <div class="card-body p-4">
+          <div class="section-label mb-2" style="color:#78350f;">Formadores</div>
+          <h2 class="fw-bold mb-1 counter" data-target="{{ teachers_count }}" style="color:#451a03;">0</h2>
+          <p class="mb-0 small" style="color:#78350f;">Professores / Mestre</p>
         </div>
+        <i class="bi bi-mortarboard-fill card-bg-icon" style="color:#d97706;"></i>
       </div>
     </div>
 
-    <!-- Children -->
-    <div class="col-lg-4 col-6">
-      <div class="card border shadow-sm h-100 small-box-card" style="border-radius: 12px;">
-        <div class="card-body d-flex flex-column justify-content-between">
-
-          <div>
-            <h3 class="fw-bold text-danger counter" data-target="{{ children_count }}">0</h3>
-            <p class="text-muted mb-2">Labarik sira</p>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center">
-            <i class="bi bi-emoji-smile-fill text-danger" style="font-size:32px;"></i>
-          </div>
-
+    <div class="col-6 col-sm-3">
+      <div class="card stat-card shadow-sm h-100" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);">
+        <div class="card-body p-4">
+          <div class="section-label mb-2" style="color:#4c1d95;">Labarik Sira</div>
+          <h2 class="fw-bold mb-1 counter" data-target="{{ children_count }}" style="color:#2e1065;">0</h2>
+          <p class="mb-0 small" style="color:#4c1d95;">Estudante registadu</p>
         </div>
+        <i class="bi bi-emoji-smile-fill card-bg-icon" style="color:#7c3aed;"></i>
+      </div>
+    </div>
+
+    <div class="col-6 col-sm-3">
+      <div class="card stat-card shadow-sm h-100" style="background:linear-gradient(135deg,#fee2e2,#fecaca);">
+        <div class="card-body p-4">
+          <div class="section-label mb-2" style="color:#7f1d1d;">Atividade</div>
+          <h2 class="fw-bold mb-1 counter" data-target="{{ teacher_logs_count }}" style="color:#450a0a;">0</h2>
+          <p class="mb-0 small" style="color:#7f1d1d;">Rejistus atividade</p>
+        </div>
+        <i class="bi bi-journal-text card-bg-icon" style="color:#dc2626;"></i>
       </div>
     </div>
 
   </div>
 
-  <!-- Tabs -->
-  <div class="card border shadow-sm mt-5" style="border-radius: 12px;">
-    <div class="card-body">
+  <!-- ═══ TAB PANEL ═══ -->
+  <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
 
-      <ul class="nav nav-tabs" id="municipalityTabs" role="tablist">
-        <li class="nav-item">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#parents">Parentes</button>
+    <!-- Tab nav -->
+    <div class="px-4 pt-3">
+      <ul class="nav mun-tabs" id="munTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabParents"
+                  role="tab" aria-selected="true">
+            <i class="bi bi-person-hearts me-1 text-success"></i>
+            Parentes
+            <span class="badge ms-1 rounded-pill" style="background:#dcfce7;color:#15803d;font-size:.68rem;">
+              {{ parents_count }}
+            </span>
+          </button>
         </li>
-        <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#teachers">Formadores</button>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabTeachers"
+                  role="tab" aria-selected="false">
+            <i class="bi bi-mortarboard-fill me-1 text-warning"></i>
+            Formadores
+            <span class="badge ms-1 rounded-pill" style="background:#fef3c7;color:#b45309;font-size:.68rem;">
+              {{ teachers_count }}
+            </span>
+          </button>
         </li>
-        <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#children">Labarik sira</button>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabChildren"
+                  role="tab" aria-selected="false">
+            <i class="bi bi-emoji-smile me-1 text-primary"></i>
+            Labarik Sira
+            <span class="badge ms-1 rounded-pill" style="background:#dbeafe;color:#1d4ed8;font-size:.68rem;">
+              {{ children_count }}
+            </span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabTeacherLogs"
+                  role="tab" aria-selected="false">
+            <i class="bi bi-journal-text me-1 text-danger"></i>
+            Atividade Profesór
+            <span class="badge ms-1 rounded-pill" style="background:#fee2e2;color:#b91c1c;font-size:.68rem;">
+              {{ teacher_logs_count }}
+            </span>
+          </button>
         </li>
       </ul>
+    </div>
 
-      <div class="tab-content mt-3">
+    <div class="tab-content">
 
-        <!-- Parents -->
-        <div class="tab-pane fade show active" id="parents">
-          <ul class="list-group list-group-flush">
-            {% for parent in parents_list %}
-              <li class="list-group-item d-flex justify-content-between">
-                <span>{{ parent.first_name }} {{ parent.last_name }}</span>
-                <small class="text-muted">{{ parent.municipality.name }}</small>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">Parentes la iha munisipiu ne'e.</li>
-            {% endfor %}
-          </ul>
+      <!-- ── PARENTS TAB ── -->
+      <div class="tab-pane fade show active" id="tabParents" role="tabpanel">
+        <div class="p-3 border-bottom" style="background:#fafcff;">
+          <div class="tab-search-wrap" style="max-width:320px;">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control tab-search" id="searchParents"
+                   placeholder="Buka parente..." autocomplete="off">
+          </div>
         </div>
-
-        <!-- Teachers -->
-        <div class="tab-pane fade" id="teachers">
-          <ul class="list-group list-group-flush">
-            {% for teacher in teachers_list %}
-              <li class="list-group-item d-flex justify-content-between">
-                <span>{{ teacher.first_name }} {{ teacher.last_name }}</span>
-                <small class="text-muted">{{ teacher.municipality.name }}</small>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">Formadores la iha munisipiu ne'e.</li>
-            {% endfor %}
-          </ul>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
+            <thead>
+              <tr>
+                <th class="th-sm px-4 py-3" style="width:44px;">#</th>
+                <th class="th-sm px-3 py-3">Naran</th>
+                <th class="th-sm px-3 py-3 d-none d-md-table-cell">WhatsApp</th>
+                <th class="th-sm px-3 py-3 d-none d-sm-table-cell">Oan Sira</th>
+              </tr>
+            </thead>
+            <tbody id="parentsBody">
+              {% for parent in parents_list %}
+              <tr class="parent-row" style="border-top:1px solid #f1f5f9;">
+                <td class="px-4 py-3 text-muted" style="font-size:.75rem;">{{ forloop.counter }}</td>
+                <td class="px-3 py-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="av av-green">
+                      {{ parent.first_name|slice:":1"|upper }}{{ parent.last_name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-semibold" style="line-height:1.2;">
+                        {{ parent.first_name }} {{ parent.last_name }}
+                      </div>
+                      <div class="text-muted d-md-none" style="font-size:.72rem;">
+                        {{ parent.whatsapp_number|default:"—" }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-muted d-none d-md-table-cell" style="font-size:.8rem;">
+                  <i class="bi bi-whatsapp text-success me-1"></i>
+                  {{ parent.whatsapp_number|default:"—" }}
+                </td>
+                <td class="px-3 py-3 d-none d-sm-table-cell">
+                  <span class="badge rounded-pill" style="background:#f1f5f9;color:#475569;font-size:.72rem;">
+                    oan {{ parent.children.count }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="bi bi-person-hearts"></i>
+                    <p>Parentes seidauk iha ba munisípiu {{ municipality.name }}.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              <tr class="no-result" id="noResultParents">
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <p>Parente la hetan. Tenta termu seluk.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- Children -->
-        <div class="tab-pane fade" id="children">
-          <ul class="list-group list-group-flush">
-            {% for child in children_list %}
-              <li class="list-group-item">
-                {{ child.first_name }} {{ child.last_name }}
-                <small class="text-muted d-block">
-                  Parent: {{ child.parent.first_name }} {{ child.parent.last_name }}
-                </small>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">Labarik sira la iha munisipiu ne'e.</li>
-            {% endfor %}
-          </ul>
-        </div>
-
       </div>
 
-    </div>
-  </div>
+      <!-- ── TEACHERS TAB ── -->
+      <div class="tab-pane fade" id="tabTeachers" role="tabpanel">
+        <div class="p-3 border-bottom" style="background:#fafcff;">
+          <div class="tab-search-wrap" style="max-width:320px;">
+            <i class="bi bi-search"></i>
+            <input type="text" class="form-control tab-search" id="searchTeachers"
+                   placeholder="Buka formador..." autocomplete="off">
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
+            <thead>
+              <tr>
+                <th class="th-sm px-4 py-3" style="width:44px;">#</th>
+                <th class="th-sm px-3 py-3">Naran</th>
+                <th class="th-sm px-3 py-3 d-none d-md-table-cell">WhatsApp</th>
+              </tr>
+            </thead>
+            <tbody id="teachersBody">
+              {% for teacher in teachers_list %}
+              <tr class="teacher-row" style="border-top:1px solid #f1f5f9;">
+                <td class="px-4 py-3 text-muted" style="font-size:.75rem;">{{ forloop.counter }}</td>
+                <td class="px-3 py-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="av av-orange">
+                      {{ teacher.first_name|slice:":1"|upper }}{{ teacher.last_name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-semibold" style="line-height:1.2;">
+                        {{ teacher.first_name }} {{ teacher.last_name }}
+                      </div>
+                      <div class="text-muted d-md-none" style="font-size:.72rem;">
+                        {{ teacher.whatsapp_number|default:"—" }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 text-muted d-none d-md-table-cell" style="font-size:.8rem;">
+                  <i class="bi bi-whatsapp text-success me-1"></i>
+                  {{ teacher.whatsapp_number|default:"—" }}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3">
+                  <div class="empty-state">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <p>Formadores seidauk iha ba munisípiu {{ municipality.name }}.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              <tr class="no-result" id="noResultTeachers">
+                <td colspan="3">
+                  <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <p>Formador la hetan. Tenta termu seluk.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── CHILDREN TAB ── -->
+      <div class="tab-pane fade" id="tabChildren" role="tabpanel">
+        <div class="p-3 border-bottom" style="background:#fafcff;">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="tab-search-wrap flex-grow-1" style="max-width:320px;">
+              <i class="bi bi-search"></i>
+              <input type="text" class="form-control tab-search" id="searchChildren"
+                     placeholder="Buka labarik..." autocomplete="off">
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm rounded-pill px-3 age-filter active-filter"
+                      data-filter="all"
+                      style="font-size:.75rem;background:#f1f5f9;color:#475569;border:none;">
+                Hotu
+              </button>
+              <button class="btn btn-sm rounded-pill px-3 age-filter"
+                      data-filter="A"
+                      style="font-size:.75rem;background:#dbeafe;color:#1d4ed8;border:none;">
+                Grupo A (3-4)
+              </button>
+              <button class="btn btn-sm rounded-pill px-3 age-filter"
+                      data-filter="B"
+                      style="font-size:.75rem;background:#ede9fe;color:#7c3aed;border:none;">
+                Grupo B (5-6)
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
+            <thead>
+              <tr>
+                <th class="th-sm px-4 py-3" style="width:44px;">#</th>
+                <th class="th-sm px-3 py-3">Naran Labarik</th>
+                <th class="th-sm px-3 py-3 d-none d-sm-table-cell">Grupo</th>
+                <th class="th-sm px-3 py-3 d-none d-md-table-cell">Tinan Moris</th>
+                <th class="th-sm px-3 py-3 d-none d-lg-table-cell">Parente</th>
+              </tr>
+            </thead>
+            <tbody id="childrenBody">
+              {% for child in children_list %}
+              <tr class="child-row" data-age-group="{{ child.age_group }}" style="border-top:1px solid #f1f5f9;">
+                <td class="px-4 py-3 text-muted" style="font-size:.75rem;">{{ forloop.counter }}</td>
+                <td class="px-3 py-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="av av-purple">
+                      {{ child.first_name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-semibold" style="line-height:1.2;">{{ child.first_name }}</div>
+                      <div class="d-sm-none mt-1">
+                        <span class="age-badge {% if child.age_group == 'A' %}age-a{% else %}age-b{% endif %}">
+                          {{ child.get_age_group_display }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 d-none d-sm-table-cell">
+                  <span class="age-badge {% if child.age_group == 'A' %}age-a{% else %}age-b{% endif %}">
+                    {{ child.get_age_group_display }}
+                  </span>
+                </td>
+                <td class="px-3 py-3 text-muted d-none d-md-table-cell" style="font-size:.8rem;">
+                  {{ child.year_of_birth }}
+                  <span class="text-muted" style="font-size:.72rem;">(tinan {{ child.age }})</span>
+                </td>
+                <td class="px-3 py-3 d-none d-lg-table-cell">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="av av-green" style="width:26px;height:26px;font-size:.62rem;">
+                      {{ child.parent.first_name|slice:":1"|upper }}{{ child.parent.last_name|slice:":1"|upper }}
+                    </div>
+                    <span class="text-muted" style="font-size:.8rem;">
+                      {{ child.parent.first_name }} {{ child.parent.last_name }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <i class="bi bi-emoji-smile-fill"></i>
+                    <p>Labarik sira seidauk iha ba munisípiu {{ municipality.name }}.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              <tr class="no-result" id="noResultChildren">
+                <td colspan="5">
+                  <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <p>Labarik la hetan. Tenta termu seluk.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── TEACHER ACTIVITY TAB ── -->
+      <div class="tab-pane fade" id="tabTeacherLogs" role="tabpanel">
+        <div class="p-3 border-bottom" style="background:#fafcff;">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="tab-search-wrap flex-grow-1" style="max-width:320px;">
+              <i class="bi bi-search"></i>
+              <input type="text" class="form-control tab-search" id="searchLogs"
+                     placeholder="Buka atividade..." autocomplete="off">
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              {% for val, label in log_status_choices %}
+              <button class="btn btn-sm rounded-pill px-3 log-status-filter"
+                      data-status="{{ val }}"
+                      style="font-size:.72rem;border:1px solid #e2e8f0;background:#f8fafc;color:#475569;">
+                {{ label }}
+              </button>
+              {% endfor %}
+              <button class="btn btn-sm rounded-pill px-3 log-status-filter active-filter"
+                      data-status="all"
+                      style="font-size:.72rem;border:1px solid #e2e8f0;background:#1d4ed8;color:#fff;">
+                Hotu
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.85rem;">
+            <thead>
+              <tr>
+                <th class="th-sm px-4 py-3">Profesór</th>
+                <th class="th-sm px-3 py-3 d-none d-sm-table-cell">Pre-Eskola</th>
+                <th class="th-sm px-3 py-3 d-none d-md-table-cell">Tema</th>
+                <th class="th-sm px-3 py-3 d-none d-lg-table-cell">Atividade</th>
+                <th class="th-sm px-3 py-3">Status</th>
+                <th class="th-sm px-3 py-3 d-none d-sm-table-cell">Data</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody">
+              {% for log in teacher_logs %}
+              <tr class="log-row" data-status="{{ log.status }}" style="border-top:1px solid #f1f5f9;">
+                <td class="px-4 py-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="av av-orange">
+                      {{ log.teacher.first_name|slice:":1"|upper }}{{ log.teacher.last_name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                      <div class="fw-semibold" style="line-height:1.2;">
+                        {{ log.teacher.first_name }} {{ log.teacher.last_name }}
+                      </div>
+                      <div class="text-muted d-sm-none" style="font-size:.72rem;">
+                        {{ log.preschool.name|default:"—" }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3 py-3 d-none d-sm-table-cell" style="font-size:.8rem;">
+                  <i class="bi bi-building me-1 text-muted"></i>
+                  {{ log.preschool.name|default:"—" }}
+                </td>
+                <td class="px-3 py-3 d-none d-md-table-cell" style="font-size:.8rem;">
+                  <div class="fw-semibold">{{ log.theme|default:"—" }}</div>
+                  {% if log.sub_theme %}
+                  <div class="text-muted" style="font-size:.72rem;">{{ log.sub_theme }}</div>
+                  {% endif %}
+                </td>
+                <td class="px-3 py-3 d-none d-lg-table-cell text-muted" style="font-size:.8rem;">
+                  {{ log.activity_name|default:"—"|truncatechars:40 }}
+                </td>
+                <td class="px-3 py-3">
+                  {% if log.status == 'completed' %}
+                    <span class="badge rounded-pill px-2" style="background:#dcfce7;color:#15803d;font-size:.7rem;">
+                      <i class="bi bi-check-circle-fill me-1"></i>{{ log.get_status_display }}
+                    </span>
+                  {% elif log.status == 'started' %}
+                    <span class="badge rounded-pill px-2" style="background:#dbeafe;color:#1d4ed8;font-size:.7rem;">
+                      <i class="bi bi-play-circle-fill me-1"></i>{{ log.get_status_display }}
+                    </span>
+                  {% elif log.status == 'pending' %}
+                    <span class="badge rounded-pill px-2" style="background:#fef3c7;color:#b45309;font-size:.7rem;">
+                      <i class="bi bi-hourglass-split me-1"></i>{{ log.get_status_display }}
+                    </span>
+                  {% elif log.status == 'failed' %}
+                    <span class="badge rounded-pill px-2" style="background:#fee2e2;color:#b91c1c;font-size:.7rem;">
+                      <i class="bi bi-x-circle-fill me-1"></i>{{ log.get_status_display }}
+                    </span>
+                  {% else %}
+                    <span class="badge rounded-pill px-2" style="background:#f1f5f9;color:#475569;font-size:.7rem;">
+                      {{ log.get_status_display }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="px-3 py-3 text-muted d-none d-sm-table-cell" style="font-size:.78rem;white-space:nowrap;">
+                  <i class="bi bi-calendar3 me-1"></i>{{ log.activity_date|date:"d/m/Y" }}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <i class="bi bi-journal-text"></i>
+                    <p>Seidauk iha atividade profesór ba munisípiu {{ municipality.name }}.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+              <tr class="no-result" id="noResultLogs">
+                <td colspan="6">
+                  <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <p>Atividade la hetan. Tenta termu seluk.</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+  </div><!-- /card -->
 
 </div>
+{% endblock %}
 
-<!-- Counter Script (same as your main dashboard) -->
+{% block extra_js %}
 <script>
-  function animateCounter(counter) {
-    const target = parseInt(counter.getAttribute("data-target")) || 0;
-    const duration = 1200;
-    const frameRate = 60;
-    const totalFrames = Math.round(duration / (1000 / frameRate));
-    let currentFrame = 0;
-
-    const updateCounter = () => {
-      currentFrame++;
-      const progress = currentFrame / totalFrames;
-      const eased = progress < 1 ? (-Math.pow(2, -10 * progress) + 1) : 1;
-
-      counter.textContent = Math.round(target * eased);
-
-      if (currentFrame < totalFrames) {
-        requestAnimationFrame(updateCounter);
-      }
-    };
-
-    updateCounter();
+/* ── Animated counters ── */
+(function () {
+  function animateCounter(el) {
+    var target = parseInt(el.getAttribute('data-target')) || 0;
+    var duration = 1200, fps = 60;
+    var frames = Math.round(duration / (1000 / fps));
+    var frame = 0;
+    (function tick() {
+      frame++;
+      var p = frame / frames;
+      var eased = p < 1 ? 1 - Math.pow(2, -10 * p) : 1;
+      el.textContent = Math.round(target * eased);
+      if (frame < frames) requestAnimationFrame(tick);
+    })();
   }
-
-  const counters = document.querySelectorAll(".counter");
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !entry.target.classList.contains("counted")) {
-        animateCounter(entry.target);
-        entry.target.classList.add("counted");
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting && !e.target.classList.contains('counted')) {
+        animateCounter(e.target);
+        e.target.classList.add('counted');
       }
     });
   }, { threshold: 0.3 });
+  document.querySelectorAll('.counter').forEach(function (el) { io.observe(el); });
+})();
 
-  counters.forEach(counter => observer.observe(counter));
+/* ── Tab search ── */
+function makeSearch(inputId, rowClass, noResultId) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('input', function () {
+    var q = this.value.trim().toLowerCase();
+    var rows = document.querySelectorAll('.' + rowClass);
+    var visible = 0;
+    rows.forEach(function (row) {
+      var match = row.textContent.toLowerCase().includes(q);
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var noResult = document.getElementById(noResultId);
+    if (noResult) noResult.style.display = visible === 0 ? '' : 'none';
+  });
+}
+
+makeSearch('searchParents',  'parent-row',  'noResultParents');
+makeSearch('searchTeachers', 'teacher-row', 'noResultTeachers');
+makeSearch('searchChildren', 'child-row',   'noResultChildren');
+makeSearch('searchLogs',     'log-row',     'noResultLogs');
+
+/* ── Status filter (teacher logs tab) ── */
+(function () {
+  var activeStatus = 'all';
+  document.querySelectorAll('.log-status-filter').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      activeStatus = this.getAttribute('data-status');
+      document.querySelectorAll('.log-status-filter').forEach(function (b) {
+        b.style.background = '#f8fafc';
+        b.style.color      = '#475569';
+      });
+      this.style.background = '#1d4ed8';
+      this.style.color      = '#fff';
+      applyLogFilters();
+    });
+  });
+
+  function applyLogFilters() {
+    var q = (document.getElementById('searchLogs').value || '').trim().toLowerCase();
+    var rows = document.querySelectorAll('.log-row');
+    var visible = 0;
+    rows.forEach(function (row) {
+      var statusMatch = activeStatus === 'all' || row.getAttribute('data-status') === activeStatus;
+      var textMatch   = !q || row.textContent.toLowerCase().includes(q);
+      var show = statusMatch && textMatch;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    var noResult = document.getElementById('noResultLogs');
+    if (noResult) noResult.style.display = visible === 0 ? '' : 'none';
+  }
+
+  // Override text search for logs to also respect status filter
+  var logInput = document.getElementById('searchLogs');
+  if (logInput) logInput.addEventListener('input', applyLogFilters);
+})();
+
+/* ── Age group filter (children tab) ── */
+(function () {
+  document.querySelectorAll('.age-filter').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.age-filter').forEach(function (b) {
+        b.classList.remove('active-filter');
+        b.style.outline = '';
+      });
+      this.classList.add('active-filter');
+      this.style.outline = '2px solid currentColor';
+
+      var filter = this.getAttribute('data-filter');
+      var rows = document.querySelectorAll('.child-row');
+      var visible = 0;
+      rows.forEach(function (row) {
+        var show = filter === 'all' || row.getAttribute('data-age-group') === filter;
+        // also respect search
+        var q = document.getElementById('searchChildren').value.trim().toLowerCase();
+        if (q && !row.textContent.toLowerCase().includes(q)) show = false;
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      var noResult = document.getElementById('noResultChildren');
+      if (noResult) noResult.style.display = visible === 0 ? '' : 'none';
+    });
+  });
+})();
 </script>
-
 {% endblock %}

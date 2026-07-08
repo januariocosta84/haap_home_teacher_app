@@ -8,6 +8,16 @@ from core.views.analytics_api import trend_data_api, summary_stats_api, get_muni
 from core.views.parents import verify_register_otp
 from core.views.send import send_whatsapp
 from core.views.user_management import forgot_password, reset_password, verify_otp
+from core.views.apk import (
+    apk_notif_count, apk_notif_list,
+    apk_notif_mark_read, apk_notif_mark_all_read,
+    delete_apk,
+)
+from core.views.audit import audit_list, audit_detail, audit_export
+from core.views.auditing_portal import (
+    auditing_login, auditing_logout,
+    auditing_dashboard, auditing_logs, auditing_log_detail, auditing_export,
+)
 
 app_name = "core"
 
@@ -42,7 +52,7 @@ urlpatterns = [
     path("register/parent/", ParentRegisterView.as_view(), name="parent_register"),
     path("register/teacher/", TeacherRegisterView.as_view(), name="teacher_register"),
     path("dashboard/profile/", profile_view, name="profile"),
-    # path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
+    path("dashboard/profile/update-image/", update_profile_image, name="update_profile_image"),
     path("dashboard/profile/change-password/", change_password, name="change_password"),
 
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),
@@ -52,6 +62,7 @@ urlpatterns = [
     path('dashboard/apk/', apk_list, name='apk_list'),
     path('dashboard/apk/upload/', upload_apk, name='upload_apk'),
     path('dashboard/apk/<uuid:apk_id>/edit/', edit_apk, name='edit_apk'),
+    path('dashboard/apk/<uuid:apk_id>/delete/', delete_apk, name='delete_apk'),
 
     path('check-whatsapp-number/', check_whatsapp_number, name='check_whatsapp_number'),
     path("ajax/load-administrative-posts/",load_administrative_posts, name="ajax_load_admin_posts"),
@@ -91,4 +102,23 @@ urlpatterns = [
     verify_register_otp,
     name='verify_register_otp'
 ),
+
+    # System Audit Log (moe_admin only)
+    path('dashboard/audit/', audit_list, name='audit_list'),
+    path('dashboard/audit/<uuid:log_id>/detail/', audit_detail, name='audit_detail'),
+    path('dashboard/audit/export/', audit_export, name='audit_export'),
+
+    # Auditing Portal (moe_auditing role only — email login)
+    path('auditing/login/',  auditing_login,     name='auditing_login'),
+    path('auditing/logout/', auditing_logout,    name='auditing_logout'),
+    path('auditing/',        auditing_dashboard, name='auditing_dashboard'),
+    path('auditing/logs/',   auditing_logs,      name='auditing_logs'),
+    path('auditing/<uuid:log_id>/detail/', auditing_log_detail, name='auditing_log_detail'),
+    path('auditing/export/', auditing_export,    name='auditing_export'),
+
+    # Parent APK notification API
+    path('apk-notifications/count/', apk_notif_count, name='apk_notif_count'),
+    path('apk-notifications/', apk_notif_list, name='apk_notif_list'),
+    path('apk-notifications/<uuid:notif_id>/read/', apk_notif_mark_read, name='apk_notif_mark_read'),
+    path('apk-notifications/read-all/', apk_notif_mark_all_read, name='apk_notif_mark_all_read'),
 ]

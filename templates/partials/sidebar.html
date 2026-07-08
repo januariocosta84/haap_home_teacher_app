@@ -24,6 +24,24 @@
     </a>
   </div>
 
+  <!-- ── User profile strip ── -->
+  <div class="sb-user-strip">
+    <div class="sb-avatar-initials">
+      {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+    </div>
+    <div style="min-width:0;flex:1;">
+      <div class="sb-user-name">{{ user.get_full_name|default:user.username }}</div>
+      <span class="sb-user-role sb-role-{{ user.role }}">
+        {% if user.role == "moe_admin" %}MoE Admin
+        {% elif user.role == "parent" %}Parente
+        {% elif user.role == "municipality_analyst" %}Analista
+        {% elif user.role == "teacher" %}Profesór
+        {% else %}{{ user.role }}
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
   <!-- ── Sidebar Wrapper ── -->
   <div class="sidebar-wrapper">
     <nav class="mt-2">
@@ -43,6 +61,9 @@
               <p>Dashboard</p>
             </a>
           </li>
+
+          <hr class="sb-sep">
+          <li class="nav-header">Gestão</li>
 
           <!-- Users group -->
           <li class="nav-item {% if '/dashboard/users' in request.path or url_name == 'register_user' or url_name == 'view_user' or url_name == 'edit_user' %}menu-open{% endif %}">
@@ -87,6 +108,15 @@
             </ul>
           </li>
 
+          <!-- Preschools -->
+          <li class="nav-item">
+            <a href="{% url 'preschools:preschool_list' %}"
+               class="nav-link {% if ns == 'preschools' and url_name != 'preschool_list_claim' %}active{% endif %}">
+              <i class="nav-icon bi bi-buildings"></i>
+              <p>Pre-Eskolares</p>
+            </a>
+          </li>
+
           <!-- Equipment group -->
           <li class="nav-item {% if '/equipment' in request.path %}menu-open{% endif %}">
             <a href="#"
@@ -112,6 +142,15 @@
             </ul>
           </li>
 
+          <!-- APK -->
+          <li class="nav-item">
+            <a href="{% url 'core:apk_list' %}"
+               class="nav-link {% if url_name == 'apk_list' or url_name == 'upload_apk' or url_name == 'edit_apk' %}active{% endif %}">
+              <i class="nav-icon bi bi-android2"></i>
+              <p>Versoes APK</p>
+            </a>
+          </li>
+
           <!-- Tickets group -->
           <li class="nav-item {% if ns == 'ticket' %}menu-open{% endif %}">
             <a href="#"
@@ -128,24 +167,6 @@
                 </a>
               </li>
             </ul>
-          </li>
-
-          <!-- APK -->
-          <li class="nav-item">
-            <a href="{% url 'core:apk_list' %}"
-               class="nav-link {% if url_name == 'apk_list' or url_name == 'upload_apk' or url_name == 'edit_apk' %}active{% endif %}">
-              <i class="nav-icon bi bi-android2"></i>
-              <p>Versoes APK</p>
-            </a>
-          </li>
-
-          <!-- Preschools -->
-          <li class="nav-item">
-            <a href="{% url 'preschools:preschool_list' %}"
-               class="nav-link {% if ns == 'preschools' and url_name != 'preschool_list_claim' %}active{% endif %}">
-              <i class="nav-icon bi bi-buildings"></i>
-              <p>Pre-Eskolares</p>
-            </a>
           </li>
 
           <hr class="sb-sep">
@@ -190,6 +211,10 @@
               <p>Hau nia Oan</p>
             </a>
           </li>
+
+          <hr class="sb-sep">
+          <li class="nav-header">App</li>
+
           <li class="nav-item">
             <a href="{% url 'core:latest_apk' %}"
                class="nav-link {% if url_name == 'latest_apk' %}active{% endif %}">
@@ -197,8 +222,8 @@
               <p>
                 Download HAAP
                 {% if versions %}
-                <span class="badge ms-1 rounded-pill"
-                      style="background:rgba(239,68,68,0.8);color:#fff;font-size:0.65rem;">Foun</span>
+                <span class="badge ms-auto rounded-pill"
+                      style="background:rgba(239,68,68,0.85);color:#fff;font-size:0.6rem;padding:2px 6px;">Foun</span>
                 {% endif %}
               </p>
             </a>
@@ -214,11 +239,22 @@
               <p>Dashboard</p>
             </a>
           </li>
+
+          <hr class="sb-sep">
+          <li class="nav-header">Relatórios</li>
+
+          <li class="nav-item">
+            <a href="{% url 'core:teacher_logs' %}"
+               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+              <i class="nav-icon bi bi-journal-text"></i>
+              <p>Atividade Profesór</p>
+            </a>
+          </li>
           <li class="nav-item">
             <a href="{% url 'core:logs' %}"
                class="nav-link {% if url_name == 'logs' %}active{% endif %}">
               <i class="nav-icon bi bi-activity"></i>
-              <p>Atividades</p>
+              <p>Atividades Alunos</p>
             </a>
           </li>
 
@@ -240,7 +276,9 @@
             </a>
           </li>
 
-          <!-- Tickets group for teacher -->
+          <hr class="sb-sep">
+          <li class="nav-header">Suporte</li>
+
           <li class="nav-item {% if ns == 'ticket' %}menu-open{% endif %}">
             <a href="#"
                class="nav-link {% if ns == 'ticket' %}active{% endif %}">
@@ -285,7 +323,7 @@
 
         {% endif %}
 
-        <!-- ── Logout (all roles) ── -->
+        <!-- ── Account (all roles) ── -->
         <hr class="sb-sep">
         <li class="nav-item">
           <a href="{% url 'core:logout' %}" class="nav-link sb-logout-link">

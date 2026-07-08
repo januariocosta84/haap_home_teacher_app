@@ -1,69 +1,74 @@
 {% extends "core/base.html" %}
 
-
-{% block title %}404 - Pajina La Hetan{% endblock %}
+{% block title %}404 — Pajina La Hetan{% endblock %}
 
 {% block content %}
 <div class="container-fluid mt-4">
-
   <div class="row justify-content-center">
     <div class="col-lg-6 col-md-8">
 
-      <div class="card border shadow-sm text-center small-box-card" style="border-radius: 12px; overflow: hidden;">
+      <div class="card border-0 shadow-sm text-center" style="border-radius:20px;overflow:hidden;">
         <div class="card-body p-5">
 
           <!-- Icon -->
-          <div class="mb-4">
-            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 64px;"></i>
+          <div class="mb-3">
+            <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle"
+                 style="width:90px;height:90px;background:#fef2f2;">
+              <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size:2.5rem;"></i>
+            </div>
           </div>
 
-          <!-- Error Code -->
-          <h1 class="fw-bold text-danger mb-2" style="font-size: 72px;">404</h1>
+          <!-- Code -->
+          <h1 class="fw-bold text-danger mb-1" style="font-size:5rem;line-height:1;">404</h1>
 
           <!-- Message -->
-          <h4 class="fw-semibold mb-2">Pajina La Hetan</h4>
-          <p class="text-muted mb-3">
+          <h5 class="fw-semibold mb-2">Pajina La Hetan</h5>
+          <p class="text-muted mb-4" style="font-size:.9rem;">
             Deskulpa, pajina ne'ebé ita buka la iha ka move ba fatin seluk.
           </p>
 
           <!-- Countdown -->
-          <p class="text-muted mb-4">
-            Ita sei fila ba dashboard iha <strong><span id="countdown">5</span></strong> segundos...
-          </p>
+          <div class="mb-4 px-3 py-2 rounded-3 d-inline-block"
+               style="background:#f8fafc;border:1px solid #e2e8f0;">
+            <span class="text-muted" style="font-size:.85rem;">
+              <i class="bi bi-arrow-clockwise me-1"></i>
+              Ita sei fila ba dashboard iha
+              <strong class="text-primary"><span id="countdown">5</span></strong>
+              segundos...
+            </span>
+          </div>
 
           <!-- Buttons -->
-          <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
-            <a href="{%url 'core:moe_admin_dashboard'%}" class="btn btn-primary">
-              <i class="bi bi-house-door-fill me-1"></i> Dashboard
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ redirect_url }}"
+               class="btn btn-primary rounded-pill px-4 fw-semibold">
+              <i class="bi bi-house-door-fill me-1"></i>Dashboard
             </a>
-
-            <button onclick="history.back()" class="btn btn-outline-secondary">
-              <i class="bi bi-arrow-left me-1"></i> Fila kotuk
+            <button onclick="history.back()"
+                    class="btn btn-outline-secondary rounded-pill px-4">
+              <i class="bi bi-arrow-left me-1"></i>Fila Kotuk
             </button>
           </div>
+
         </div>
       </div>
 
     </div>
   </div>
-
 </div>
 
-<!-- Scripts -->
 <script>
-  // Countdown + Redirect
-  let seconds = 5;
-  const countdownEl = document.getElementById("countdown");
-
-  const timer = setInterval(() => {
+(function () {
+  var seconds = 5;
+  var el = document.getElementById('countdown');
+  var timer = setInterval(function () {
     seconds--;
-    countdownEl.textContent = seconds;
-
+    el.textContent = seconds;
     if (seconds <= 0) {
       clearInterval(timer);
-      window.location.href = "{%url 'core:moe_admin_dashboard'%}";
+      window.location.href = "{{ redirect_url }}";
     }
   }, 1000);
+})();
 </script>
-
 {% endblock %}

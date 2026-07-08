@@ -87,6 +87,7 @@ class User(AbstractUser):
     ROLE_CHOICES = [
         ('parent', 'Parent/Carer'),
         ('moe_admin', 'MoE Admin'),
+        ('moe_auditing', 'MoE Auditing'),
         ('municipality_analyst', 'Municipality Analyst'),
         ('teacher', 'Teacher'),
     ]
@@ -334,8 +335,7 @@ class PreschoolEnrollmentOptIn(models.Model):
 # 6. APK Version Management
 # ---------------------------------
 def apk_upload_path(instance, filename):
-    # optional: keep same filename to replace
-    return f"apk/{filename}"
+    return "apk/haap_uma.apk"
 
 
 class ApkVersion(models.Model):
@@ -356,8 +356,6 @@ class ApkVersion(models.Model):
         return ""
 
     def save(self, *args, **kwargs):
-
-        # 🔥 delete old file when replacing
         if self.pk:
             try:
                 old = ApkVersion.objects.get(pk=self.pk)
@@ -373,6 +371,13 @@ class ApkVersion(models.Model):
         if self.is_latest:
             ApkVersion.objects.exclude(pk=self.pk).update(is_latest=False)
 
+    def delete(self, *args, **kwargs):
+        if self.apk_file:
+            storage, name = self.apk_file.storage, self.apk_file.name
+            if storage.exists(name):
+                storage.delete(name)
+        super().delete(*args, **kwargs)
+
     class Meta:
         db_table = "apk_versions"
 
@@ -381,7 +386,36 @@ class ApkVersion(models.Model):
 
     
 # ---------------------------------
-# 7. WhatsApp Message Log
+# 7. App-wide Notifications
+# ---------------------------------
+class AppNotification(models.Model):
+    TYPE_CHOICES = [
+        ('apk_update', 'APK Update'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='app_notifications',
+    )
+    notification_type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    action_url = models.CharField(max_length=500, blank=True, default='')
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'app_notifications'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"[{self.notification_type}] → {self.recipient}"
+
+
+# ---------------------------------
+# 8. WhatsApp Message Log
 # ---------------------------------
 class WhatsAppMessage(models.Model):
     TEMPLATE_CHOICES = [
@@ -469,4 +503,65 @@ class ActivityResult(models.Model):
 
     def __str__(self):
         return f"ActivityResult {self.id} ({self.activity_name}) -> {self.activity_result}"
+
+
+# ---------------------------------
+# 9. Audit Log
+# ---------------------------------
+class AuditLog(models.Model):
+    ACTION_CHOICES = [
+        ('login',           'Login'),
+        ('logout',          'Logout'),
+        ('login_failed',    'Login Failed'),
+        ('create',          'Kria'),
+        ('update',          'Atualiza'),
+        ('delete',          'Apaga'),
+        ('upload',          'Upload'),
+        ('download',        'Download'),
+        ('export',          'Export'),
+        ('password_change', 'Muda Password'),
+        ('password_reset',  'Reset Password'),
+        ('activate',        'Ativasaun'),
+        ('deactivate',      'Dezativasaun'),
+        ('role_change',     'Muda Papel'),
+        ('other',           'Seluk'),
+    ]
+    STATUS_CHOICES = [
+        ('success', 'Suksesu'),
+        ('failed',  'Falha'),
+    ]
+
+    id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user         = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='audit_logs',
+    )
+    username     = models.CharField(max_length=255, blank=True)
+    action       = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    module       = models.CharField(max_length=100, blank=True)
+    description  = models.TextField(blank=True)
+    record_id    = models.CharField(max_length=255, blank=True)
+    record_name  = models.CharField(max_length=500, blank=True)
+    previous_value = models.JSONField(null=True, blank=True)
+    new_value    = models.JSONField(null=True, blank=True)
+    ip_address   = models.GenericIPAddressField(null=True, blank=True)
+    user_agent   = models.TextField(blank=True)
+    browser      = models.CharField(max_length=200, blank=True)
+    os_info      = models.CharField(max_length=200, blank=True)
+    status       = models.CharField(max_length=20, choices=STATUS_CHOICES, default='success')
+    timestamp    = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'audit_logs'
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['-timestamp']),
+            models.Index(fields=['user', '-timestamp']),
+            models.Index(fields=['action']),
+            models.Index(fields=['module']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return f"[{self.timestamp:%Y-%m-%d %H:%M}] {self.username} → {self.action}"
 

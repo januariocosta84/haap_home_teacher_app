@@ -142,9 +142,10 @@
               <i class="bi bi-telephone-fill me-1"></i>Kontaktu
             </div>
             <div class="row g-3">
-              <div class="col-12">
+              <!-- WhatsApp field — hidden when moe_auditing is selected -->
+              <div class="col-12" id="whatsappRow">
                 <label class="form-label fw-semibold small">
-                  Numeru WhatsApp <span class="text-danger">*</span>
+                  Numeru WhatsApp <span class="text-danger" id="whatsappRequired">*</span>
                 </label>
                 <div class="field-wrap" id="phoneWrap">
                   <i class="bi bi-whatsapp field-icon" id="phoneIcon"></i>
@@ -161,7 +162,9 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <label class="form-label fw-semibold small">Email <span class="text-muted fw-normal">(Opsional)</span></label>
+                <label class="form-label fw-semibold small" id="emailLabel">
+                  Email <span id="emailRequired" class="text-muted fw-normal">(Opsional)</span>
+                </label>
                 <div class="field-wrap">
                   <i class="bi bi-envelope field-icon"></i>
                   {{ form.email }}
@@ -285,6 +288,19 @@
                 </div>
               </div>
 
+              <div class="col-12 col-sm-6">
+                <div class="role-card d-flex align-items-center gap-3"
+                     data-role="moe_auditing" onclick="selectRole('moe_auditing', this)">
+                  <div class="role-icon" style="background:#f0fdf4;">
+                    <i class="bi bi-shield-lock-fill" style="color:#059669;"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:0.85rem;">MoE Auditing</div>
+                    <div class="text-muted" style="font-size:0.75rem;">Auditor sistema (read-only)</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
             {% for e in form.role.errors %}
             <div class="text-danger small mt-2"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
@@ -300,7 +316,7 @@
             </div>
             <div>
               <label class="form-label fw-semibold small">
-                Password <span class="text-muted fw-normal">(Opsional)</span>
+                Password <span id="pwRequired" class="text-muted fw-normal">(Opsional)</span>
               </label>
               <div class="field-wrap pw-wrap" style="position:relative;">
                 <i class="bi bi-lock field-icon"></i>
@@ -310,9 +326,13 @@
                   <i class="bi bi-eye" id="pwEyeIcon"></i>
                 </button>
               </div>
-              <div class="form-text mt-1">
+              <div id="pwHelp" class="form-text mt-1">
                 <i class="bi bi-info-circle me-1"></i>
                 Labele hatama karik hakarak haruka link konfigurasaun via WhatsApp.
+              </div>
+              <div id="pwHelpAudit" class="form-text mt-1 d-none text-primary">
+                <i class="bi bi-info-circle me-1"></i>
+                Auditor tenke uza email no password ba login.
               </div>
             </div>
           </div>
@@ -342,6 +362,45 @@ function selectRole(value, card) {
   document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   document.getElementById('id_role').value = value;
+  applyRoleFieldRules(value);
+}
+
+function applyRoleFieldRules(role) {
+  const isAuditing    = role === 'moe_auditing';
+  const whatsappRow   = document.getElementById('whatsappRow');
+  const emailRequired = document.getElementById('emailRequired');
+  const pwRequired    = document.getElementById('pwRequired');
+  const pwHelp        = document.getElementById('pwHelp');
+  const pwHelpAudit   = document.getElementById('pwHelpAudit');
+  const whatsappInput = document.getElementById('id_whatsapp_number');
+  const emailInput    = document.getElementById('id_email');
+  const pwInput       = document.getElementById('id_password');
+
+  if (isAuditing) {
+    whatsappRow.classList.add('d-none');
+    whatsappInput.required = false;
+    emailRequired.textContent = '';
+    emailRequired.innerHTML   = '<span class="text-danger">*</span>';
+    emailInput.required = true;
+    pwRequired.innerHTML  = '<span class="text-danger">*</span>';
+    pwInput.required = true;
+    pwHelp.classList.add('d-none');
+    pwHelpAudit.classList.remove('d-none');
+    // clear phone validation state
+    document.getElementById('phone-error').classList.add('d-none');
+    document.getElementById('phone-ok').classList.add('d-none');
+    document.getElementById('phoneWrap').classList.remove('phone-valid', 'phone-invalid');
+    document.getElementById('submit-button').disabled = false;
+  } else {
+    whatsappRow.classList.remove('d-none');
+    whatsappInput.required = true;
+    emailRequired.innerHTML = '(Opsional)';
+    emailInput.required = false;
+    pwRequired.innerHTML  = '(Opsional)';
+    pwInput.required = false;
+    pwHelp.classList.remove('d-none');
+    pwHelpAudit.classList.add('d-none');
+  }
 }
 
 // Sync visual state on page load (e.g. form re-render after error)
@@ -350,6 +409,7 @@ function selectRole(value, card) {
   if (currentRole) {
     const card = document.querySelector(`.role-card[data-role="${currentRole}"]`);
     if (card) card.classList.add('selected');
+    applyRoleFieldRules(currentRole);
   }
 })();
 
@@ -444,6 +504,9 @@ $(document).ready(function () {
   }
 
   phoneInput.addEventListener('input', function () {
+    // skip validation when moe_auditing is selected
+    if (document.getElementById('id_role').value === 'moe_auditing') return;
+
     let phone = this.value.trim();
     if (phone.startsWith('7'))   phone = '+670' + phone;
     else if (phone.startsWith('670')) phone = '+' + phone;

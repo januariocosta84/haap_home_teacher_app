@@ -1,96 +1,570 @@
 {% extends 'core/base.html' %}
+{% block title %}{% if form.instance.pk %}Edita{% else %}Kria{% endif %} Pre-Eskolár{% endblock %}
 
-{% block title %}Create Pre-Escolar{% endblock %}
+{% block extra_css %}
+<style>
+/* ── Page variables ── */
+:root {
+  --pf-blue:    #2563eb;
+  --pf-blue-dk: #1d4ed8;
+  --pf-radius:  12px;
+}
+
+/* ── Hero ── */
+.pf-hero {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  border-radius: 16px;
+  padding: 1.6rem 2rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.75rem;
+}
+.pf-hero::before {
+  content: '';
+  position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.pf-hero::after {
+  content: '';
+  position: absolute; bottom: -70px; left: 28%;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.pf-hero-inner { position: relative; z-index: 1; }
+
+/* breadcrumb inside hero */
+.pf-breadcrumb {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; color: rgba(255,255,255,.7);
+  margin-bottom: .5rem;
+  background: rgba(255,255,255,.12); border-radius: 6px;
+  padding: 3px 10px;
+}
+.pf-breadcrumb a { color: rgba(255,255,255,.85); text-decoration: none; }
+.pf-breadcrumb a:hover { color: #fff; text-decoration: underline; }
+.pf-breadcrumb i { font-size: .65rem; }
+
+.pf-hero-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 3px; }
+.pf-hero-sub   { font-size: .82rem; color: rgba(255,255,255,.75); margin: 0; }
+
+/* ── Section card ── */
+.pf-section {
+  background: #fff; border-radius: var(--pf-radius);
+  box-shadow: 0 2px 14px rgba(0,0,0,.06);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+.pf-section-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.pf-section-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: #fff; flex-shrink: 0;
+}
+.pf-section-title { font-size: .9rem; font-weight: 700; color: #0f172a; margin: 0; }
+.pf-section-sub   { font-size: .72rem; color: #94a3b8; margin: 2px 0 0; }
+.pf-section-body  { padding: 1.25rem 1.5rem; }
+
+/* ── Field ── */
+.pf-field { margin-bottom: 1.1rem; }
+.pf-field:last-child { margin-bottom: 0; }
+.pf-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: .055em;
+  text-transform: uppercase; color: #64748b;
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 5px;
+}
+.pf-label .req { color: #ef4444; }
+.pf-input-wrap { position: relative; }
+.pf-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  font-size: .88rem; color: #94a3b8; pointer-events: none; z-index: 2;
+}
+.pf-input-wrap .form-control,
+.pf-input-wrap .form-select {
+  padding-left: 2.4rem !important;
+}
+
+/* Shared control style */
+.pf-section .form-control,
+.pf-section .form-select {
+  border: 1.5px solid #e2e8f0; border-radius: 9px;
+  padding: .52rem .85rem; font-size: .86rem;
+  background: #f8fafc; color: #1e293b;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+  width: 100%;
+}
+.pf-section .form-control:focus,
+.pf-section .form-select:focus {
+  border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  background: #fff; outline: none;
+}
+.pf-section .form-control::placeholder { color: #cbd5e1; }
+.pf-section .form-select option[value=""] { color: #94a3b8; }
+
+/* Cascade hint */
+.pf-cascade-hint {
+  font-size: .69rem; color: #94a3b8; margin-top: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* field error */
+.pf-field-error {
+  font-size: .72rem; color: #ef4444; margin-top: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+.pf-field-error::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: #ef4444; display: inline-block; flex-shrink: 0;
+}
+#phone-error { font-size: .72rem; color: #ef4444; margin-top: 4px; }
+
+/* GPS divider */
+.pf-gps-note {
+  font-size: .72rem; color: #64748b; display: flex; align-items: center;
+  gap: 6px; background: #f0f9ff; border: 1px solid #bae6fd;
+  border-radius: 8px; padding: .55rem .8rem; margin-bottom: 1rem;
+}
+
+/* ── Sidebar ── */
+.pf-sidebar-card {
+  background: #fff; border-radius: var(--pf-radius);
+  box-shadow: 0 2px 14px rgba(0,0,0,.06);
+  overflow: hidden;
+  position: sticky; top: 1rem;
+}
+.pf-sidebar-head {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  padding: 1.1rem 1.5rem;
+}
+.pf-sidebar-head-title {
+  font-size: .88rem; font-weight: 700; color: #fff; margin: 0 0 2px;
+}
+.pf-sidebar-head-sub {
+  font-size: .72rem; color: rgba(255,255,255,.7); margin: 0;
+}
+.pf-sidebar-body { padding: 1.25rem; }
+
+/* Buttons */
+.pf-btn-primary {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; width: 100%; padding: .7rem;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: .88rem; font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(22,163,74,.28);
+  transition: box-shadow .15s, transform .12s, opacity .15s;
+  margin-bottom: .65rem;
+}
+.pf-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(22,163,74,.38); transform: translateY(-1px);
+}
+.pf-btn-primary:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+.pf-btn-cancel {
+  display: flex; align-items: center; justify-content: center;
+  gap: 7px; width: 100%; padding: .62rem;
+  background: #f8fafc; color: #475569; border: 1.5px solid #e2e8f0;
+  border-radius: 10px; font-size: .86rem; font-weight: 600;
+  text-decoration: none; transition: background .15s, border-color .15s;
+}
+.pf-btn-cancel:hover {
+  background: #f1f5f9; border-color: #cbd5e1; color: #334155;
+}
+
+/* Tips list */
+.pf-tips { list-style: none; padding: 0; margin: 1rem 0 0; }
+.pf-tips li {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: .75rem; color: #64748b;
+  padding: .4rem 0; border-bottom: 1px solid #f1f5f9;
+}
+.pf-tips li:last-child { border-bottom: none; padding-bottom: 0; }
+.pf-tips li i { font-size: .8rem; margin-top: 2px; flex-shrink: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 991px) {
+  .pf-sidebar-card { position: static; margin-top: 1rem; }
+}
+@media (max-width: 576px) {
+  .pf-hero        { padding: 1.1rem; border-radius: 12px; }
+  .pf-hero-title  { font-size: 1.05rem; }
+  .pf-section-body { padding: 1rem; }
+  .pf-sidebar-body { padding: 1rem; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="container-fluid mt-4">
+  <!-- ── HERO ── -->
+  <div class="pf-hero">
+    <div class="pf-hero-inner">
+      <div class="pf-breadcrumb">
+        <i class="bi bi-house-fill"></i>
+        <a href="{% url 'preschools:preschool_list' %}">Pre-Eskolár</a>
+        <i class="bi bi-chevron-right"></i>
+        {% if form.instance.pk %}Edita{% else %}Kria Foun{% endif %}
+      </div>
+      <div class="pf-hero-title">
+        <i class="bi bi-building-fill me-2"></i>
+        {% if form.instance.pk %}Edita Pre-Eskolár{% else %}Rejista Pre-Eskolár Foun{% endif %}
+      </div>
+      <div class="pf-hero-sub">
+        Hatama informasaun pre-eskolár nian ho kompletu atu salva ba sistema
+      </div>
+    </div>
+  </div>
 
-    <div class="card shadow-sm border-0" style="border-radius:12px;">
-        <div class="card-body">
+  <form method="POST" id="preschoolForm" novalidate>
+    {% csrf_token %}
 
-            <h4 class="mb-3">Adicionar Pre-Escolar</h4>
-            <hr>
-            <form method="POST">
-                {% csrf_token %}
+    <div class="row g-4 align-items-start">
 
-                <div class="row g-3">
+      <!-- ══ LEFT: form sections ══════════════════════════════════ -->
+      <div class="col-lg-8">
 
-                    <div class="col-md-6">
-                        {{ form.name.label }}
-                        {{ form.name }}
-                    </div>
+        <!-- Non-field errors -->
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger d-flex align-items-center gap-2 mb-3"
+               style="border-radius:10px;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ form.non_field_errors|striptags }}</span>
+          </div>
+        {% endif %}
 
-                    <div class="col-md-6">
-                        {{ form.municipality.label }}
-                        {{ form.municipality }}
-                    </div>
+        <!-- ── 1. IDENTITY ── -->
+        <div class="pf-section">
+          <div class="pf-section-head">
+            <div class="pf-section-icon" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+              <i class="bi bi-building-fill"></i>
+            </div>
+            <div>
+              <div class="pf-section-title">Identidade Pre-Eskolár</div>
+              <div class="pf-section-sub">Naran no tipu eskola</div>
+            </div>
+          </div>
+          <div class="pf-section-body">
+            <div class="row g-3">
 
-                    <div class="col-md-6">
-                        {{ form.administrative_post.label }}
-                        {{ form.administrative_post }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.suco.label }}
-                        {{ form.suco }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.aldeia.label }}
-                        {{ form.aldeia }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.preschool_type.label }}
-                        {{ form.preschool_type }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.whatsapp_contact.label }}
-                        {{ form.whatsapp_contact }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.email.label }}
-                        {{ form.email }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.latitude.label }}
-                        {{ form.latitude }}
-                    </div>
-
-                    <div class="col-md-6">
-                        {{ form.longitude.label }}
-                        {{ form.longitude }}
-                    </div>
-
+              <!-- Name -->
+              <div class="col-12">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.name.id_for_label }}">
+                    <i class="bi bi-card-text" style="color:#2563eb;"></i>
+                    Naran Pre-Eskolár <span class="req">*</span>
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-building pf-icon"></i>
+                    {{ form.name }}
+                  </div>
+                  {% if form.name.errors %}
+                    <div class="pf-field-error">{{ form.name.errors|striptags }}</div>
+                  {% endif %}
                 </div>
+              </div>
 
-                <div class="mt-4">
-                    <button class="btn btn-success">
-                        Save Pre-Escolar
-                    </button>
-
-                    <a href="{% url 'preschools:preschool_list' %}" class="btn btn-secondary">
-                        Cancel
-                    </a>
+              <!-- Preschool Type -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.preschool_type.id_for_label }}">
+                    <i class="bi bi-tag-fill" style="color:#7c3aed;"></i>
+                    Tipu Pre-Eskolár <span class="req">*</span>
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-tag pf-icon"></i>
+                    {{ form.preschool_type }}
+                  </div>
+                  {% if form.preschool_type.errors %}
+                    <div class="pf-field-error">{{ form.preschool_type.errors|striptags }}</div>
+                  {% endif %}
                 </div>
+              </div>
 
-            </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 2. LOCATION ── -->
+        <div class="pf-section">
+          <div class="pf-section-head">
+            <div class="pf-section-icon" style="background:linear-gradient(135deg,#0891b2,#0e7490);">
+              <i class="bi bi-geo-alt-fill"></i>
+            </div>
+            <div>
+              <div class="pf-section-title">Lokalizasaun</div>
+              <div class="pf-section-sub">Munisípiu, Postu Administrativu, Suku, Aldeia</div>
+            </div>
+          </div>
+          <div class="pf-section-body">
+            <div class="row g-3">
+
+              <!-- Municipality -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.municipality.id_for_label }}">
+                    <i class="bi bi-map-fill" style="color:#0891b2;"></i>
+                    Munisípiu <span class="req">*</span>
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-map pf-icon"></i>
+                    {{ form.municipality }}
+                  </div>
+                  {% if form.municipality.errors %}
+                    <div class="pf-field-error">{{ form.municipality.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Administrative Post -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.administrative_post.id_for_label }}">
+                    <i class="bi bi-pin-map-fill" style="color:#0891b2;"></i>
+                    Postu Administrativu
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-pin-map pf-icon"></i>
+                    {{ form.administrative_post }}
+                  </div>
+                  <div class="pf-cascade-hint">
+                    <i class="bi bi-arrow-return-right"></i>
+                    Selesiona Munisípiu uluk
+                  </div>
+                  {% if form.administrative_post.errors %}
+                    <div class="pf-field-error">{{ form.administrative_post.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Suco -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.suco.id_for_label }}">
+                    <i class="bi bi-geo-fill" style="color:#0891b2;"></i>
+                    Suku
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-geo pf-icon"></i>
+                    {{ form.suco }}
+                  </div>
+                  <div class="pf-cascade-hint">
+                    <i class="bi bi-arrow-return-right"></i>
+                    Selesiona Postu Administrativu uluk
+                  </div>
+                  {% if form.suco.errors %}
+                    <div class="pf-field-error">{{ form.suco.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Aldeia -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.aldeia.id_for_label }}">
+                    <i class="bi bi-house-fill" style="color:#0891b2;"></i>
+                    Aldeia
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-house pf-icon"></i>
+                    {{ form.aldeia }}
+                  </div>
+                  <div class="pf-cascade-hint">
+                    <i class="bi bi-arrow-return-right"></i>
+                    Selesiona Suku uluk
+                  </div>
+                  {% if form.aldeia.errors %}
+                    <div class="pf-field-error">{{ form.aldeia.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 3. CONTACT ── -->
+        <div class="pf-section">
+          <div class="pf-section-head">
+            <div class="pf-section-icon" style="background:linear-gradient(135deg,#16a34a,#15803d);">
+              <i class="bi bi-telephone-fill"></i>
+            </div>
+            <div>
+              <div class="pf-section-title">Kontaktu</div>
+              <div class="pf-section-sub">WhatsApp no email pre-eskolár nian</div>
+            </div>
+          </div>
+          <div class="pf-section-body">
+            <div class="row g-3">
+
+              <!-- WhatsApp -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.whatsapp_contact.id_for_label }}">
+                    <i class="bi bi-whatsapp" style="color:#25d366;"></i>
+                    Kontaktu WhatsApp
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-whatsapp pf-icon" style="color:#25d366;"></i>
+                    {{ form.whatsapp_contact }}
+                  </div>
+                  <div class="pf-cascade-hint">
+                    <i class="bi bi-info-circle"></i>
+                    Formatu: +6707XXXXXXX
+                  </div>
+                  <small id="phone-error" class="d-none" style="color:#ef4444;font-size:.72rem;"></small>
+                  {% if form.whatsapp_contact.errors %}
+                    <div class="pf-field-error">{{ form.whatsapp_contact.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.email.id_for_label }}">
+                    <i class="bi bi-envelope-fill" style="color:#2563eb;"></i>
+                    Email
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-envelope pf-icon"></i>
+                    {{ form.email }}
+                  </div>
+                  {% if form.email.errors %}
+                    <div class="pf-field-error">{{ form.email.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 4. GEOLOCATION ── -->
+        <div class="pf-section">
+          <div class="pf-section-head">
+            <div class="pf-section-icon" style="background:linear-gradient(135deg,#d97706,#b45309);">
+              <i class="bi bi-compass-fill"></i>
+            </div>
+            <div>
+              <div class="pf-section-title">Koordinadas GPS</div>
+              <div class="pf-section-sub">Latitude no longitude (opsional)</div>
+            </div>
+          </div>
+          <div class="pf-section-body">
+            <div class="pf-gps-note">
+              <i class="bi bi-info-circle-fill" style="color:#0284c7;flex-shrink:0;"></i>
+              Hatama koordinadas GPS iha formatu desimal, exemplu: Latitude <strong>-8.5569</strong>,
+              Longitude <strong>125.5603</strong>
+            </div>
+            <div class="row g-3">
+
+              <!-- Latitude -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.latitude.id_for_label }}">
+                    <i class="bi bi-arrow-up-down" style="color:#d97706;"></i>
+                    Latitude
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-crosshair pf-icon"></i>
+                    {{ form.latitude }}
+                  </div>
+                  {% if form.latitude.errors %}
+                    <div class="pf-field-error">{{ form.latitude.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Longitude -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.longitude.id_for_label }}">
+                    <i class="bi bi-arrow-left-right" style="color:#d97706;"></i>
+                    Longitude
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-crosshair2 pf-icon"></i>
+                    {{ form.longitude }}
+                  </div>
+                  {% if form.longitude.errors %}
+                    <div class="pf-field-error">{{ form.longitude.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /col-lg-8 -->
+
+      <!-- ══ RIGHT: sidebar ══════════════════════════════════════ -->
+      <div class="col-lg-4">
+        <div class="pf-sidebar-card">
+
+          <div class="pf-sidebar-head">
+            <div class="pf-sidebar-head-title">
+              {% if form.instance.pk %}Garda Mudansa{% else %}Salva Pre-Eskolár{% endif %}
+            </div>
+            <div class="pf-sidebar-head-sub">
+              Konfirma informasaun molok submete
+            </div>
+          </div>
+
+          <div class="pf-sidebar-body">
+            <button type="submit" class="pf-btn-primary" id="submit-button">
+              <i class="bi bi-{% if form.instance.pk %}check-circle-fill{% else %}plus-circle-fill{% endif %}"></i>
+              {% if form.instance.pk %}Garda Mudansa{% else %}Rejista Pre-Eskolár{% endif %}
+            </button>
+
+            <a href="{% url 'preschools:preschool_list' %}" class="pf-btn-cancel">
+              <i class="bi bi-x-circle"></i>Kansela
+            </a>
+
+            <hr style="border-color:#f1f5f9; margin: 1rem 0 .75rem;">
+            <div style="font-size:.72rem;font-weight:700;letter-spacing:.06em;
+                        text-transform:uppercase;color:#94a3b8;margin-bottom:.6rem;">
+              Orientasaun
+            </div>
+            <ul class="pf-tips">
+              <li>
+                <i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>
+                Naran pre-eskolár tenke úniku no klaru
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>
+                Selesiona lokalizasaun ho hierarkia: Munisípiu → Postu → Suku → Aldeia
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill" style="color:#16a34a;"></i>
+                Numeru WhatsApp uza formatu +6707XXXXXXX
+              </li>
+              <li>
+                <i class="bi bi-info-circle-fill" style="color:#2563eb;"></i>
+                Koordinadas GPS opsional maibé ajuda hatudu mapa
+              </li>
+            </ul>
+          </div>
 
         </div>
-    </div>
+      </div><!-- /col-lg-4 -->
 
-</div>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </div><!-- /row -->
+  </form>
 
-<!-- Phone validation script -->
+</div><!-- /container-fluid -->
+
 <script>
 $(document).ready(function () {
-  // Load Administrative Posts when municipality changes
+
+  // ── Cascade: Municipality → Administrative Post ──
   $("#id_municipality").change(function () {
     var municipalityId = $(this).val();
     $("#id_administrative_post").html('<option value="">Hili Postu Administrativu</option>');
@@ -101,14 +575,14 @@ $(document).ready(function () {
       $.ajax({
         url: "{% url 'core:ajax_load_admin_posts' %}",
         data: { municipality_id: municipalityId },
-        success: function(data) {
+        success: function (data) {
           data.forEach(p => $("#id_administrative_post").append(new Option(p.name, p.id)));
         }
       });
     }
   });
 
-  // Load Sucos when administrative post changes
+  // ── Cascade: Administrative Post → Suco ──
   $("#id_administrative_post").change(function () {
     var postId = $(this).val();
     $("#id_suco").html('<option value="">Hili Suku</option>');
@@ -118,14 +592,14 @@ $(document).ready(function () {
       $.ajax({
         url: "{% url 'core:ajax_load_sucos' %}",
         data: { administrative_post_id: postId },
-        success: function(data) {
+        success: function (data) {
           data.forEach(s => $("#id_suco").append(new Option(s.name, s.id)));
         }
       });
     }
   });
 
-  // Load Aldeias when suco changes
+  // ── Cascade: Suco → Aldeia ──
   $("#id_suco").change(function () {
     var sucoId = $(this).val();
     $("#id_aldeia").html('<option value="">Hili Aldeia</option>');
@@ -134,62 +608,61 @@ $(document).ready(function () {
       $.ajax({
         url: "{% url 'core:ajax_load_aldeias' %}",
         data: { suco_id: sucoId },
-        success: function(data) {
+        success: function (data) {
           data.forEach(a => $("#id_aldeia").append(new Option(a.name, a.id)));
         }
       });
     }
   });
 
-  // WhatsApp validation
-  const phoneInput = document.getElementById("id_whatsapp_number");
-  const errorDisplay = document.getElementById("phone-error");
-  const submitButton = document.getElementById("submit-button");
-  const timorPhoneRegex = /^\+6707\d{7}$/;
+  // ── WhatsApp validation (fixed: id_whatsapp_contact) ──
+  var phoneInput   = document.getElementById("id_whatsapp_contact");
+  var errorDisplay = document.getElementById("phone-error");
+  var submitButton = document.getElementById("submit-button");
+  var timorPhoneRegex = /^\+6707\d{7}$/;
 
-  phoneInput.addEventListener("input", () => {
-    let phone = phoneInput.value.trim();
-    if (phone.startsWith("7")) phone = "+670" + phone;
-    else if (phone.startsWith("670")) phone = "+" + phone;
-    phoneInput.value = phone;
+  if (phoneInput) {
+    phoneInput.addEventListener("input", function () {
+      var phone = phoneInput.value.trim();
+      if (phone.startsWith("7"))   phone = "+670" + phone;
+      else if (phone.startsWith("670")) phone = "+" + phone;
+      phoneInput.value = phone;
 
-    errorDisplay.classList.add("d-none");
-    submitButton.disabled = false;
+      errorDisplay.classList.add("d-none");
+      errorDisplay.textContent = "";
+      submitButton.disabled = false;
 
-    if (phone && !timorPhoneRegex.test(phone)) {
-      errorDisplay.textContent = "Numeru WhatsApp tenke komesa ho +6707...";
-      errorDisplay.classList.remove("d-none");
-      submitButton.disabled = true;
-      return;
-    }
+      if (phone && !timorPhoneRegex.test(phone)) {
+        errorDisplay.textContent = "Numeru WhatsApp tenke komesa ho +6707 no iha dijitu 7";
+        errorDisplay.classList.remove("d-none");
+        submitButton.disabled = true;
+        return;
+      }
 
-    if (timorPhoneRegex.test(phone)) {
-      fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.exists) {
-            errorDisplay.textContent = "Numeru WhatsApp ida ne’e rejistadu ona.";
-            errorDisplay.classList.remove("d-none");
-            submitButton.disabled = true;
-          }
-        }).catch(err => console.error("Error checking WhatsApp:", err));
+      if (timorPhoneRegex.test(phone)) {
+        fetch("/check-whatsapp-number/?number=" + encodeURIComponent(phone))
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.exists) {
+              errorDisplay.textContent = "Numeru WhatsApp ida ne'e rejistadu ona.";
+              errorDisplay.classList.remove("d-none");
+              submitButton.disabled = true;
+            }
+          })
+          .catch(function (err) { console.error("WhatsApp check error:", err); });
+      }
+    });
+  }
+
+  // ── Loading state on submit ──
+  document.getElementById("preschoolForm").addEventListener("submit", function () {
+    var btn = document.getElementById("submit-button");
+    if (!btn.disabled) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split"></i>A salva…';
     }
   });
+
 });
-function togglePassword() {
-  const field = document.getElementById("id_password");
-  const icon = document.getElementById("eyeIcon");
-
-  if (field.type === "password") {
-    field.type = "text";
-    icon.classList.replace("bi-eye", "bi-eye-slash");
-  } else {
-    field.type = "password";
-    icon.classList.replace("bi-eye-slash", "bi-eye");
-  }
-}
-
 </script>
-
-
 {% endblock %}

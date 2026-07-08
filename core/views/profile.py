@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from core.forms import ProfileForm, ProfileImageForm, ChangePasswordForm
+from core.audit import log_action
 
 @login_required
 def profile_view(request):
@@ -49,7 +50,13 @@ def change_password(request):
             # Set new password
             user.set_password(new_password)
             user.save()
-            
+            log_action(
+                request=request,
+                action='password_change', module='Profile',
+                description=f"{user.get_full_name()} muda password.",
+                record_id=str(user.id),
+                record_name=user.get_full_name(),
+            )
             messages.success(request, "Password changed successfully. Please login again.")
             return redirect('core:login')
     else:

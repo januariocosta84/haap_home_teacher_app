@@ -99,16 +99,25 @@
 
       <!--begin::App Main-->
       <main class="app-main">
-                {% if messages %}
-                <div class="container-fluid mt-3">
-                  {% for message in messages %}
-                  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                  </div>
-                  {% endfor %}
-                </div>
-                {% endif %}
+        <!-- DJANGO MESSAGES — rendered as slide-in toasts top-right -->
+        {% if messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1200;">
+          {% for message in messages %}{% with tags=message.tags %}
+          <div class="toast border-0 shadow-lg mb-2" role="alert" aria-live="assertive" aria-atomic="true"
+               data-bs-autohide="true" data-bs-delay="5000" style="min-width:280px;max-width:380px;">
+            <div class="d-flex align-items-center text-white rounded"
+                 style="background:{% if 'success' in tags %}#059669{% elif 'error' in tags or 'danger' in tags %}#dc2626{% elif 'warning' in tags %}#d97706{% else %}#2563eb{% endif %};">
+              <div class="toast-body d-flex align-items-center gap-2 flex-grow-1 py-3 px-3">
+                <i class="bi bi-{% if 'success' in tags %}check-circle-fill{% elif 'error' in tags or 'danger' in tags %}x-circle-fill{% elif 'warning' in tags %}exclamation-triangle-fill{% else %}info-circle-fill{% endif %} fs-5 flex-shrink-0"></i>
+                <span class="fw-semibold lh-sm" style="font-size:0.88rem;">{{ message }}</span>
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 my-auto flex-shrink-0"
+                      data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+          {% endwith %}{% endfor %}
+        </div>
+        {% endif %}
         <!--begin::App Content Header-->
         <div class="app-content-header">
           <!--begin::Container-->
@@ -233,22 +242,40 @@
   
 <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
     <script>
-  // Wait for the page to fully load
-  document.addEventListener("DOMContentLoaded", function() {
-    // Select all alert elements
-    const alerts = document.querySelectorAll('.alert');
-    
-    // Loop through each alert and set a timer
-    alerts.forEach(function(alert) {
-      setTimeout(function() {
-        // Use Bootstrap's built-in dismissal
-        const alertInstance = bootstrap.Alert.getOrCreateInstance(alert);
-        alertInstance.close();
-      }, 10000); // 10 seconds = 10000 milliseconds
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toast').forEach(function (el) {
+      bootstrap.Toast.getOrCreateInstance(el).show();
     });
   });
 
-
+  /* Global helper — call showToast('success'|'error'|'warning'|'info', 'message') from any page */
+  window.showToast = function (type, message) {
+    var colors = {success:'#059669', error:'#dc2626', warning:'#d97706', info:'#2563eb'};
+    var icons  = {success:'check-circle-fill', error:'x-circle-fill', warning:'exclamation-triangle-fill', info:'info-circle-fill'};
+    var container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container position-fixed top-0 end-0 p-3';
+      container.style.zIndex = '1200';
+      document.body.appendChild(container);
+    }
+    var el = document.createElement('div');
+    el.className = 'toast border-0 shadow-lg mb-2';
+    el.setAttribute('role', 'alert');
+    el.setAttribute('aria-atomic', 'true');
+    el.style.cssText = 'min-width:280px;max-width:380px;';
+    el.innerHTML =
+      '<div class="d-flex align-items-center text-white rounded" style="background:' + (colors[type]||colors.info) + ';">'
+      + '<div class="toast-body d-flex align-items-center gap-2 flex-grow-1 py-3 px-3">'
+      + '<i class="bi bi-' + (icons[type]||icons.info) + ' fs-5 flex-shrink-0"></i>'
+      + '<span class="fw-semibold lh-sm" style="font-size:.88rem;">' + message + '</span>'
+      + '</div>'
+      + '<button type="button" class="btn-close btn-close-white me-2 my-auto flex-shrink-0" data-bs-dismiss="toast"></button>'
+      + '</div>';
+    container.appendChild(el);
+    bootstrap.Toast.getOrCreateInstance(el, {delay: 5000}).show();
+    el.addEventListener('hidden.bs.toast', function () { el.remove(); });
+  };
 </script>
     <!-- NOTIFICATION SYSTEM -->
     <script>
@@ -347,6 +374,104 @@
     })();
     </script>
     <!-- END NOTIFICATION SYSTEM -->
+
+    <!-- PARENT APK NOTIFICATION SYSTEM -->
+    {% if user.role == 'parent' %}
+    <script>
+    (function () {
+      var COUNT_URL    = '{% url "core:apk_notif_count" %}';
+      var LIST_URL     = '{% url "core:apk_notif_list" %}';
+      var READ_ALL_URL = '{% url "core:apk_notif_mark_all_read" %}';
+      var MARK_URL_TPL = '/apk-notifications/{id}/read/';
+
+      var badge   = document.getElementById('apk-notif-badge');
+      var list    = document.getElementById('apk-notif-list');
+      var readAll = document.getElementById('apk-notif-read-all-btn');
+      var bell    = document.getElementById('apkNotifBellBtn');
+
+      if (!badge) return;
+
+      function getCsrf() {
+        var m = document.cookie.match(/csrftoken=([^;]+)/);
+        return m ? m[1] : '';
+      }
+
+      function updateBadge(count) {
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.style.display = '';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      function fetchCount() {
+        fetch(COUNT_URL, {credentials: 'same-origin'})
+          .then(function(r){ return r.json(); })
+          .then(function(d){ updateBadge(d.count); })
+          .catch(function(){});
+      }
+
+      function renderNotifications(notifications) {
+        if (!notifications.length) {
+          list.innerHTML = '<div class="text-center text-muted py-4" style="font-size:0.83rem;"><i class="bi bi-bell-slash d-block mb-1" style="font-size:1.5rem;"></i>Laiha notifikasaun foun</div>';
+          return;
+        }
+        list.innerHTML = notifications.map(function(n) {
+          var unreadBg = n.is_read ? '' : 'background:#f0fdf4;';
+          var dot = n.is_read ? '' : '<span style="width:7px;height:7px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;margin-top:4px;"></span>';
+          var href = n.action_url || '#';
+          return '<a href="' + href + '" class="d-flex align-items-start gap-2 px-3 py-2 apk-notif-item text-decoration-none border-bottom" data-notif-id="' + n.id + '" style="' + unreadBg + '">'
+            + '<div class="pt-1"><i class="bi bi-android2 me-2" style="color:#059669;font-size:1rem;"></i></div>'
+            + '<div style="min-width:0;flex:1;">'
+            + '<div class="fw-semibold text-dark" style="font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.title + '</div>'
+            + '<div class="text-muted" style="font-size:0.76rem;white-space:normal;line-height:1.3;">' + n.message + '</div>'
+            + '<div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">' + n.created_at + '</div>'
+            + '</div>'
+            + dot
+            + '</a>';
+        }).join('');
+
+        list.querySelectorAll('.apk-notif-item').forEach(function(el) {
+          el.addEventListener('click', function() {
+            var id = el.getAttribute('data-notif-id');
+            fetch(MARK_URL_TPL.replace('{id}', id), {
+              method: 'POST', credentials: 'same-origin',
+              headers: {'X-CSRFToken': getCsrf()}
+            }).catch(function(){});
+          });
+        });
+      }
+
+      function fetchList() {
+        fetch(LIST_URL, {credentials: 'same-origin'})
+          .then(function(r){ return r.json(); })
+          .then(function(d){
+            renderNotifications(d.notifications);
+            var unread = d.notifications.filter(function(n){ return !n.is_read; }).length;
+            updateBadge(unread);
+          })
+          .catch(function(){});
+      }
+
+      if (bell) { bell.addEventListener('click', fetchList); }
+
+      if (readAll) {
+        readAll.addEventListener('click', function(e) {
+          e.preventDefault(); e.stopPropagation();
+          fetch(READ_ALL_URL, {
+            method: 'POST', credentials: 'same-origin',
+            headers: {'X-CSRFToken': getCsrf()}
+          }).then(function(){ fetchList(); }).catch(function(){});
+        });
+      }
+
+      fetchCount();
+      setInterval(fetchCount, 30000);
+    })();
+    </script>
+    {% endif %}
+    <!-- END PARENT APK NOTIFICATION SYSTEM -->
 
     <!-- jsvectormap -->
     <script>

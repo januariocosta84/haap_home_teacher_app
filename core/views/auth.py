@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from core.forms import LoginForm
+from core.audit import log_action
 from preschools.models import Preschool, PreschoolTeacher
 from klase.models import Classroom
 
@@ -60,5 +61,10 @@ def user_login(request):
 
 
 def user_logout(request):
+    log_action(
+        request=request,
+        action='logout', module='Auth',
+        description=f'{request.user.get_full_name() or request.user.username} logout.',
+    )
     logout(request)
     return redirect("core:login")

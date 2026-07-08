@@ -101,17 +101,42 @@
               </div>
             </div>
 
-            <!-- Progress bar (hidden until upload starts) -->
+            <!-- Progress panel (hidden until upload starts) -->
             <div class="mb-4 d-none" id="progressContainer">
-              <div class="d-flex justify-content-between small text-muted mb-2">
-                <span><i class="bi bi-cloud-upload me-1"></i>Upload hela...</span>
-                <span id="progressPercent" class="fw-semibold">0%</span>
+
+              <!-- Phase label -->
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <span id="phaseIcon" class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                      style="width:34px;height:34px;background:#dbeafe;">
+                  <i class="bi bi-cloud-upload-fill text-primary" style="font-size:1rem;"></i>
+                </span>
+                <div>
+                  <div class="fw-semibold small" id="phaseLabel">Upload hela...</div>
+                  <div class="text-muted" style="font-size:0.75rem;" id="phaseDetail">Hahu ona…</div>
+                </div>
               </div>
-              <div class="progress rounded-pill" style="height: 8px;">
-                <div id="uploadProgress"
-                     class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                     role="progressbar" style="width: 0%"></div>
+
+              <!-- Big percentage + bar -->
+              <div class="d-flex align-items-end gap-3 mb-2">
+                <div class="fw-bold" id="progressPercent"
+                     style="font-size:2.2rem;line-height:1;color:#1d4ed8;min-width:4.5rem;">0%</div>
+                <div class="flex-grow-1 pb-1">
+                  <div class="progress rounded-pill" style="height:12px;">
+                    <div id="uploadProgress"
+                         class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar"
+                         style="width:0%;background:linear-gradient(90deg,#2563eb,#0ea5e9);"></div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Stats row -->
+              <div class="d-flex gap-4 small text-muted" id="statsRow">
+                <span><i class="bi bi-hdd me-1"></i><span id="statLoaded">0 KB</span> / <span id="statTotal">—</span></span>
+                <span><i class="bi bi-speedometer2 me-1"></i><span id="statSpeed">—</span></span>
+                <span><i class="bi bi-clock me-1"></i><span id="statEta">—</span></span>
+              </div>
+
             </div>
 
             <!-- Buttons -->
@@ -134,62 +159,147 @@
 </div>
 
 <script>
-document.getElementById('apkUploadForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+(function () {
 
-  const formData   = new FormData(this);
-  const xhr        = new XMLHttpRequest();
-  const submitBtn  = document.getElementById('submitBtn');
-  const bar        = document.getElementById('uploadProgress');
-  const pct        = document.getElementById('progressPercent');
-  const container  = document.getElementById('progressContainer');
-  const errorBox   = document.getElementById('uploadErrors');
+  function fmtBytes(b) {
+    if (b < 1024)       return b + ' B';
+    if (b < 1048576)    return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1048576).toFixed(1) + ' MB';
+  }
 
-  errorBox.classList.add('d-none');
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Upload hela...';
-  container.classList.remove('d-none');
+  function fmtSpeed(bps) {
+    if (bps < 1024)       return bps.toFixed(0) + ' B/s';
+    if (bps < 1048576)    return (bps / 1024).toFixed(1) + ' KB/s';
+    return (bps / 1048576).toFixed(1) + ' MB/s';
+  }
 
-  xhr.open('POST', '', true);
+  function fmtEta(sec) {
+    if (!isFinite(sec) || sec < 0) return '—';
+    if (sec < 60)  return Math.ceil(sec) + 's';
+    return Math.floor(sec / 60) + 'm ' + Math.ceil(sec % 60) + 's';
+  }
 
-  xhr.upload.addEventListener('progress', function(ev) {
-    if (ev.lengthComputable) {
-      const p = Math.round((ev.loaded / ev.total) * 100);
-      bar.style.width = p + '%';
-      pct.textContent = p + '%';
-    }
+  document.getElementById('apkUploadForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData  = new FormData(this);
+    const xhr       = new XMLHttpRequest();
+    const submitBtn = document.getElementById('submitBtn');
+    const bar       = document.getElementById('uploadProgress');
+    const pct       = document.getElementById('progressPercent');
+    const container = document.getElementById('progressContainer');
+    const errorBox  = document.getElementById('uploadErrors');
+    const phaseLabel  = document.getElementById('phaseLabel');
+    const phaseDetail = document.getElementById('phaseDetail');
+    const phaseIcon   = document.getElementById('phaseIcon');
+    const statLoaded  = document.getElementById('statLoaded');
+    const statTotal   = document.getElementById('statTotal');
+    const statSpeed   = document.getElementById('statSpeed');
+    const statEta     = document.getElementById('statEta');
+
+    errorBox.classList.add('d-none');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Upload hela...';
+    container.classList.remove('d-none');
+
+    /* reset display */
+    bar.style.width = '0%';
+    pct.textContent = '0%';
+    statLoaded.textContent = '0 KB';
+    statTotal.textContent  = '—';
+    statSpeed.textContent  = '—';
+    statEta.textContent    = '—';
+
+    let startTime = null;
+
+    xhr.open('POST', '', true);
+
+    xhr.upload.addEventListener('progress', function (ev) {
+      if (!ev.lengthComputable) return;
+      if (!startTime) startTime = Date.now();
+
+      const p       = Math.round((ev.loaded / ev.total) * 100);
+      const elapsed = (Date.now() - startTime) / 1000;          /* seconds */
+      const speed   = elapsed > 0 ? ev.loaded / elapsed : 0;
+      const remain  = speed > 0 ? (ev.total - ev.loaded) / speed : Infinity;
+
+      bar.style.width    = p + '%';
+      bar.setAttribute('aria-valuenow', p);
+      pct.textContent    = p + '%';
+
+      statLoaded.textContent = fmtBytes(ev.loaded);
+      statTotal.textContent  = fmtBytes(ev.total);
+      statSpeed.textContent  = fmtSpeed(speed);
+      statEta.textContent    = p < 100 ? fmtEta(remain) : '—';
+
+      phaseLabel.textContent  = 'Upload hela... ' + p + '%';
+      phaseDetail.textContent = fmtBytes(ev.loaded) + ' / ' + fmtBytes(ev.total)
+                                + '  ·  ' + fmtSpeed(speed);
+    });
+
+    xhr.upload.addEventListener('load', function () {
+      /* Browser finished sending — server is now processing/saving */
+      bar.style.width = '100%';
+      bar.classList.remove('progress-bar-animated', 'progress-bar-striped');
+      bar.style.background = 'linear-gradient(90deg,#059669,#10b981)';
+      pct.textContent      = '100%';
+      pct.style.color      = '#059669';
+
+      phaseIcon.style.background = '#d1fae5';
+      phaseIcon.innerHTML = '<i class="bi bi-gear-wide-connected text-success" style="font-size:1rem;"></i>';
+      phaseLabel.textContent  = 'Upload kompletu — Servisu hela...';
+      phaseDetail.textContent = 'Servidor a grava APK. Por favor hein momentu...';
+
+      statSpeed.textContent = '—';
+      statEta.textContent   = '—';
+    });
+
+    xhr.onload = function () {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Upload APK';
+
+      let response = null;
+      try { response = JSON.parse(xhr.responseText); } catch (_) {}
+
+      if (xhr.status === 200 && response && response.success) {
+        /* Show success state briefly then redirect */
+        phaseIcon.style.background = '#d1fae5';
+        phaseIcon.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size:1rem;"></i>';
+        phaseLabel.textContent  = 'Upload buras!';
+        phaseDetail.textContent = 'A rediresiona...';
+        setTimeout(function () {
+          window.location.href = "{% url 'core:apk_list' %}";
+        }, 800);
+        return;
+      }
+
+      container.classList.add('d-none');
+      const errors = (response && response.errors) || { upload: ['Upload la konsege. Haree koneksaun ka tamanho file.'] };
+      errorBox.innerHTML = Object.entries(errors)
+        .map(function ([f, msgs]) {
+          return '<div><i class="bi bi-exclamation-circle me-1"></i><strong>' + f + ':</strong> '
+                 + (Array.isArray(msgs) ? msgs.join(', ') : msgs) + '</div>';
+        }).join('');
+      errorBox.classList.remove('d-none');
+
+      /* reset bar */
+      bar.style.width = '0%';
+      bar.classList.add('progress-bar-animated', 'progress-bar-striped');
+      bar.style.background = 'linear-gradient(90deg,#2563eb,#0ea5e9)';
+      pct.textContent  = '0%';
+      pct.style.color  = '#1d4ed8';
+    };
+
+    xhr.onerror = function () {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i>Upload APK';
+      container.classList.add('d-none');
+      errorBox.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Upload la konsege. Se APK boot, uza Download URL.';
+      errorBox.classList.remove('d-none');
+    };
+
+    xhr.send(formData);
   });
-
-  xhr.onload = function() {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i> Upload APK';
-    bar.classList.remove('progress-bar-animated');
-
-    let response = null;
-    try { response = JSON.parse(xhr.responseText); } catch(_) {}
-
-    if ((xhr.status === 200 || xhr.status === 302) && response && response.success) {
-      window.location.href = "{% url 'core:apk_list' %}";
-      return;
-    }
-
-    container.classList.add('d-none');
-    const errors = (response && response.errors) || { upload: ['Upload la konsege. Haree koneksaun ka tamanho file.'] };
-    errorBox.innerHTML = Object.entries(errors)
-      .map(([f, msgs]) => `<div><i class="bi bi-exclamation-circle me-1"></i><strong>${f}:</strong> ${Array.isArray(msgs) ? msgs.join(', ') : msgs}</div>`)
-      .join('');
-    errorBox.classList.remove('d-none');
-  };
-
-  xhr.onerror = function() {
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="bi bi-cloud-upload me-1"></i> Upload APK';
-    container.classList.add('d-none');
-    errorBox.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Upload la konsege. Se APK boot, uza Download URL.';
-    errorBox.classList.remove('d-none');
-  };
-
-  xhr.send(formData);
-});
+})();
 </script>
 {% endblock %}

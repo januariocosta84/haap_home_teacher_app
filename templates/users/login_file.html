@@ -31,7 +31,7 @@
     <div class="login-container">
 
       <!-- Card heading (no logo) -->
-      <div style="margin-bottom:1.25rem;">
+      <div style="margin-bottom:1.25rem;text-align:center;">
         <div class="login-card-title">Bem-vindo de volta</div>
         <div class="login-card-sub">Tama ho ita nia numeru no password</div>
       </div>
@@ -87,14 +87,25 @@
           </button>
         </div>
 
-        <div class="login-link-row">
-          <a href="{% url 'core:forgot_password' %}">
-            <i class="bi bi-key me-1"></i>Haluan Password?
+        <!-- ── Registration options ── -->
+        <div class="ln-reg-divider"><span>Seidauk iha konta?</span></div>
+
+        <div class="ln-reg-row">
+          <a href="{% url 'core:parent_register' %}" class="ln-reg-btn ln-reg-parent">
+            <i class="bi bi-house-heart-fill"></i>
+            <span>Aman-Inan</span>
           </a>
-          <div style="display:flex;flex-direction:column;gap:4px;text-align:right;">
-            <a href="{% url 'core:parent_register' %}">Rejistu hanesan <strong>Aman-Inan</strong></a>
-            <a href="{% url 'core:teacher_register' %}">Rejistu hanesan <strong>Formadór</strong></a>
-          </div>
+          <a href="{% url 'core:teacher_register' %}" class="ln-reg-btn ln-reg-teacher">
+            <i class="bi bi-mortarboard-fill"></i>
+            <span>Formadór</span>
+          </a>
+        </div>
+
+        <!-- ── Forgot password ── -->
+        <div class="ln-forgot-row">
+          <a href="{% url 'core:forgot_password' %}" class="ln-forgot-link">
+            <i class="bi bi-key-fill"></i>Haluan Password?
+          </a>
         </div>
 
       </form>
@@ -108,6 +119,65 @@
   </footer>
 
 </div><!-- /overlay-container -->
+
+<style>
+/* ── Registration divider ── */
+.ln-reg-divider {
+  display:flex; align-items:center; gap:10px;
+  margin:.9rem 0 .7rem;
+  font-size:.67rem; color:#94a3b8;
+  text-transform:uppercase; letter-spacing:.07em; font-weight:700;
+}
+.ln-reg-divider::before,
+.ln-reg-divider::after {
+  content:''; flex:1; height:1px; background:#f1f5f9;
+}
+
+/* ── Side-by-side register buttons ── */
+.ln-reg-row {
+  display:flex; gap:9px; margin-bottom:.8rem;
+}
+.ln-reg-btn {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  gap:6px; padding:.58rem .5rem;
+  border-radius:10px; font-size:.78rem; font-weight:600;
+  text-decoration:none; border:1.5px solid;
+  transition:background .18s, border-color .18s, box-shadow .18s, transform .14s;
+  white-space:nowrap;
+}
+.ln-reg-btn i { font-size:.9rem; flex-shrink:0; }
+
+/* Parent — green */
+.ln-reg-parent { background:#f0fdf4; border-color:#86efac; color:#15803d; }
+.ln-reg-parent:hover {
+  background:#dcfce7; border-color:#4ade80; color:#15803d;
+  transform:translateY(-2px); box-shadow:0 5px 14px rgba(22,163,74,.18);
+}
+
+/* Teacher — blue */
+.ln-reg-teacher { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
+.ln-reg-teacher:hover {
+  background:#dbeafe; border-color:#60a5fa; color:#1d4ed8;
+  transform:translateY(-2px); box-shadow:0 5px 14px rgba(37,99,235,.18);
+}
+
+/* ── Forgot password ── */
+.ln-forgot-row {
+  text-align:center; padding-top:.65rem;
+  border-top:1px solid #f1f5f9;
+}
+.ln-forgot-link {
+  font-size:.79rem; color:#64748b; text-decoration:none;
+  display:inline-flex; align-items:center; gap:5px;
+  font-weight:500; transition:color .14s;
+}
+.ln-forgot-link:hover { color:#2563eb; }
+
+/* ── Responsive: stack on very small screens ── */
+@media (max-width:320px) {
+  .ln-reg-row { flex-direction:column; }
+}
+</style>
 
 <script>
 function toggleLoginPassword() {

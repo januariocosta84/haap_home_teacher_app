@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}HAAP Auditing Portal{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous">
+  <style>
+    :root {
+      --aud-sidebar-bg:   #0f172a;
+      --aud-sidebar-w:    240px;
+      --aud-accent:       #3b82f6;
+      --aud-accent-dark:  #1d4ed8;
+      --aud-text:         #f1f5f9;
+      --aud-muted:        #94a3b8;
+      --aud-hover:        rgba(59,130,246,.12);
+      --aud-active:       rgba(59,130,246,.22);
+      --aud-separator:    rgba(255,255,255,.07);
+      --aud-body-bg:      #f0f4f8;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--aud-body-bg);
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .aud-sidebar {
+      width: var(--aud-sidebar-w);
+      min-height: 100vh;
+      background: var(--aud-sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 1050;
+      overflow-y: auto;
+      transition: transform .25s ease;
+    }
+    .aud-brand {
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid var(--aud-separator);
+    }
+    .aud-brand-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .aud-brand-title {
+      font-size: .78rem; font-weight: 700; color: #f1f5f9;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .aud-brand-sub { font-size: .67rem; color: var(--aud-muted); margin-top: 1px; }
+
+    .aud-user-card {
+      padding: .9rem 1.25rem;
+      border-bottom: 1px solid var(--aud-separator);
+      display: flex; align-items: center; gap: .65rem;
+    }
+    .aud-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .aud-user-name { font-size: .8rem; font-weight: 600; color: #e2e8f0; }
+    .aud-user-role {
+      font-size: .65rem; color: var(--aud-muted);
+      background: rgba(59,130,246,.15);
+      border-radius: 4px; padding: 1px 6px; margin-top: 2px; display: inline-block;
+    }
+
+    .aud-nav { padding: .75rem 0; flex: 1; }
+    .aud-nav-label {
+      font-size: .6rem; font-weight: 700; color: var(--aud-muted);
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: .65rem 1.25rem .25rem;
+    }
+    .aud-nav-item { list-style: none; padding: 0 .75rem; margin: 1px 0; }
+    .aud-nav-link {
+      display: flex; align-items: center; gap: .65rem;
+      padding: .55rem .75rem; border-radius: 8px;
+      color: var(--aud-muted); text-decoration: none;
+      font-size: .825rem; transition: background .15s, color .15s;
+    }
+    .aud-nav-link:hover { background: var(--aud-hover); color: #e2e8f0; }
+    .aud-nav-link.active { background: var(--aud-active); color: #fff; font-weight: 600; }
+    .aud-nav-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .aud-sidebar-footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--aud-separator);
+    }
+
+    /* ── Sidebar close button (mobile only) ── */
+    .aud-sidebar-close {
+      display: none;
+      position: absolute;
+      top: .75rem; right: .75rem;
+      background: rgba(255,255,255,.08);
+      border: none; border-radius: 8px;
+      color: #94a3b8; width: 32px; height: 32px;
+      cursor: pointer; font-size: 1.1rem;
+      align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .aud-sidebar-close:hover { background: rgba(255,255,255,.15); color: #f1f5f9; }
+
+    /* ── Overlay ── */
+    .aud-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1040;
+      backdrop-filter: blur(2px);
+    }
+    .aud-overlay.show { display: block; }
+
+    /* ── Main content ── */
+    .aud-main {
+      margin-left: var(--aud-sidebar-w);
+      flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+    }
+    .aud-topbar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: .75rem 1.25rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 1000;
+    }
+    .aud-topbar-title { font-size: .95rem; font-weight: 700; color: #0f172a; }
+
+    /* Hamburger button */
+    .aud-hamburger {
+      display: none;
+      background: none; border: none;
+      color: #0f172a; font-size: 1.25rem;
+      padding: .25rem .5rem; cursor: pointer;
+      border-radius: 8px; line-height: 1;
+      transition: background .15s;
+    }
+    .aud-hamburger:hover { background: #f1f5f9; }
+
+    .aud-page { padding: 1.5rem; flex: 1; }
+    .toast-container { z-index: 1200; }
+
+    /* ── Tablet (≤ 991px) ── */
+    @media (max-width: 991.98px) {
+      .aud-sidebar {
+        transform: translateX(-100%);
+      }
+      .aud-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,.35);
+      }
+      .aud-sidebar-close { display: flex; }
+      .aud-main { margin-left: 0; }
+      .aud-hamburger { display: flex; align-items: center; }
+      .aud-topbar { padding: .65rem 1rem; }
+      .aud-page { padding: 1rem; }
+    }
+
+    /* ── Mobile (≤ 575px) ── */
+    @media (max-width: 575.98px) {
+      .aud-sidebar { width: 80vw; max-width: 280px; }
+      .aud-page { padding: .75rem; }
+      .aud-topbar-title { font-size: .82rem; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- OVERLAY (tap to close sidebar) -->
+  <div class="aud-overlay" id="audOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="aud-sidebar" id="audSidebar">
+
+    <!-- Close button (mobile/tablet) -->
+    <button class="aud-sidebar-close" id="audSidebarClose" aria-label="Taka sidebar">
+      <i class="bi bi-x-lg"></i>
+    </button>
+
+    <!-- Brand -->
+    <div class="aud-brand">
+      <div class="d-flex align-items-center gap-2">
+        <div class="aud-brand-icon">
+          <i class="bi bi-shield-lock-fill text-white" style="font-size:1rem;"></i>
+        </div>
+        <div>
+          <div class="aud-brand-title">HAAP Auditing</div>
+          <div class="aud-brand-sub">Portál Monitorisasaun</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User card -->
+    {% if user.is_authenticated %}
+    <div class="aud-user-card">
+      <div class="aud-avatar">{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}</div>
+      <div>
+        <div class="aud-user-name">{{ user.get_full_name }}</div>
+        <span class="aud-user-role">Auditor</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Navigation -->
+    <nav class="aud-nav">
+      <ul class="list-unstyled mb-0">
+
+        <li class="aud-nav-label">Navegasaun</li>
+
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_dashboard' %}"
+             class="aud-nav-link {% if request.resolver_match.url_name == 'auditing_dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i><span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}"
+             class="aud-nav-link {% if request.resolver_match.url_name == 'auditing_logs' %}active{% endif %}">
+            <i class="bi bi-list-ul"></i><span>Audit Logs</span>
+          </a>
+        </li>
+
+        <li class="aud-nav-label mt-2">Relatoriu</li>
+
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?action=login_failed" class="aud-nav-link">
+            <i class="bi bi-shield-x"></i><span>Login Falha</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?action=login" class="aud-nav-link">
+            <i class="bi bi-person-check"></i><span>Historial Login</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?status=failed" class="aud-nav-link">
+            <i class="bi bi-exclamation-triangle"></i><span>Eventu Seguransa</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?action=delete" class="aud-nav-link">
+            <i class="bi bi-trash3"></i><span>Rekord Apagadu</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?action=create" class="aud-nav-link">
+            <i class="bi bi-plus-square"></i><span>Rekord Kriadu</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_logs' %}?action=update" class="aud-nav-link">
+            <i class="bi bi-pencil-square"></i><span>Rekord Atualizu</span>
+          </a>
+        </li>
+
+        <li class="aud-nav-label mt-2">Export</li>
+
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_export' %}?format=csv" class="aud-nav-link">
+            <i class="bi bi-filetype-csv"></i><span>Exporta CSV</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_export' %}?format=excel" class="aud-nav-link">
+            <i class="bi bi-file-earmark-excel"></i><span>Exporta Excel</span>
+          </a>
+        </li>
+        <li class="aud-nav-item">
+          <a href="{% url 'core:auditing_export' %}?format=pdf" class="aud-nav-link">
+            <i class="bi bi-file-earmark-pdf"></i><span>Exporta PDF</span>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <div class="aud-sidebar-footer">
+      <a href="{% url 'core:auditing_logout' %}"
+         class="btn btn-sm w-100 rounded-pill fw-semibold"
+         style="background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25);">
+        <i class="bi bi-box-arrow-right me-1"></i>Sair
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <div class="aud-main">
+
+    <!-- Top bar -->
+    <div class="aud-topbar">
+      <div class="d-flex align-items-center gap-2">
+        <!-- Hamburger (tablet / mobile only) -->
+        <button class="aud-hamburger" id="audHamburger" aria-label="Abri menu">
+          <i class="bi bi-list"></i>
+        </button>
+        <i class="bi bi-shield-lock-fill text-primary d-none d-lg-inline"></i>
+        <span class="aud-topbar-title">{% block topbar_title %}HAAP Auditing Portal{% endblock %}</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 gap-sm-3">
+        <span class="badge rounded-pill px-2 px-sm-3 py-2"
+              style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;font-size:.68rem;">
+          <i class="bi bi-eye-fill me-1"></i><span class="d-none d-sm-inline">Aksesu Haree De'it</span><span class="d-sm-none">Read Only</span>
+        </span>
+        <span class="text-muted small d-none d-md-inline">{{ request.user.get_full_name }}</span>
+      </div>
+    </div>
+
+    <!-- Toast container -->
+    {% if messages %}
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1200;">
+      {% for message in messages %}{% with tags=message.tags %}
+      <div class="toast border-0 shadow-lg mb-2 show" role="alert" aria-atomic="true"
+           data-bs-autohide="true" data-bs-delay="5000" style="min-width:260px;max-width:360px;">
+        <div class="d-flex align-items-center text-white rounded"
+             style="background:{% if 'success' in tags %}#059669{% elif 'error' in tags %}#dc2626{% elif 'warning' in tags %}#d97706{% else %}#2563eb{% endif %};">
+          <div class="toast-body d-flex align-items-center gap-2 flex-grow-1 py-3 px-3">
+            <i class="bi bi-{% if 'success' in tags %}check-circle-fill{% elif 'error' in tags %}x-circle-fill{% else %}info-circle-fill{% endif %} fs-5 flex-shrink-0"></i>
+            <span class="fw-semibold lh-sm" style="font-size:.88rem;">{{ message }}</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 my-auto flex-shrink-0"
+                  data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+      {% endwith %}{% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page content -->
+    <div class="aud-page">
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js" crossorigin="anonymous"></script>
+  <script>
+  (function () {
+    var sidebar   = document.getElementById('audSidebar');
+    var overlay   = document.getElementById('audOverlay');
+    var hamburger = document.getElementById('audHamburger');
+    var closeBtn  = document.getElementById('audSidebarClose');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', openSidebar);
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    // Close sidebar when a nav link is tapped on mobile/tablet
+    sidebar.querySelectorAll('.aud-nav-link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        if (window.innerWidth < 992) closeSidebar();
+      });
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    // Toast init
+    document.querySelectorAll('.toast').forEach(function (el) {
+      bootstrap.Toast.getOrCreateInstance(el).show();
+    });
+  })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

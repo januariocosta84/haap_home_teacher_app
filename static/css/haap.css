@@ -346,6 +346,30 @@ textarea.form-control {
   border: 2px solid rgba(255,255,255,0.12);
   flex-shrink: 0;
 }
+.sb-avatar-initials {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--sb-active-bg, rgba(59,130,246,0.35));
+  border: 2px solid var(--sb-active-bar, rgba(59,130,246,0.5));
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.sb-profile-btn {
+  color: var(--sb-text-dim);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.sb-profile-btn:hover { color: #fff; }
 .sb-user-name {
   color: rgba(255,255,255,0.9);
   font-size: 0.8rem;

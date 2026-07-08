@@ -11,6 +11,7 @@ import requests
 from fonte_api import send_whatsapp_message
 
 from core.forms import ForgotPasswordForm, ResetPasswordForm, UserForm, UserRegistrationForm, UserEditForm
+from core.audit import log_action
 # Make sure this is at the top of your views file
 from django.core.cache import cache as django_cache
 from core.models import Child
@@ -44,11 +45,21 @@ class UserManagementView(View):
 
 @login_required
 def register_user(request):
+    if request.user.role != 'moe_admin':
+        return redirect('core:login')
     if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, f"User {user.first_name} created successfully and password setup email sent.")
+            log_action(
+                request=request,
+                action='create', module='Users',
+                description=f"Kria utilizador foun: {user.get_full_name()} ({user.role})",
+                record_id=str(user.id),
+                record_name=user.get_full_name(),
+                new_value={'role': user.role, 'whatsapp': str(user.whatsapp_number)},
+            )
+            messages.success(request, f"Utilizador {user.first_name} kria ho susesu.")
             return redirect("core:moe_admin_dashboard")
     else:
         form = UserRegistrationForm()
@@ -81,6 +92,13 @@ def approve_teacher(request, user_id):
     teacher.is_active = True
     teacher.is_verified = True
     teacher.save()
+    log_action(
+        request=request,
+        action='activate', module='Users',
+        description=f"Aprova formadór: {teacher.get_full_name()}",
+        record_id=str(teacher.id),
+        record_name=teacher.get_full_name(),
+    )
 
     message = (
         f"Hello {teacher.first_name},\n\n"
@@ -106,9 +124,22 @@ def edit_user(request, user_id):
         return redirect("core:user_management")
 
     if request.method == "POST":
+        old_role = user_obj.role
         form = UserEditForm(request.POST, instance=user_obj, current_user=request.user)
         if form.is_valid():
-            form.save()
+            new_user = form.save()
+            changed = {k: v for k, v in form.cleaned_data.items()
+                       if k not in ('password', 'password2')}
+            action = 'role_change' if old_role != new_user.role else 'update'
+            log_action(
+                request=request,
+                action=action, module='Users',
+                description=f"Atualiza utilizador: {new_user.get_full_name()}",
+                record_id=str(new_user.id),
+                record_name=new_user.get_full_name(),
+                previous_value={'role': old_role},
+                new_value={'role': new_user.role},
+            )
             messages.success(request, "Utilizador atualizado ho sucesso.")
             # Redirect based on user role
             if request.user.role == "moe_admin":
@@ -134,7 +165,17 @@ def delete_user(request, user_id):
     user_obj = get_object_or_404(User, id=user_id)
     if request.method == "POST":
         name = f"{user_obj.first_name} {user_obj.last_name}"
+        uid  = str(user_obj.id)
+        role = user_obj.role
         user_obj.delete()
+        log_action(
+            request=request,
+            action='delete', module='Users',
+            description=f"Apaga utilizador: {name} ({role})",
+            record_id=uid,
+            record_name=name,
+            previous_value={'role': role},
+        )
         messages.warning(request, f"User '{name}' has been deleted.")
         return redirect("core:user_management")
 

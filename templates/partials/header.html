@@ -16,7 +16,7 @@
     <!-- RIGHT -->
     <ul class="navbar-nav ms-auto align-items-center gap-2">
 
-      <!-- NOTIFICATION BELL -->
+      <!-- TICKET NOTIFICATION BELL (admin & teacher) -->
       {% if user.role == 'moe_admin' or user.role == 'teacher' %}
       <li class="nav-item dropdown" id="notif-dropdown-item">
         <a class="nav-link position-relative p-2" href="#" id="notifBellBtn"
@@ -31,7 +31,6 @@
         <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
              id="notif-panel"
              style="width:clamp(280px,340px,95vw);border-radius:14px;overflow:hidden;">
-          <!-- Header -->
           <div class="d-flex align-items-center justify-content-between px-3 py-2"
                style="background:#2563eb;">
             <span class="fw-bold text-white" style="font-size:0.88rem;">
@@ -43,9 +42,52 @@
               Marka hotu lida
             </button>
           </div>
+          <div id="notif-list" style="max-height:360px;overflow-y:auto;">
+            <div class="text-center text-muted py-4" style="font-size:0.83rem;">
+              <i class="bi bi-bell-slash d-block mb-1" style="font-size:1.5rem;"></i>
+              Laiha notifikasaun foun
+            </div>
+          </div>
+          <div class="border-top text-center py-2">
+            <a href="{% url 'ticket:support-ticket-list' %}"
+               class="text-primary fw-semibold"
+               style="font-size:0.8rem;text-decoration:none;">
+              Haree tiket hotu <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </li>
+      {% endif %}
+
+      <!-- APK NOTIFICATION BELL (parent only) -->
+      {% if user.role == 'parent' %}
+      <li class="nav-item dropdown" id="apk-notif-dropdown">
+        <a class="nav-link position-relative p-2" href="#" id="apkNotifBellBtn"
+           data-bs-toggle="dropdown" aria-expanded="false"
+           title="Notifikasaun Aplikasaun">
+          <i class="bi bi-bell fs-5"></i>
+          <span id="apk-notif-badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size:0.6rem;display:none;">0</span>
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+             id="apk-notif-panel"
+             style="width:clamp(280px,340px,95vw);border-radius:14px;overflow:hidden;">
+          <!-- Header -->
+          <div class="d-flex align-items-center justify-content-between px-3 py-2"
+               style="background:linear-gradient(135deg,#059669,#047857);">
+            <span class="fw-bold text-white" style="font-size:0.88rem;">
+              <i class="bi bi-bell me-1"></i>Notifikasaun
+            </span>
+            <button id="apk-notif-read-all-btn"
+                    class="btn btn-sm text-white fw-semibold p-0"
+                    style="font-size:0.75rem;background:none;border:none;opacity:0.85;">
+              Marka hotu lida
+            </button>
+          </div>
           <!-- List -->
-          <div id="notif-list"
-               style="max-height:360px;overflow-y:auto;">
+          <div id="apk-notif-list" style="max-height:360px;overflow-y:auto;">
             <div class="text-center text-muted py-4" style="font-size:0.83rem;">
               <i class="bi bi-bell-slash d-block mb-1" style="font-size:1.5rem;"></i>
               Laiha notifikasaun foun
@@ -53,10 +95,10 @@
           </div>
           <!-- Footer -->
           <div class="border-top text-center py-2">
-            <a href="{% url 'ticket:support-ticket-list' %}"
-               class="text-primary fw-semibold"
+            <a href="/apk/download-latest/"
+               class="text-success fw-semibold"
                style="font-size:0.8rem;text-decoration:none;">
-              Haree tiket hotu <i class="bi bi-arrow-right"></i>
+              Download HAAP APK <i class="bi bi-download"></i>
             </a>
           </div>
         </div>

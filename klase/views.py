@@ -255,6 +255,8 @@ class ClassroomDetailView(View):
         return render(request, self.template_name, context)
 
     def post(self, request, classroom_id):
+        import datetime
+
         if request.user.role == 'moe_admin':
             messages.error(request, "MoE admin bele haree klase, maibe labele aumenta alunu iha pajina ida ne'e.")
             return redirect('klase:classroom-detail', classroom_id=classroom_id)
@@ -267,48 +269,95 @@ class ClassroomDetailView(View):
 
         form = ChildCodeEnrollmentForm(request.POST)
 
-        if form.is_valid():
-            child_code = form.cleaned_data['child_code']
-            print("Received child code:", child_code)
-
-            # Find child by user_id (the code)
-            child = Child.objects.filter(user_id=child_code).first()
-            print("Found child:", child.first_name if child else "No child found")
-            print("Child age group:", child.age_group if child else "N/A")
-
-            if not child:
-                messages.error(request, f" Kodigu  '{child_code}' ida ne'e la existe iha sistema Halo favor tau kodigu ho los")
-                return redirect('klase:classroom-detail', classroom_id=classroom.id)
-
-            # Validate child group against classroom group based on child registration age group
-            if child.age_group != classroom.group:
-                messages.error(
-                    request,
-                    f"Labarik group '{child.age_group}' labele rejista iha group '{classroom.group}'. Favor usa kodigu labarik ne ho koreta."
-                )
-                return redirect('klase:classroom-detail', classroom_id=classroom.id)
-
-            enrollment = ClassroomChild.objects.filter(classroom=classroom, child=child).first()
-
-            if enrollment and enrollment.is_active:
-                messages.warning(request, f"{child.first_name} Rejistadu ona iha klase ida ne'e.")
-                return redirect('klase:classroom-detail', classroom_id=classroom.id)
-
-            if enrollment:
-                enrollment.is_active = True
-                enrollment.save(update_fields=['is_active'])
-            else:
-                ClassroomChild.objects.create(
-                    classroom=classroom,
-                    child=child,
-                    is_active=True
-                )
-
-            messages.success(request, f"{child.first_name} adisiona ona ba klase {classroom.name}.")
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
-        else:
+        if not form.is_valid():
             messages.error(request, "Kodigu invalidu.")
             return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        child_code = form.cleaned_data['child_code']
+
+        # 1. Find child by user_id (the code)
+        child = Child.objects.filter(user_id=child_code).first()
+
+        if not child:
+            messages.error(
+                request,
+                f"Kodigu '{child_code}' la existe iha sistema. Favor verifika kodigu ho los."
+            )
+            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        # 2. Validate registered age group matches classroom group
+        if child.age_group != classroom.group:
+            group_label = {'A': 'Grupo A (Tinan 3–4)', 'B': 'Grupo B (Tinan 5–6)'}
+            messages.error(
+                request,
+                f"Labarik '{child.first_name}' pertense {group_label.get(child.age_group, child.age_group)}, "
+                f"maibé klase ida ne'e uza {group_label.get(classroom.group, classroom.group)}. "
+                f"Labarik labele rejista iha grupo ne'ebé la tuir."
+            )
+            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        # 3. Validate actual age from year_of_birth
+        current_year = datetime.date.today().year
+        child_age = current_year - child.year_of_birth
+        age_ranges = {'A': (3, 4), 'B': (5, 6)}
+        min_age, max_age = age_ranges[classroom.group]
+
+        if not (min_age <= child_age <= max_age):
+            messages.error(
+                request,
+                f"Labarik '{child.first_name}' iha tinan {child_age} "
+                f"({child.year_of_birth}), maibé klase {classroom.group} presiza labarik tinan {min_age}–{max_age}. "
+                f"Labarik la elegível atu rejista iha klase ida ne'e."
+            )
+            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        # 4. Check if already actively enrolled in THIS classroom
+        this_enrollment = ClassroomChild.objects.filter(
+            classroom=classroom, child=child
+        ).first()
+
+        if this_enrollment and this_enrollment.is_active:
+            messages.warning(
+                request,
+                f"{child.first_name} rejistadu ona iha klase '{classroom.name}'."
+            )
+            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        # 5. Check if actively enrolled in ANY OTHER classroom (one-class rule)
+        other_enrollment = ClassroomChild.objects.filter(
+            child=child,
+            is_active=True
+        ).exclude(classroom=classroom).select_related(
+            'classroom', 'classroom__preschool'
+        ).first()
+
+        if other_enrollment:
+            messages.error(
+                request,
+                f"{child.first_name} rejistadu ona iha klase "
+                f"'{other_enrollment.classroom.name}' "
+                f"({other_enrollment.classroom.preschool.name}). "
+                f"Favor hasai labarik hosi klase ne'ebé atual molok rejista iha klase seluk."
+            )
+            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+
+        # 6. All checks passed — enroll
+        if this_enrollment:
+            # reactivate a previously removed enrollment in this same class
+            this_enrollment.is_active = True
+            this_enrollment.save(update_fields=['is_active'])
+        else:
+            ClassroomChild.objects.create(
+                classroom=classroom,
+                child=child,
+                is_active=True
+            )
+
+        messages.success(
+            request,
+            f"{child.first_name} adisiona ona ba klase '{classroom.name}' ho susesu."
+        )
+        return redirect('klase:classroom-detail', classroom_id=classroom.id)
 
 
 @method_decorator(login_required, name='dispatch')

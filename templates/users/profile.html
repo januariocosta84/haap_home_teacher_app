@@ -14,39 +14,42 @@
         <!-- Header: Avatar + Name + Role + Actions -->
         <div class="card-body px-4 pb-4" style="margin-top: -52px;">
 
-          <!-- Avatar / Photo (overlaps the banner on its own) -->
-          <div class="flex-shrink-0">
-            {% if user.image %}
-              <img src="{{ user.image.url }}"
-                   id="previewImg"
-                   alt="Foto Perfil"
-                   class="rounded-circle"
-                   style="width:104px; height:104px; object-fit:cover; border: 4px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.12);">
-            {% else %}
-              <div id="avatarInitials"
-                   class="rounded-circle d-flex align-items-center justify-content-center"
-                   style="width:104px; height:104px; background:#E6F1FB; font-size:34px; font-weight:600; color:#185FA5; border: 4px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.12);">
-                {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
-              </div>
-            {% endif %}
+          <!-- Avatar / Photo (overlaps the banner) -->
+          <div class="flex-shrink-0" style="position:relative;display:inline-block;">
 
-            {% comment %} Photo upload disabled: core:update_profile_image route is inactive
-            <form method="post" enctype="multipart/form-data" id="photoForm" action="{% url 'core:update_profile_image' %}">
+            <!-- Clickable avatar triggers confirmation dialog -->
+            <div id="avatarWrap" onclick="openPhotoConfirm()"
+                 style="cursor:pointer;position:relative;display:inline-block;" title="Troka foto perfil">
+
+              {% if user.image %}
+                <img src="{{ user.image.url }}"
+                     id="previewImg"
+                     alt="Foto Perfil"
+                     class="rounded-circle"
+                     style="width:104px;height:104px;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.12);transition:filter .2s;">
+              {% else %}
+                <div id="avatarInitials"
+                     class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:104px;height:104px;background:#E6F1FB;font-size:34px;font-weight:600;color:#185FA5;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.12);">
+                  {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                </div>
+              {% endif %}
+
+              <!-- Camera badge overlay -->
+              <div style="position:absolute;bottom:4px;right:4px;width:28px;height:28px;border-radius:50%;
+                          background:#2563eb;border:2px solid #fff;display:flex;align-items:center;
+                          justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.2);">
+                <i class="bi bi-camera-fill" style="font-size:.65rem;color:#fff;"></i>
+              </div>
+            </div>
+
+            <!-- Hidden upload form -->
+            <form method="post" enctype="multipart/form-data" id="photoForm"
+                  action="{% url 'core:update_profile_image' %}">
               {% csrf_token %}
-              <input type="file"
-                     id="id_image"
-                     name="image"
-                     accept="image/*"
-                     style="display:none;"
-                     onchange="autoSubmit(this)">
-              <button type="button"
-                      class="btn btn-sm btn-outline-secondary mt-2 px-3"
-                      style="font-size:12px; border-radius:20px;"
-                      onclick="document.getElementById('id_image').click()">
-                &#8593; Hili foto
-              </button>
+              <input type="file" id="id_image" name="image" accept="image/*"
+                     style="display:none;" onchange="submitPhoto(this)">
             </form>
-            {% endcomment %}
           </div>
 
           <!-- Name + number + badge + actions (clear of the banner) -->
@@ -108,39 +111,111 @@
   </div>
 </div>
 
+<!-- ── Photo confirmation dialog ──────────────────────────────────────────── -->
+<div id="photoConfirmOverlay"
+     style="display:none;position:fixed;inset:0;z-index:9999;
+            background:rgba(15,23,42,.55);backdrop-filter:blur(4px);
+            -webkit-backdrop-filter:blur(4px);
+            align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:20px;padding:2rem 1.75rem 1.5rem;
+              max-width:360px;width:100%;
+              box-shadow:0 20px 60px rgba(0,0,0,.22);
+              text-align:center;animation:pcFadeIn .18s ease;">
+
+    <!-- Icon -->
+    <div style="width:60px;height:60px;border-radius:50%;background:#eff6ff;
+                display:flex;align-items:center;justify-content:center;
+                margin:0 auto 1rem;">
+      <i class="bi bi-camera-fill" style="font-size:1.5rem;color:#2563eb;"></i>
+    </div>
+
+    <!-- Message -->
+    <h6 style="font-weight:700;color:#0f172a;margin-bottom:.4rem;font-size:1rem;">
+      Hakarak troka profile picture?
+    </h6>
+    <p style="font-size:.82rem;color:#64748b;margin-bottom:1.5rem;line-height:1.5;">
+      Foto foun sei substitui foto atual ita nian.
+    </p>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:.75rem;justify-content:center;">
+      <button onclick="closePhotoConfirm()"
+              style="flex:1;padding:.62rem 1rem;border-radius:10px;
+                     border:1.5px solid #e2e8f0;background:#f8fafc;
+                     color:#475569;font-size:.85rem;font-weight:600;cursor:pointer;
+                     transition:background .15s;">
+        <i class="bi bi-x-lg me-1"></i>Lae
+      </button>
+      <button onclick="confirmPhotoUpload()"
+              style="flex:1;padding:.62rem 1rem;border-radius:10px;
+                     border:0;background:linear-gradient(135deg,#2563eb,#1d4ed8);
+                     color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;
+                     box-shadow:0 3px 10px rgba(37,99,235,.3);
+                     transition:box-shadow .15s,transform .12s;">
+        <i class="bi bi-upload me-1"></i>Sin, Troka
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+@keyframes pcFadeIn {
+  from { opacity:0; transform:scale(.94); }
+  to   { opacity:1; transform:scale(1); }
+}
+#avatarWrap:hover img,
+#avatarWrap:hover #avatarInitials { filter: brightness(.88); }
+</style>
+
 <script>
-  function autoSubmit(input) {
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        // Remove initials avatar if it exists
-        const initials = document.getElementById('avatarInitials');
-        if (initials) initials.remove();
-
-        // Update or create the preview image
-        let img = document.getElementById('previewImg');
-        if (!img) {
-          img = document.createElement('img');
-          img.id = 'previewImg';
-          img.alt = 'Foto Perfil';
-          img.className = 'rounded-circle';
-          img.style.cssText = 'width:100px; height:100px; object-fit:cover; border: 2px solid #e0e0e0;';
-          input.closest('.text-center').insertBefore(img, input.closest('form'));
-        }
-
-        // Show new photo immediately
-        img.src = e.target.result;
-
-        // Submit after short delay so user sees the change
-        setTimeout(function() {
-          document.getElementById('photoForm').submit();
-        }, 500);
-      };
-
-      reader.readAsDataURL(file);
-    }
+  function openPhotoConfirm() {
+    var overlay = document.getElementById('photoConfirmOverlay');
+    overlay.style.display = 'flex';
   }
+
+  function closePhotoConfirm() {
+    document.getElementById('photoConfirmOverlay').style.display = 'none';
+  }
+
+  function confirmPhotoUpload() {
+    closePhotoConfirm();
+    document.getElementById('id_image').click();
+  }
+
+  function submitPhoto(input) {
+    if (!input.files || !input.files.length) return;
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      /* swap preview immediately */
+      var initials = document.getElementById('avatarInitials');
+      if (initials) initials.remove();
+      var img = document.getElementById('previewImg');
+      if (!img) {
+        img = document.createElement('img');
+        img.id        = 'previewImg';
+        img.alt       = 'Foto Perfil';
+        img.className = 'rounded-circle';
+        img.style.cssText = 'width:104px;height:104px;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.12);';
+        document.getElementById('avatarWrap').prepend(img);
+      }
+      img.src = e.target.result;
+      /* submit after brief preview */
+      setTimeout(function () {
+        document.getElementById('photoForm').submit();
+      }, 400);
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+  /* Close on backdrop click */
+  document.getElementById('photoConfirmOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closePhotoConfirm();
+  });
+
+  /* Close on Escape key */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closePhotoConfirm();
+  });
 </script>
 {% endblock %}

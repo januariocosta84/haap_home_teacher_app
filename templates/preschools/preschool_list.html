@@ -154,7 +154,7 @@
   box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
   margin-bottom: 1.25rem;
 }
-#psMap { height: 480px; width: 100%; }
+#psMap { height: 500px; width: 100%; }
 .map-toggle-btn {
   display: inline-flex; align-items: center; gap: 6px;
   border-radius: 20px; padding: 4px 14px;
@@ -172,15 +172,52 @@
 .map-toggle-btn:not(.active):hover {
   background: rgba(255,255,255,.25); color: #fff;
 }
+/* Map topbar */
+.map-topbar {
+  background: #fff; padding: .7rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: .5rem;
+}
+.map-topbar-title {
+  font-weight: 700; font-size: .88rem; color: #1e293b;
+  display: flex; align-items: center; gap: 6px;
+}
+/* Map legend */
+.map-legend {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  font-size: .72rem; color: #64748b;
+}
+.map-legend-item {
+  display: inline-flex; align-items: center; gap: 5px; font-weight: 600;
+}
+.map-legend-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.map-legend-approx {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px dashed #94a3b8; flex-shrink: 0;
+  background: #f1f5f9;
+}
+/* Map stats strip */
+.map-stats-strip {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .5rem 1.25rem;
+  background: #f8fafc; border-top: 1px solid #f1f5f9;
+  font-size: .75rem; color: #64748b; flex-wrap: wrap;
+}
+.map-stat { display: flex; align-items: center; gap: 5px; font-weight: 600; }
+/* Popup */
 .leaflet-popup-content-wrapper {
   border-radius: 12px !important; padding: 0 !important; overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,.15) !important;
 }
 .leaflet-popup-content { margin: 0 !important; }
-.map-popup { padding: 12px 14px; min-width: 180px; }
+.map-popup { padding: 12px 14px; min-width: 190px; }
 .map-popup-title { font-weight: 700; font-size: 0.88rem; color: #1e293b; margin-bottom: 4px; }
 .map-popup-type { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; padding: 2px 9px; font-size: 0.72rem; font-weight: 700; margin-bottom: 6px; }
 .map-popup-muni { font-size: 0.76rem; color: #64748b; }
+.map-popup-approx { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; font-style: italic; }
 .map-popup-link { display: inline-block; margin-top: 8px; font-size: 0.76rem; font-weight: 600; color: #2563eb; text-decoration: none; }
 .map-popup-link:hover { text-decoration: underline; }
 </style>
@@ -208,16 +245,6 @@
         </div>
       </div>
       <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
-        <!-- View toggle -->
-        <div style="display:flex;gap:4px;background:rgba(0,0,0,.15);border-radius:24px;padding:3px;">
-          <button id="btnViewList" class="map-toggle-btn active">
-            <i class="bi bi-list-ul"></i>Lista
-          </button>
-          <button id="btnViewMap" class="map-toggle-btn">
-            <i class="bi bi-geo-alt-fill"></i>Mapa
-            {% if map_count %}<span style="background:rgba(255,255,255,.25);border-radius:12px;padding:0 6px;font-size:0.7rem;">{{ map_count }}</span>{% endif %}
-          </button>
-        </div>
         {% if user.role == 'moe_admin' %}
         <a href="{% url 'preschools:preschool_create' %}"
            class="btn rounded-pill px-4 fw-semibold"
@@ -286,19 +313,59 @@
     </form>
   </div>
 
-  <!-- ══ MAP SECTION ══════════════════════════════════════════════════════ -->
+  <!-- ══ MAP SECTION — always visible ═════════════════════════════════════ -->
   <div id="mapSection">
-    <div class="card border-0" style="border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);margin-bottom:1.25rem;">
-      <div style="background:#fff;padding:0.7rem 1.25rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <span style="font-weight:600;font-size:0.88rem;color:#1e293b;"><i class="bi bi-geo-alt-fill me-1" style="color:#2563eb;"></i>Mapa Pre-Eskolár</span>
-          <span style="font-size:0.75rem;color:#94a3b8;margin-left:8px;">{{ map_count }} pre-eskolár ho lokalizasaun</span>
+    <div class="card border-0" style="border-radius:16px;overflow:hidden;
+         box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);margin-bottom:1.25rem;">
+
+      <!-- Topbar -->
+      <div class="map-topbar">
+        <div class="map-topbar-title">
+          <i class="bi bi-geo-alt-fill" style="color:#2563eb;"></i>
+          Mapa Pre-Eskolár
         </div>
-        <div style="font-size:0.72rem;color:#94a3b8;">
-          <i class="bi bi-info-circle me-1"></i>Klik marker atu haree detallu
+        <!-- Legend -->
+        <div class="map-legend">
+          <span class="map-legend-item">
+            <span class="map-legend-dot" style="background:#2563eb;"></span>Government
+          </span>
+          <span class="map-legend-item">
+            <span class="map-legend-dot" style="background:#16a34a;"></span>Community
+          </span>
+          <span class="map-legend-item">
+            <span class="map-legend-dot" style="background:#6d28d9;"></span>Private
+          </span>
+          <span class="map-legend-item">
+            <span class="map-legend-dot" style="background:#b45309;"></span>Playgroup
+          </span>
+          <span class="map-legend-item" style="margin-left:4px;">
+            <span class="map-legend-approx"></span>Lokalizasaun aproximadu
+          </span>
+          <span style="color:#94a3b8;font-size:.7rem;">
+            <i class="bi bi-info-circle me-1"></i>Klik marker atu haree detallu
+          </span>
         </div>
       </div>
+
+      <!-- Map canvas -->
       <div id="psMap"></div>
+
+      <!-- Stats strip -->
+      <div class="map-stats-strip">
+        <span class="map-stat">
+          <i class="bi bi-building-fill" style="color:#2563eb;"></i>
+          {{ map_count }} pre-eskolár total
+        </span>
+        <span class="map-stat">
+          <i class="bi bi-crosshair" style="color:#16a34a;"></i>
+          {{ gps_count }} ho GPS exatu
+        </span>
+        <span class="map-stat">
+          <i class="bi bi-geo" style="color:#94a3b8;"></i>
+          {{ map_count }} total · {{ gps_count }} GPS exatu
+        </span>
+      </div>
+
     </div>
   </div>
 
@@ -514,54 +581,92 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+/* ── Raw data from Django ── */
 var _psMapData = {{ map_data_json|safe }};
 
+/* ── Type colours ── */
 var _typeColors = {
   government: '#2563eb', community: '#16a34a',
-  private: '#6d28d9',   playgroup: '#b45309'
+  private:    '#6d28d9', playgroup: '#b45309'
 };
 var _typeBg = {
   government: '#eff6ff', community: '#f0fdf4',
-  private: '#f5f3ff',   playgroup: '#fffbeb'
+  private:    '#f5f3ff', playgroup: '#fffbeb'
 };
 
-function makeMarkerIcon(type) {
-  var color = _typeColors[type] || '#475569';
-  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">' +
-    '<ellipse cx="16" cy="39" rx="6" ry="3" fill="rgba(0,0,0,0.18)"/>' +
-    '<path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 28 12 28S28 21 28 12C28 5.4 22.6 0 16 0z" fill="' + color + '"/>' +
-    '<circle cx="16" cy="12" r="6" fill="#fff" opacity="0.9"/>' +
-    '</svg>';
-  return L.divIcon({ html: svg, className: '', iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -44] });
-}
+/* ── Municipality centroids for Timor-Leste (fallback when GPS missing) ── */
+var _munCentroids = {
+  'Aileu':            [-8.730,  125.570],
+  'Ainaro':           [-9.000,  125.500],
+  'Baucau':           [-8.467,  126.453],
+  'Bobonaro':         [-9.022,  124.986],
+  'Cova Lima':        [-9.297,  125.259],
+  'Dili':             [-8.557,  125.560],
+  'Ermera':           [-8.750,  125.383],
+  'Lautém':           [-8.367,  126.900],
+  'Liquiçá':          [-8.597,  125.310],
+  'Manufahi':         [-9.000,  125.900],
+  'Manatuto':         [-8.517,  126.017],
+  'Oé-Cusse Ambeno':  [-9.200,  124.350],
+  'Oecussi':          [-9.200,  124.350],
+  'Viqueque':         [-8.867,  126.367],
+};
+var _defaultCenter = [-8.874, 125.727]; /* centre of Timor-Leste */
 
-function switchView(view) {
-  var mapSec = document.getElementById('mapSection');
-  var tableSec = document.getElementById('tableSection');
-  var btnList = document.getElementById('btnViewList');
-  var btnMap = document.getElementById('btnViewMap');
-  if (view === 'map') {
-    mapSec.style.display = 'block';
-    tableSec.style.display = 'none';
-    btnMap.classList.add('active');
-    btnList.classList.remove('active');
-  } else {
-    mapSec.style.display = 'none';
-    tableSec.style.display = 'block';
-    btnList.classList.add('active');
-    btnMap.classList.remove('active');
+/* ── Build per-municipality centroid from exact-GPS preschools ── */
+var _munGpsSum = {};
+_psMapData.forEach(function (p) {
+  if (p.has_gps && p.municipality) {
+    if (!_munGpsSum[p.municipality]) _munGpsSum[p.municipality] = { lat: 0, lng: 0, n: 0 };
+    _munGpsSum[p.municipality].lat += p.lat;
+    _munGpsSum[p.municipality].lng += p.lng;
+    _munGpsSum[p.municipality].n++;
   }
+});
+
+function getMunCenter(mun) {
+  /* 1. average of GPS preschools in same municipality */
+  if (_munGpsSum[mun] && _munGpsSum[mun].n > 0) {
+    var s = _munGpsSum[mun];
+    return [s.lat / s.n, s.lng / s.n];
+  }
+  /* 2. hardcoded centroid */
+  if (_munCentroids[mun]) return _munCentroids[mun];
+  /* 3. country centre */
+  return _defaultCenter;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+/* ── Marker icon factory ── */
+function makeMarkerIcon(type, exact) {
+  var color  = _typeColors[type] || '#475569';
+  var shadow = exact ? 'rgba(0,0,0,0.20)' : 'rgba(0,0,0,0.10)';
+  var opacity = exact ? '1' : '0.7';
+  var pinFill = exact ? color : '#94a3b8';
+  /* dashed ring for approximate markers */
+  var ring = exact ? '' :
+    '<circle cx="16" cy="12" r="10" fill="none" stroke="' + color + '" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.8"/>';
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42" opacity="' + opacity + '">' +
+    '<ellipse cx="16" cy="39" rx="6" ry="3" fill="' + shadow + '"/>' +
+    '<path d="M16 0C9.4 0 4 5.4 4 12c0 9 12 28 12 28S28 21 28 12C28 5.4 22.6 0 16 0z" fill="' + pinFill + '"/>' +
+    '<circle cx="16" cy="12" r="6" fill="#fff" opacity="0.92"/>' +
+    ring +
+    '</svg>';
+  return L.divIcon({
+    html: svg, className: '',
+    iconSize: [32, 42], iconAnchor: [16, 42], popupAnchor: [0, -46]
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  /* tooltips */
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
     new bootstrap.Tooltip(el, { trigger: 'hover' });
   });
-  document.querySelector('select[name="municipality"]')?.addEventListener('change', function() {
-    this.closest('form').submit();
-  });
+  /* auto-submit on municipality select change */
+  var munSel = document.querySelector('select[name="municipality"]');
+  if (munSel) munSel.addEventListener('change', function () { this.closest('form').submit(); });
 
-  // Initialize Leaflet map — container is always in DOM so size is calculable
+  /* ── Initialise Leaflet ── */
   var map = L.map('psMap', { zoomControl: true });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -569,40 +674,55 @@ document.addEventListener('DOMContentLoaded', function() {
   }).addTo(map);
 
   var bounds = [];
-  _psMapData.forEach(function(p) {
+
+  _psMapData.forEach(function (p) {
+    var lat, lng, isExact;
+    if (p.has_gps) {
+      lat = p.lat; lng = p.lng; isExact = true;
+    } else {
+      var c = getMunCenter(p.municipality);
+      /* small jitter so stacked approximate markers spread out */
+      lat = c[0] + (Math.random() - 0.5) * 0.012;
+      lng = c[1] + (Math.random() - 0.5) * 0.012;
+      isExact = false;
+    }
+
     var color = _typeColors[p.type] || '#475569';
-    var bg = _typeBg[p.type] || '#f8fafc';
-    var popup = '<div class="map-popup">' +
-      '<div class="map-popup-title">' + p.name + '</div>' +
-      '<span class="map-popup-type" style="background:' + bg + ';color:' + color + ';">' + p.type_display + '</span>' +
-      (p.municipality ? '<div class="map-popup-muni"><i class="bi bi-geo-alt" style="color:#94a3b8;margin-right:3px;"></i>' + p.municipality + '</div>' : '') +
-      '<a href="/preschool/detail/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
+    var bg    = _typeBg[p.type]    || '#f8fafc';
+
+    var popup =
+      '<div class="map-popup">' +
+        '<div class="map-popup-title">' + p.name + '</div>' +
+        '<span class="map-popup-type" style="background:' + bg + ';color:' + color + ';">' +
+          p.type_display +
+        '</span>' +
+        (p.municipality
+          ? '<div class="map-popup-muni"><i class="bi bi-geo-alt" style="color:#94a3b8;margin-right:3px;"></i>' + p.municipality + '</div>'
+          : '') +
+        (!isExact
+          ? '<div class="map-popup-approx"><i class="bi bi-info-circle me-1"></i>Lokalizasaun aproximadu ba munisípiu</div>'
+          : '') +
+        '<a href="/preschool/list-preschool/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
       '</div>';
-    L.marker([p.lat, p.lng], { icon: makeMarkerIcon(p.type) })
+
+    L.marker([lat, lng], { icon: makeMarkerIcon(p.type, isExact) })
       .bindPopup(popup, { maxWidth: 240 })
       .addTo(map);
-    bounds.push([p.lat, p.lng]);
+
+    bounds.push([lat, lng]);
   });
 
+  /* fit view */
   if (bounds.length === 1) {
     map.setView(bounds[0], 13);
   } else if (bounds.length > 1) {
     map.fitBounds(bounds, { padding: [40, 40] });
   } else {
-    map.setView([-8.874, 125.727], 9);
+    map.setView(_defaultCenter, 9);
   }
 
-  // Handle toggle: invalidate size when map section becomes visible
-  document.getElementById('btnViewMap').addEventListener('click', function() {
-    switchView('map');
-    setTimeout(function() { map.invalidateSize(); }, 50);
-  });
-  document.getElementById('btnViewList').addEventListener('click', function() {
-    switchView('list');
-  });
-
-  // Start in list view; map section is visible for init but will be hidden
-  switchView('list');
+  /* keep map sized correctly after layout changes */
+  setTimeout(function () { map.invalidateSize(); }, 100);
 });
 </script>
 {% endblock %}

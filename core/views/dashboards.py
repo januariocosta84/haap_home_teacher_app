@@ -1,12 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from core.models import User, Child
+from core.models import User, Child, TeacherActivityLog
 from preschools.models import PreschoolTeacher, Preschool
 from equipment.models import Equipment
 from ticket.models import SupportTicket
 
 @login_required
 def moe_admin_dashboard(request):
+    if request.user.role != 'moe_admin':
+        return redirect('core:login')
     tickets_qs = SupportTicket.objects.select_related(
         'teacher', 'preschool'
     ).order_by('-created_at')
@@ -33,21 +35,32 @@ def moe_admin_dashboard(request):
 
 @login_required
 def municipality_dashboard(request):
+    if request.user.role != 'municipality_analyst':
+        return redirect('core:login')
     user = request.user
     municipality = user.municipality
 
     children_list = Child.objects.filter(parent__municipality=municipality)
     parents_list = User.objects.filter(role="parent", municipality=municipality)
     teachers_list = User.objects.filter(role="teacher", municipality=municipality)
+    teacher_logs = (
+        TeacherActivityLog.objects
+        .select_related("teacher", "preschool")
+        .filter(preschool__municipality=municipality)
+        .order_by("-created_at")[:100]
+    )
 
     context = {
         "municipality": municipality,
         "children_count": children_list.count(),
         "parents_count": parents_list.count(),
         "teachers_count": teachers_list.count(),
+        "teacher_logs_count": TeacherActivityLog.objects.filter(preschool__municipality=municipality).count(),
         "children_list": children_list,
         "parents_list": parents_list,
         "teachers_list": teachers_list,
+        "teacher_logs": teacher_logs,
+        "log_status_choices": TeacherActivityLog.STATUS_CHOICES,
     }
     return render(request, "dashboards/municipality_dashboard.html", context)
 

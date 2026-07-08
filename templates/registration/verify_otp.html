@@ -1,82 +1,209 @@
 {% extends "./layout.html" %}
+{% load static %}
+{% block title %}HAAP | Verifika OTP{% endblock %}
+
 {% block content %}
 
-
-<div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-  <div class="col-md-4">
-    <div class="card shadow otp-card">
-
-      <!-- Header -->
-      <div class="otp-header text-white">
-        <i class="bi bi-key"></i>
-        <h5 class="mb-0">Verifika OTP</h5>
-        <small>Konfirma ita nia identidade</small>
-      </div>
-
-      <!-- Body -->
-      <div class="card-body p-4">
-
-        <!-- Messages -->
-        {% if messages %}
-          {% for msg in messages %}
-            <div class="alert alert-{{ msg.tags }} alert-dismissible fade show" role="alert">
-              {{ msg }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-          {% endfor %}
-        {% endif %}
-
-        <!-- Instruction -->
-        <p class="text-muted small text-center mb-4">
-          Hatama <strong>OTP</strong> ne'ebé ami haruka ba ita nia WhatsApp.
-        </p>
-
-        <!-- Form -->
-        <form method="post">
-          {% csrf_token %}
-
-          <div class="mb-3">
-            <input type="text"
-                   name="otp"
-                   class="form-control otp-input"
-                   placeholder="••••••"
-                   maxlength="6"
-                   required
-                   autofocus>
-          </div>
-
-          <button type="submit" class="btn btn-primary w-100">
-            <i class="bi bi-check-circle"></i> Verifika
-          </button>
-        </form>
-
-      </div>
-
-      <!-- Footer -->
-      <div class="card-footer text-center bg-light">
-        <small>
-          <a href="{% url 'core:forgot_password' %}" class="text-decoration-none">
-            🔄 Husu OTP fali
-          </a>
-        </small>
-      </div>
-
+<!-- Full-screen background carousel -->
+<div id="backgroundCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000"
+     style="position:fixed;inset:0;z-index:0;">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/static/img/Background 1_Transport.png" class="img-fluid w-100" alt="">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 2_Me.png" class="img-fluid w-100" alt="">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 3_Culture.png" class="img-fluid w-100" alt="">
     </div>
   </div>
 </div>
 
-<!-- Optional UX Script -->
+<!-- Overlay: flex column — header · body · footer -->
+<div class="overlay-container">
+
+  <!-- ── Top header ── -->
+  <div class="auth-header">
+    <img src="/static/img/logo-ori.png" alt="HAAP Logo">
+    <div>
+      <!-- <div class="auth-header-title">HAAP Platform</div>
+      <div class="auth-header-sub">Home Activity Assessment Program</div> -->
+    </div>
+  </div>
+
+  <!-- ── Centered card ── -->
+  <div class="auth-body" style="justify-content:center;align-items:center;">
+    <div class="rp-card">
+
+      <!-- Icon + title -->
+      <div class="rp-card-head">
+        <div class="rp-icon-wrap"
+             style="background:linear-gradient(135deg,#0d9488,#0f766e);box-shadow:0 4px 14px rgba(13,148,136,.3);">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <h5 class="rp-card-title">Verifika OTP</h5>
+        <p class="rp-card-sub">
+          Hatama kódigu 6 dijitu ne'ebé haruka ba ita nia WhatsApp.<br>
+          Kódigu validu durante <strong style="color:#0f172a;">minutu 10</strong>.
+        </p>
+      </div>
+
+      <!-- Django messages -->
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="rp-alert rp-alert-{{ msg.tags }}" id="msg-{{ forloop.counter }}">
+            <i class="bi bi-{% if msg.tags == 'error' %}exclamation-triangle-fill{% elif msg.tags == 'success' %}check-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+            <span>{{ msg }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- OTP form -->
+      <form method="post" id="otpForm" novalidate>
+        {% csrf_token %}
+        <!-- Hidden real input that the view reads -->
+        <input type="hidden" name="otp" id="otpHidden">
+
+        <!-- 6 individual digit boxes -->
+        <div class="otp-boxes-wrap">
+          <div class="otp-boxes" id="otpBoxes">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" autocomplete="one-time-code" aria-label="Dijitu 1">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 2">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 3">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 4">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 5">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 6">
+          </div>
+          <div class="otp-hint">
+            <i class="bi bi-whatsapp" style="color:#25d366;"></i>
+            Simu via WhatsApp
+          </div>
+        </div>
+
+        <!-- Verify button -->
+        <button type="submit" class="rp-btn-primary" id="verifyBtn"
+                style="background:linear-gradient(135deg,#0d9488,#0f766e);
+                       box-shadow:0 4px 14px rgba(13,148,136,.3);" disabled>
+          <i class="bi bi-check-circle-fill"></i>Verifika OTP
+        </button>
+      </form>
+
+      <!-- Footer links -->
+      <div class="rp-links">
+        <a href="{% url 'core:forgot_password' %}">
+          <i class="bi bi-arrow-repeat"></i>Husu OTP fali
+        </a>
+        <a href="{% url 'core:login' %}" class="rp-link-muted">
+          <i class="bi bi-arrow-left"></i>Fila ba Login
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="auth-footer">
+    <div>Portal HAAP ida ne'e kria husi <strong style="color:rgba(255,255,255,.8);">World Mosaic</strong> ba no konsultasaun ho <strong style="color:rgba(255,255,255,.8);">Ministeriu da Edukasaun Timor-Leste</strong> nu'udar parte ida husi inisiativa <strong style="color:rgba(255,255,255,.8);">Mary Mackillop Today EdTech for Early Learning (ETEL)</strong> ne'ebe patrosina husi <strong style="color:rgba(255,255,255,.8);">O'Brien Foundation Australia</strong>.</div>
+    <div>© World Mosaic. Direitu rezervadu.</div>
+  </footer>
+
+</div><!-- /overlay-container -->
+
 <script>
-  // Auto move cursor effect (simple UX)
-  const otpInput = document.querySelector('input[name="otp"]');
-  otpInput.addEventListener('input', function () {
-    this.value = this.value.replace(/[^0-9]/g, '');
+(function () {
+  var boxes     = Array.from(document.querySelectorAll('.otp-box'));
+  var hidden    = document.getElementById('otpHidden');
+  var verifyBtn = document.getElementById('verifyBtn');
+  var form      = document.getElementById('otpForm');
+
+  /* Rebuild the hidden value and toggle button state */
+  function sync() {
+    var val = boxes.map(function (b) { return b.value; }).join('');
+    hidden.value    = val;
+    verifyBtn.disabled = val.length < 6;
+    boxes.forEach(function (b) {
+      b.classList.toggle('otp-filled', b.value !== '');
+    });
+  }
+
+  /* Shake all boxes to signal an error */
+  function shakeBoxes() {
+    var wrap = document.getElementById('otpBoxes');
+    wrap.classList.add('otp-shake');
+    boxes.forEach(function (b) { b.classList.add('otp-error'); });
+    setTimeout(function () {
+      wrap.classList.remove('otp-shake');
+      boxes.forEach(function (b) { b.classList.remove('otp-error'); });
+    }, 600);
+  }
+
+  boxes.forEach(function (box, i) {
+
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace') {
+        if (!this.value && i > 0) {
+          boxes[i - 1].value = '';
+          boxes[i - 1].focus();
+          sync();
+          e.preventDefault();
+        }
+      }
+      if (e.key === 'ArrowLeft'  && i > 0) { boxes[i - 1].focus(); e.preventDefault(); }
+      if (e.key === 'ArrowRight' && i < 5) { boxes[i + 1].focus(); e.preventDefault(); }
+    });
+
+    box.addEventListener('input', function () {
+      /* strip non-digits, keep last char */
+      this.value = this.value.replace(/\D/g, '').slice(-1);
+      sync();
+      if (this.value && i < 5) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('focus', function () { this.select(); });
   });
 
-  // Button loading effect
-  document.querySelector("form").addEventListener("submit", function() {
-    document.querySelector("button").innerHTML = "Verifying...";
+  /* Paste support — paste anywhere in the row */
+  boxes.forEach(function (box) {
+    box.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData)
+                   .getData('text').replace(/\D/g, '').slice(0, 6);
+      text.split('').forEach(function (ch, idx) {
+        if (boxes[idx]) boxes[idx].value = ch;
+      });
+      sync();
+      boxes[Math.min(text.length, 5)].focus();
+    });
   });
+
+  /* Form submit */
+  form.addEventListener('submit', function (e) {
+    sync();
+    if (hidden.value.length < 6) {
+      e.preventDefault();
+      shakeBoxes();
+      return;
+    }
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i>Verifying…';
+  });
+
+  /* If server returned an error, shake the boxes */
+  {% if messages %}
+    {% for msg in messages %}{% if msg.tags == 'error' %}
+      shakeBoxes();
+    {% endif %}{% endfor %}
+  {% endif %}
+
+  /* Focus first box on load */
+  boxes[0].focus();
+})();
 </script>
-
 {% endblock %}
