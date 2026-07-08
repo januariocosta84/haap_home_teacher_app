@@ -77,7 +77,7 @@
 
   <!-- ═══ HERO HEADER ═══ -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'core:user_management' %}"
+    <a href="{% url 'core:user_list' %}"
        class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
       <i class="bi bi-arrow-left"></i>
     </a>
@@ -344,7 +344,7 @@
                   class="btn btn-primary rounded-pill px-4 fw-semibold">
             <i class="bi bi-person-plus-fill me-1"></i>Kria Utilizador
           </button>
-          <a href="{% url 'core:user_management' %}"
+          <a href="{% url 'core:user_list' %}"
              class="btn btn-outline-secondary rounded-pill px-4">
             Kansela
           </a>
@@ -524,7 +524,7 @@ $(document).ready(function () {
 
     // Debounce duplicate check
     checkTimer = setTimeout(() => {
-      fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
+      fetch(`/check-whatsapp/?number=${encodeURIComponent(phone)}`)
         .then(r => r.json())
         .then(data => {
           if (data.exists) {

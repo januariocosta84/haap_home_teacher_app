@@ -189,12 +189,12 @@
         <!-- Right: actions -->
         {% if user.role == 'moe_admin' %}
         <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1;">
-          <a href="{% url 'preschools:preschool_edit' preschool.pk %}"
+          <a href="{% url 'preschools:preschool_update' preschool.pk %}"
              class="btn rounded-pill px-4 fw-semibold"
              style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:0.82rem;">
             <i class="bi bi-pencil me-1"></i>Edita
           </a>
-          <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+          <a href="{% url 'preschools:classroom_create' id=preschool.id %}"
              class="btn rounded-pill px-4 fw-semibold"
              style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
             <i class="bi bi-plus-lg me-1"></i>Adisiona Klase
@@ -370,7 +370,7 @@
           <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">{{ classrooms|length }} klase rejista</div>
         </div>
         {% if user.role == 'moe_admin' %}
-        <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+        <a href="{% url 'preschools:classroom_create' id=preschool.id %}"
            class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">
           <i class="bi bi-plus-lg me-1"></i>Klase Foun
         </a>
@@ -388,10 +388,10 @@
               <div class="d-flex align-items-center justify-content-between mb-2">
                 <span class="klase-group-pill">Grupo {{ classroom.group }}</span>
                 <div class="d-flex gap-1">
-                  <a href="{% url 'klase:classroom-detail' classroom.id %}" class="klase-act view" title="Haree">
+                  <a href="{% url 'klase:classroom_detail' classroom.id %}" class="klase-act view" title="Haree">
                     <i class="bi bi-eye"></i>
                   </a>
-                  <a href="{% url 'preschools:edit_classroom' id=classroom.id %}" class="klase-act edit" title="Edita">
+                  <a href="{% url 'preschools:classroom_update' id=classroom.id %}" class="klase-act edit" title="Edita">
                     <i class="bi bi-pencil"></i>
                   </a>
                 </div>
@@ -416,7 +416,7 @@
               {% endif %}
 
               <div class="mt-3">
-                <a href="{% url 'klase:classroom-detail' classroom.id %}"
+                <a href="{% url 'klase:classroom_detail' classroom.id %}"
                    class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold w-100"
                    style="font-size:0.78rem;">
                   <i class="bi bi-arrow-right-circle me-1"></i>Haree Klase
@@ -438,7 +438,7 @@
           Adisiona klase primeiru atu organizasaun pre-eskolár ne'e hahú funsiona.
         </div>
         {% if user.role == 'moe_admin' %}
-        <a href="{% url 'preschools:add_classroom' id=preschool.id %}"
+        <a href="{% url 'preschools:classroom_create' id=preschool.id %}"
            class="btn btn-primary rounded-pill px-5 fw-semibold">
           <i class="bi bi-plus-lg me-1"></i>Adisiona Klase Foun
         </a>

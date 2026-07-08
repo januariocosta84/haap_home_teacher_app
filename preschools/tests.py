@@ -9,7 +9,7 @@ from preschools.models import Preschool
 class ClassroomEditAccessTests(TestCase):
     def test_anonymous_user_is_redirected_to_login_for_classroom_edit(self):
         response = self.client.get(
-            reverse("preschools:edit_classroom", kwargs={"id": "9d07022f-cfeb-45d3-96cf-8762bfbb8f42"})
+            reverse("preschools:classroom_update", kwargs={"id": "9d07022f-cfeb-45d3-96cf-8762bfbb8f42"})
         )
 
         self.assertEqual(response.status_code, 302)
@@ -37,7 +37,7 @@ class ClassroomEditAccessTests(TestCase):
 
         self.client.force_login(admin)
         response = self.client.get(
-            reverse("preschools:edit_classroom", kwargs={"id": classroom.id})
+            reverse("preschools:classroom_update", kwargs={"id": classroom.id})
         )
 
         self.assertEqual(response.status_code, 200)

@@ -1,56 +1,41 @@
 from django.urls import path
+
 from preschools import views
-
-
 from .views import (
     ClassroomCreateView,
     ClassroomDetailView,
     ClassroomUpdateView,
+    PreschoolCreateView,
+    PreschoolDeleteView,
     PreschoolDetailView,
     PreschoolListView,
-    PreschoolCreateView,
     PreschoolUpdateView,
-    PreschoolDeleteView,
     TeacherPreschoolListView,
-    join_view
+    join_view,
 )
 
 app_name = 'preschools'
 
 urlpatterns = [
-    path('list/', PreschoolListView.as_view(), name='preschool_list'),
-    path('list_claim/', TeacherPreschoolListView.as_view(), name='preschool_list_claim'),
-    path('detail/<uuid:pk>/', PreschoolDetailView.as_view(), name='preschool_detail'),
-    path('create/', PreschoolCreateView.as_view(), name='preschool_create'),
-    path('edit/<uuid:pk>/', PreschoolUpdateView.as_view(), name='preschool_edit'),
-    path('delete/<uuid:pk>/', PreschoolDeleteView.as_view(), name='preschool_delete'),
-    # Change <uuid:preschool_id> to <uuid:id>
-    path('join/<uuid:preschool_id>/', views.join_view, name='join_preschool'),
-    path('teacher-requests/', views.PreschoolTeacherRequestListView.as_view(), name='preschool_teacher_requests'),
-    path('teacher-requests/<uuid:request_id>/approve/', views.approve_preschool_teacher_request, name='approve_preschool_teacher_request'),
-    path("list-preschool/<uuid:id>/", PreschoolDetailView.as_view(), name="preschool_detail"),
 
-    path(
-        "preschool/<uuid:id>/classroom/add/",
-        ClassroomCreateView.as_view(),
-        name="add_classroom"
-    ),
+    # ── Preschool CRUD ────────────────────────────────────────
+    path('',               PreschoolListView.as_view(),   name='preschool_list'),
+    path('create/',        PreschoolCreateView.as_view(), name='preschool_create'),
+    path('<uuid:pk>/',     PreschoolDetailView.as_view(), name='preschool_detail'),
+    path('<uuid:pk>/edit/',   PreschoolUpdateView.as_view(), name='preschool_update'),
+    path('<uuid:pk>/delete/', PreschoolDeleteView.as_view(), name='preschool_delete'),
 
-    path(
-        "classroom/<uuid:id>/",
-        ClassroomDetailView.as_view(),
-        name="classroom_detail"
-    ),
+    # ── Teacher preschool claim list ──────────────────────────
+    path('my-preschools/', TeacherPreschoolListView.as_view(), name='teacher_preschool_list'),
+    path('join/<uuid:preschool_id>/', join_view, name='preschool_join'),
 
-    path(
-        "classroom/<uuid:id>/enroll/",
-        views.enroll_child,
-        name="enroll_child"
-    ),
+    # ── Teacher requests ──────────────────────────────────────
+    path('teacher-requests/', views.PreschoolTeacherRequestListView.as_view(), name='teacher_request_list'),
+    path('teacher-requests/<uuid:request_id>/approve/', views.approve_preschool_teacher_request, name='teacher_request_approve'),
 
-    path(
-        "classroom/<uuid:id>/edit/",
-        ClassroomUpdateView.as_view(),
-        name="edit_classroom"
-    ),
+    # ── Classroom (preschool-scoped) ──────────────────────────
+    path('<uuid:id>/classroom/create/',   ClassroomCreateView.as_view(),  name='classroom_create'),
+    path('classroom/<uuid:id>/',          ClassroomDetailView.as_view(),  name='classroom_detail'),
+    path('classroom/<uuid:id>/edit/',     ClassroomUpdateView.as_view(),  name='classroom_update'),
+    path('classroom/<uuid:id>/enroll/',   views.enroll_child,             name='classroom_enroll'),
 ]

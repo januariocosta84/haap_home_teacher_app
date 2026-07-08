@@ -362,7 +362,7 @@
 
               {% elif preschool.is_approved %}
                 {% if preschool.target_classroom %}
-                  <a href="{% url 'klase:school-classrooms' preschool_id=preschool.id %}"
+                  <a href="{% url 'klase:school_classroom_list' preschool_id=preschool.id %}"
                      class="plc-btn plc-btn-detail"
                      title="Haree detalhes pre-eskolár">
                     <i class="bi bi-arrow-right-circle-fill"></i>Haree Detalhes
@@ -376,7 +376,7 @@
 
               {% else %}
                 <form method="post"
-                      action="{% url 'preschools:join_preschool' preschool.id %}"
+                      action="{% url 'preschools:preschool_join' preschool.id %}"
                       style="display:inline;">
                   {% csrf_token %}
                   <button type="submit" class="plc-btn plc-btn-join"

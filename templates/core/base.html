@@ -86,16 +86,16 @@
   </head>
   <!--end::Head-->
   <!--begin::Body-->
-  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
+  <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary{% if request.GET.embedded %} haap-embedded{% endif %}">
    
 
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!-- HEADER -->
-      {% include 'partials/header.html' %}
+      {% if not request.GET.embedded %}{% include 'partials/header.html' %}{% endif %}
 
       <!-- SIDEBAR -->
-      {% include 'partials/sidebar.html' %}
+      {% if not request.GET.embedded %}{% include 'partials/sidebar.html' %}{% endif %}
 
       <!--begin::App Main-->
       <main class="app-main">
@@ -155,7 +155,7 @@
       <!--end::App Main-->
 
       <!-- FOOTER -->
-      {% include 'partials/footer.html' %}
+      {% if not request.GET.embedded %}{% include 'partials/footer.html' %}{% endif %}
 
     </div>
     <!--end::App Wrapper-->

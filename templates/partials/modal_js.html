@@ -1,0 +1,130 @@
+<script>
+(function () {
+
+  // ── Toast helper (dynamic, works without Django messages) ──
+  function showModalToast(type, msg) {
+    var container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container position-fixed top-0 end-0 p-3';
+      container.style.zIndex = '1200';
+      document.body.appendChild(container);
+    }
+    var bg   = type === 'success' ? '#059669' : type === 'error' ? '#dc2626' : '#2563eb';
+    var icon = type === 'success' ? 'check-circle-fill'
+             : type === 'error'   ? 'x-circle-fill'
+             :                      'info-circle-fill';
+    var el = document.createElement('div');
+    el.className = 'toast border-0 shadow-lg mb-2';
+    el.setAttribute('data-bs-autohide', 'true');
+    el.setAttribute('data-bs-delay', '5000');
+    el.style.cssText = 'min-width:280px;max-width:380px;';
+    el.innerHTML =
+      '<div class="d-flex align-items-center text-white rounded" style="background:' + bg + ';">' +
+        '<div class="toast-body d-flex align-items-center gap-2 flex-grow-1 py-3 px-3">' +
+          '<i class="bi bi-' + icon + ' fs-5 flex-shrink-0"></i>' +
+          '<span class="fw-semibold lh-sm" style="font-size:0.88rem;">' + msg + '</span>' +
+        '</div>' +
+        '<button type="button" class="btn-close btn-close-white me-2 my-auto flex-shrink-0" data-bs-dismiss="toast"></button>' +
+      '</div>';
+    container.appendChild(el);
+    new bootstrap.Toast(el).show();
+    el.addEventListener('hidden.bs.toast', function () { el.remove(); });
+  }
+
+  // ── Show any toast stored by a previous modal save ─────────
+  (function () {
+    try {
+      var pending = sessionStorage.getItem('haap_modal_toast');
+      if (pending) {
+        sessionStorage.removeItem('haap_modal_toast');
+        var d = JSON.parse(pending);
+        showModalToast(d.type || 'success', d.msg || 'Atualizadu ho suksesu.');
+      }
+    } catch (e) {}
+  })();
+
+  // ── Delete Modal ────────────────────────────────────────────
+  var delModal = document.getElementById('deleteModal');
+  if (delModal) {
+    delModal.addEventListener('show.bs.modal', function (e) {
+      var btn = e.relatedTarget;
+      if (!btn) return;
+      document.getElementById('deleteItemName').textContent =
+        btn.getAttribute('data-item-name') || '';
+      var form = document.getElementById('deleteForm');
+      if (form) form.action = btn.getAttribute('data-delete-url') || '';
+    });
+  }
+
+  // ── Edit Modal ──────────────────────────────────────────────
+  var editModal = document.getElementById('editModal');
+  var editFrame = document.getElementById('editFrame');
+  var editName  = document.getElementById('editModalName');
+  var spinner   = document.getElementById('editFrameSpinner');
+
+  if (!editModal || !editFrame) return;
+
+  editModal.addEventListener('show.bs.modal', function (e) {
+    var btn = e.relatedTarget;
+    if (!btn) return;
+    if (editName) editName.textContent = btn.getAttribute('data-item-name') || 'Editar';
+    if (spinner)  spinner.style.display = 'flex';
+    editFrame.style.opacity = '0';
+    editFrame.src = btn.getAttribute('data-edit-url') || 'about:blank';
+  });
+
+  editModal.addEventListener('hidden.bs.modal', function () {
+    editFrame.src = 'about:blank';
+    editFrame.style.opacity = '0';
+    if (spinner) spinner.style.display = 'flex';
+  });
+
+  editFrame.addEventListener('load', function () {
+    try {
+      var framePath = editFrame.contentWindow.location.pathname;
+      var editSrc   = editFrame.src;
+
+      // Hide spinner, reveal frame
+      if (spinner) spinner.style.display = 'none';
+      editFrame.style.opacity = '1';
+
+      if (!editSrc || editSrc === 'about:blank') return;
+
+      var editPath = new URL(editSrc, window.location.origin).pathname;
+      if (framePath === editPath) return; // still on the edit page (e.g. validation error)
+
+      // ── Form was saved — iframe navigated to success URL ──
+      // Try to read the Django success message from the iframe's toast
+      var msg  = 'Atualizadu ho suksesu.';
+      var type = 'success';
+      try {
+        var toastSpan = editFrame.contentDocument
+          .querySelector('.toast-body .fw-semibold, .toast-body span');
+        if (toastSpan && toastSpan.textContent.trim()) {
+          msg = toastSpan.textContent.trim();
+        }
+        // Detect error toasts (red background)
+        var toastWrap = editFrame.contentDocument
+          .querySelector('.toast-body')?.closest('[style*="dc2626"], [style*="b91c1c"]');
+        if (toastWrap) type = 'error';
+      } catch (ex) {}
+
+      // Persist the message across the page reload
+      try {
+        sessionStorage.setItem('haap_modal_toast', JSON.stringify({ type: type, msg: msg }));
+      } catch (ex) {}
+
+      var modal = bootstrap.Modal.getInstance(editModal);
+      if (modal) modal.hide();
+      window.location.reload();
+
+    } catch (ex) {
+      // Guard against cross-origin errors (shouldn't happen same-domain)
+      if (spinner) spinner.style.display = 'none';
+      editFrame.style.opacity = '1';
+    }
+  });
+
+})();
+</script>

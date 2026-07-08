@@ -54,7 +54,7 @@ def child_registration(request):
             child.parent = request.user  # assign logged-in parent
             child.save()
             messages.success(request, f"Labarik '{child.first_name}' rejistu ho susesu.")
-            return redirect('core:children_list')  # redirect to a list page (define this URL)
+            return redirect('core:child_list')  # redirect to a list page (define this URL)
     else:
         form = ChildRegistrationForm()
     #return render(request, 'children/register_child.html', {'form': form})
@@ -68,7 +68,7 @@ def edit_child(request, child_id):
         if form.is_valid():
             form.save()
             messages.success(request, f"Labarik '{child.first_name}' aktualiza ho susesu.")
-            return redirect('core:children_list')
+            return redirect('core:child_list')
         else:
             messages.error(request, "Iha problema iha aktualizasaun labarik.")
     else:
@@ -82,7 +82,7 @@ def delete_child(request, child_id):
         name = child.first_name
         child.delete()
         messages.warning(request, f"Child '{name}' has been deleted.")
-        return redirect('core:children_list')
+        return redirect('core:child_list')
     return render(request, 'core/delete_child.html', {'child': child})
 @login_required
 def children_list(request):
@@ -222,7 +222,7 @@ def user_login(request):
                 if user.role == "moe_admin":
                     return redirect("core:moe_admin_dashboard")
                 elif user.role == "parent":
-                    return redirect("core:children_list")
+                    return redirect("core:child_list")
                 elif user.role == "municipality_analyst":
                     return redirect("core:municipality_dashboard")
                 elif user.role == "teacher":
@@ -741,7 +741,7 @@ def view_user(request, user_id):
     """Simple view for a single user (MoE admin only)."""
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     user = get_object_or_404(User, id=user_id)
     return render(request, "users/view_user.html", {"obj": user})
@@ -752,7 +752,7 @@ def edit_user(request, user_id):
     """Edit an existing user (MoE admin only)."""
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     user_obj = get_object_or_404(User, id=user_id)
 
@@ -761,7 +761,7 @@ def edit_user(request, user_id):
         if form.is_valid():
             form.save()
             messages.success(request, "User updated successfully.")
-            return redirect("core:user_management")
+            return redirect("core:user_list")
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -775,14 +775,14 @@ def delete_user(request, user_id):
     """Delete a user (MoE admin only). Shows confirmation form on GET, deletes on POST."""
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     user_obj = get_object_or_404(User, id=user_id)
     if request.method == "POST":
         name = f"{user_obj.first_name} {user_obj.last_name}"
         user_obj.delete()
         messages.warning(request, f"User '{name}' has been deleted.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     return render(request, "users/confirm_delete_user.html", {"user_obj": user_obj})
 

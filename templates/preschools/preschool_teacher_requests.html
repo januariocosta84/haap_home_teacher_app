@@ -32,7 +32,7 @@
                 <td><span class="badge bg-warning text-dark">Aprovasaun pendente</span></td>
                 <td class="text-end">
                   <a href="{% url 'preschools:preschool_detail' request.preschool.id %}" class="btn btn-sm btn-outline-secondary">Pre eskolar</a>
-                  <a href="{% url 'preschools:approve_preschool_teacher_request' request.id %}" class="btn btn-sm btn-success">Aprovadu</a>
+                  <a href="{% url 'preschools:teacher_request_approve' request.id %}" class="btn btn-sm btn-success">Aprovadu</a>
                 </td>
               </tr>
               {% endfor %}

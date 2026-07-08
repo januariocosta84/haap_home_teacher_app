@@ -15,7 +15,7 @@
       <p class="text-muted small mb-0">Versaun app disponivel ba download</p>
     </div>
     {% if user.role == 'moe_admin' %}
-    <a href="{% url 'core:upload_apk' %}"
+    <a href="{% url 'core:apk_create' %}"
        class="btn fw-semibold rounded-pill px-4"
        style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;
               box-shadow:0 4px 14px rgba(37,99,235,.35);">
@@ -181,12 +181,15 @@
               <!-- Actions -->
               <td class="px-4 py-3 text-center">
                 <div class="d-flex align-items-center justify-content-center gap-2">
-                  <a href="{% url 'core:edit_apk' apk.id %}"
-                     class="btn btn-sm rounded-pill px-3"
-                     style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;"
-                     title="Edita">
+                  <button type="button"
+                          class="btn btn-sm rounded-pill px-3"
+                          style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;"
+                          title="Edita"
+                          data-bs-toggle="modal" data-bs-target="#editModal"
+                          data-edit-url="{% url 'core:apk_update' apk.id %}?embedded=1"
+                          data-item-name="HAAP v{{ apk.version_name }}">
                     <i class="bi bi-pencil-fill me-1"></i>Edita
-                  </a>
+                  </button>
                   <button type="button"
                           class="btn btn-sm rounded-pill px-3"
                           style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;"
@@ -223,7 +226,7 @@
       <h5 class="fw-semibold text-muted mb-2">Sedauk iha versaun</h5>
       <p class="text-muted small mb-4">HAAP APK seidauk iha. Upload versaun ida hodi hahu.</p>
       {% if user.role == 'moe_admin' %}
-      <a href="{% url 'core:upload_apk' %}"
+      <a href="{% url 'core:apk_create' %}"
          class="btn fw-semibold rounded-pill px-4"
          style="background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;">
         <i class="bi bi-plus-circle-fill me-2"></i>Hatama APK Foun
@@ -335,4 +338,6 @@
 </script>
 {% endif %}
 
+{% include 'partials/edit_modal.html' %}
+{% include 'partials/modal_js.html' %}
 {% endblock %}

@@ -26,7 +26,7 @@ class EquipmentCreateView(LoginRequiredMixin, AdminOnlyMixin, CreateView):
     model = Equipment
     form_class = EquipmentForm
     template_name = 'equipment/equipment_form.html'
-    success_url = reverse_lazy('equipment-list')
+    success_url = reverse_lazy('equipment:equipment_list')
 
     def form_valid(self, form):
         messages.success(
@@ -111,7 +111,7 @@ class EquipmentUpdateView(LoginRequiredMixin, AdminOnlyMixin, UpdateView):
     template_name = 'equipment/equipment_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('equipment-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('equipment:equipment_detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
         # Check if assignment changed
@@ -247,14 +247,14 @@ class EquipmentAssignmentChangeView(LoginRequiredMixin, AdminOnlyMixin, UpdateVi
             return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse_lazy('equipment-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('equipment:equipment_detail', kwargs={'pk': self.object.pk})
 
 
 class EquipmentDeleteView(LoginRequiredMixin, AdminOnlyMixin, DeleteView):
 
     model = Equipment
     template_name = 'equipment/equipment_confirm_delete.html'
-    success_url = reverse_lazy('equipment-list')
+    success_url = reverse_lazy('equipment:equipment_list')
 
     def form_valid(self, form):
         messages.success(self.request, 'Ekipamentu deleta ho susesu.')

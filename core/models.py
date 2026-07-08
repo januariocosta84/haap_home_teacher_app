@@ -80,7 +80,7 @@ def user_image_upload_path(instance, filename):
 class User(AbstractUser):
     image = models.ImageField(
         upload_to=user_image_upload_path,
-        default="defaults/user.png",   # <-- place a default image in MEDIA_ROOT/defaults/user.png
+        default="apk/user.jpg",
         blank=True,
         null=True
     )

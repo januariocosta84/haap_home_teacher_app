@@ -853,3 +853,11 @@ textarea.form-control {
   .hero-flex-row { flex-direction: column !important; align-items: flex-start !important; }
   .hero-flex-row .hero-actions { width: 100%; }
 }
+
+/* ── Embedded / iframe mode ─────────────────────────────────── */
+.haap-embedded .app-header,
+.haap-embedded .app-sidebar,
+.haap-embedded .content-footer { display: none !important; }
+.haap-embedded .app-main        { margin-left: 0 !important; padding-top: 0 !important; }
+.haap-embedded .app-content     { padding: 1.25rem !important; }
+.haap-embedded .app-content-header { display: none !important; }

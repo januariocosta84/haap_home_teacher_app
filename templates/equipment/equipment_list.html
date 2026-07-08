@@ -32,7 +32,7 @@
           <i class="bi bi-box-seam me-1"></i>
           {% if page_obj %}{{ page_obj.paginator.count }}{% else %}{{ equipments|length }}{% endif %} Ekipamentu
         </span>
-        <a href="{% url 'equipment-add' %}"
+        <a href="{% url 'equipment:equipment_create' %}"
            class="btn rounded-pill px-4 fw-semibold"
            style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;">
           <i class="bi bi-plus-lg me-1"></i>Adisiona Ekipamentu
@@ -98,7 +98,7 @@
                   class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold flex-grow-1">
             <i class="bi bi-funnel-fill me-1"></i>Filtra
           </button>
-          <a href="{% url 'equipment-list' %}"
+          <a href="{% url 'equipment:equipment_list' %}"
              class="btn btn-outline-secondary btn-sm rounded-pill px-3"
              title="Hamoos filtru">
             <i class="bi bi-x-lg"></i>
@@ -265,30 +265,33 @@
             <!-- Actions -->
             <td class="text-center" style="padding-right:1.5rem;">
               <div class="eq-action-wrap justify-content-center">
-                <a href="{% url 'equipment-detail' equipment.pk %}"
+                <a href="{% url 'equipment:equipment_detail' equipment.pk %}"
                    class="eq-act-btn view"
                    title="Haree Detallu"
                    data-toggle="tooltip" data-placement="top">
                   <i class="bi bi-eye"></i>
                 </a>
-                <a href="{% url 'equipment-update' equipment.pk %}"
-                   class="eq-act-btn edit"
-                   title="Edita"
-                   data-toggle="tooltip" data-placement="top">
+                <button type="button" class="eq-act-btn edit"
+                   title="Edita" data-toggle="tooltip" data-placement="top"
+                   data-bs-toggle="modal" data-bs-target="#editModal"
+                   data-edit-url="{% url 'equipment:equipment_update' equipment.pk %}?embedded=1"
+                   data-item-name="{{ equipment.name }}">
                   <i class="bi bi-pencil"></i>
-                </a>
-                <a href="{% url 'equipment-assignment-change' equipment.pk %}"
-                   class="eq-act-btn assign"
-                   title="Atribui"
-                   data-toggle="tooltip" data-placement="top">
+                </button>
+                <button type="button" class="eq-act-btn assign"
+                   title="Atribui" data-toggle="tooltip" data-placement="top"
+                   data-bs-toggle="modal" data-bs-target="#editModal"
+                   data-edit-url="{% url 'equipment:equipment_assignment_update' equipment.pk %}?embedded=1"
+                   data-item-name="{{ equipment.name }} — Atribuisaun">
                   <i class="bi bi-arrow-left-right"></i>
-                </a>
-                <a href="{% url 'equipment-delete' equipment.pk %}"
-                   class="eq-act-btn del"
-                   title="Hamos"
-                   data-toggle="tooltip" data-placement="top">
+                </button>
+                <button type="button" class="eq-act-btn del"
+                   title="Hamos" data-toggle="tooltip" data-placement="top"
+                   data-bs-toggle="modal" data-bs-target="#deleteModal"
+                   data-delete-url="{% url 'equipment:equipment_delete' equipment.pk %}"
+                   data-item-name="{{ equipment.name }}">
                   <i class="bi bi-trash3"></i>
-                </a>
+                </button>
               </div>
             </td>
           </tr>
@@ -306,13 +309,13 @@
                   {% endif %}
                 </div>
                 {% if request.GET.search or request.GET.equipment_type or request.GET.status or request.GET.preschool %}
-                  <a href="{% url 'equipment-list' %}"
+                  <a href="{% url 'equipment:equipment_list' %}"
                      class="btn btn-outline-secondary rounded-pill px-4 mt-3 fw-semibold"
                      style="font-size:0.83rem;">
                     <i class="bi bi-x-circle me-1"></i>Hamoos Filtru
                   </a>
                 {% else %}
-                  <a href="{% url 'equipment-add' %}"
+                  <a href="{% url 'equipment:equipment_create' %}"
                      class="btn btn-primary rounded-pill px-4 mt-3 fw-semibold"
                      style="font-size:0.83rem;">
                     <i class="bi bi-plus-lg me-1"></i>Adisiona Ekipamentu
@@ -390,18 +393,22 @@
 
 </div><!-- /container-fluid -->
 
+<!-- ── Delete Confirm Modal ── -->
+{% include 'partials/delete_modal.html' %}
+
+<!-- ── Edit Modal ── -->
+{% include 'partials/edit_modal.html' %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  // Bootstrap 4 tooltips
   if (typeof $ !== 'undefined') {
     $('[data-toggle="tooltip"]').tooltip({ trigger: 'hover' });
   }
-  // Auto-submit on filter change
   ['equipment_type', 'status', 'preschool'].forEach(function (name) {
     var el = document.querySelector('select[name="' + name + '"]');
     if (el) el.addEventListener('change', function () { document.getElementById('filterForm').submit(); });
   });
 });
 </script>
-
+{% include 'partials/modal_js.html' %}
 {% endblock %}

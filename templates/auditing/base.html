@@ -228,7 +228,7 @@
         </li>
 
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}"
+          <a href="{% url 'core:auditing_log_list' %}"
              class="aud-nav-link {% if request.resolver_match.url_name == 'auditing_logs' %}active{% endif %}">
             <i class="bi bi-list-ul"></i><span>Audit Logs</span>
           </a>
@@ -237,32 +237,32 @@
         <li class="aud-nav-label mt-2">Relatoriu</li>
 
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?action=login_failed" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?action=login_failed" class="aud-nav-link">
             <i class="bi bi-shield-x"></i><span>Login Falha</span>
           </a>
         </li>
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?action=login" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?action=login" class="aud-nav-link">
             <i class="bi bi-person-check"></i><span>Historial Login</span>
           </a>
         </li>
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?status=failed" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?status=failed" class="aud-nav-link">
             <i class="bi bi-exclamation-triangle"></i><span>Eventu Seguransa</span>
           </a>
         </li>
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?action=delete" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?action=delete" class="aud-nav-link">
             <i class="bi bi-trash3"></i><span>Rekord Apagadu</span>
           </a>
         </li>
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?action=create" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?action=create" class="aud-nav-link">
             <i class="bi bi-plus-square"></i><span>Rekord Kriadu</span>
           </a>
         </li>
         <li class="aud-nav-item">
-          <a href="{% url 'core:auditing_logs' %}?action=update" class="aud-nav-link">
+          <a href="{% url 'core:auditing_log_list' %}?action=update" class="aud-nav-link">
             <i class="bi bi-pencil-square"></i><span>Rekord Atualizu</span>
           </a>
         </li>

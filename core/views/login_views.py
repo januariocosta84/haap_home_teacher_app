@@ -17,7 +17,7 @@ def user_login(request):
                 if user.role == "moe_admin":
                     return redirect("moe_admin_dashboard")
                 elif user.role == "parent":
-                    return redirect("children_list")
+                    return redirect("core:child_list")
                 elif user.role == "teacher":
                     return redirect("teacher_dashboard")
                 elif user.role == "municipality_analyst":

@@ -118,12 +118,6 @@ class PreschoolDetailView(DetailView):
     model = Preschool
     template_name = 'preschools/preschool_detail.html'
     context_object_name = 'preschool'
-    pk_url_kwarg = 'id'
-
-    def get_object(self, queryset=None):
-        if 'id' in self.kwargs and 'pk' not in self.kwargs:
-            self.kwargs['pk'] = self.kwargs['id']
-        return super().get_object(queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -159,7 +153,7 @@ class ClaimPreschoolView(LoginRequiredMixin, View):
         )
 
         messages.success(request, 'Request submitted. Your preschool claim is pending admin approval.')
-        return redirect('preschools:preschool_list_claim')
+        return redirect('preschools:teacher_preschool_list')
     
 class TeacherPreschoolListView(LoginRequiredMixin, TemplateView):
     template_name = 'preschools/preschool_list_claim.html'
@@ -241,7 +235,7 @@ def join_view(request, preschool_id):
         )
     except Exception:
         messages.error(request, 'Akontese erru ikus ba pedidu ida ne\'e. Favor koko fali.')
-        return redirect('preschools:preschool_list_claim')
+        return redirect('preschools:teacher_preschool_list')
 
     if not created:
         if not relation.is_active:
@@ -255,7 +249,7 @@ def join_view(request, preschool_id):
     else:
         messages.success(request, "Pedidu haruka ona. Hein aprovasaun admin nian.")
 
-    return redirect('preschools:preschool_list_claim')
+    return redirect('preschools:teacher_preschool_list')
 
 @method_decorator(login_required, name='dispatch')
 class PreschoolTeacherRequestListView(TemplateView):
@@ -301,7 +295,7 @@ def approve_preschool_teacher_request(request, request_id):
     except Exception as exc:
         messages.warning(request, f'Profesór pre-eskolár nian aprova ona, maibé notifikasaun WhatsApp la konsege haruka. {exc}')
 
-    return redirect('preschools:preschool_teacher_requests')
+    return redirect('preschools:teacher_request_list')
 
 class UnclaimPreschoolView(LoginRequiredMixin, View):
     def post(self, request, preschool_id):
@@ -430,7 +424,7 @@ class ClassroomDetailView(LoginRequiredMixin, DetailView):
             return redirect('core:teacher_dashboard')
         if request.user.role == 'parent':
             messages.error(request, 'Aksesu negadu.')
-            return redirect('core:children_list')
+            return redirect('core:child_list')
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

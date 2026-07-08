@@ -166,7 +166,7 @@ class ParentRegisterView(View):
             )
 
             return redirect(
-                'core:verify_register_otp'
+                'core:register_otp_verify'
             )
 
         return render(

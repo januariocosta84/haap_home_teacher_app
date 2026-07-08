@@ -1,62 +1,202 @@
 {% extends "./layout.html" %}
+{% load static %}
+{% block title %}HAAP | Verifika Rejistrasaun{% endblock %}
 
 {% block content %}
 
-<div class="container mt-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-md-5">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-body p-4">
-
-                    <h4 class="fw-bold mb-3 text-center">
-                        Verifika OTP
-                    </h4>
-
-                    <p class="text-muted text-center">
-                        Favor hatama kode OTP ne'ebe haruka ba WhatsApp.
-                    </p>
-
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-danger">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="post">
-
-                        {% csrf_token %}
-
-                        <input
-                            type="text"
-                            name="otp"
-                            class="form-control"
-                            placeholder="Hatama OTP"
-                            required
-                        >
-
-                        <button
-                            type="submit"
-                            class="btn btn-primary w-100 mt-3"
-                        >
-                            Verifika OTP
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </div>
-
+<!-- Full-screen background carousel -->
+<div id="backgroundCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000"
+     style="position:fixed;inset:0;z-index:0;">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/static/img/Background 1_Transport.png" class="img-fluid w-100" alt="">
     </div>
-
+    <div class="carousel-item">
+      <img src="/static/img/Background 2_Me.png" class="img-fluid w-100" alt="">
+    </div>
+    <div class="carousel-item">
+      <img src="/static/img/Background 3_Culture.png" class="img-fluid w-100" alt="">
+    </div>
+  </div>
 </div>
 
+<!-- Overlay -->
+<div class="overlay-container">
+
+  <!-- Top header -->
+  <div class="auth-header">
+    <img src="/static/img/logo-ori.png" alt="HAAP Logo">
+  </div>
+
+  <!-- Centered card -->
+  <div class="auth-body" style="justify-content:center;align-items:center;">
+    <div class="rp-card">
+
+      <!-- Icon + title -->
+      <div class="rp-card-head">
+        <div class="rp-icon-wrap"
+             style="background:linear-gradient(135deg,#15803d,#22c55e);box-shadow:0 4px 14px rgba(34,197,94,.3);">
+          <i class="bi bi-person-check-fill"></i>
+        </div>
+        <h5 class="rp-card-title">Verifika Rejistrasaun</h5>
+        <p class="rp-card-sub">
+          Kódigu 6 dijitu haruka ba ita nia WhatsApp
+          {% if request.session.register_whatsapp %}
+            <br><strong style="color:#0f172a;">{{ request.session.register_whatsapp }}</strong>
+          {% endif %}
+          <br>Kódigu validu durante <strong style="color:#0f172a;">minutu 10</strong>.
+        </p>
+      </div>
+
+      <!-- Django messages -->
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="rp-alert rp-alert-{{ msg.tags }}">
+            <i class="bi bi-{% if msg.tags == 'error' %}exclamation-triangle-fill{% elif msg.tags == 'success' %}check-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+            <span>{{ msg }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- OTP form -->
+      <form method="post" id="otpForm" novalidate>
+        {% csrf_token %}
+        <!-- Hidden real input that the view reads -->
+        <input type="hidden" name="otp" id="otpHidden">
+
+        <!-- 6 individual digit boxes -->
+        <div class="otp-boxes-wrap">
+          <div class="otp-boxes" id="otpBoxes">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" autocomplete="one-time-code" aria-label="Dijitu 1">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 2">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 3">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 4">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 5">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric"
+                   pattern="[0-9]" aria-label="Dijitu 6">
+          </div>
+          <div class="otp-hint">
+            <i class="bi bi-whatsapp" style="color:#25d366;"></i>
+            Simu via WhatsApp
+          </div>
+        </div>
+
+        <!-- Verify button -->
+        <button type="submit" class="rp-btn-primary" id="verifyBtn"
+                style="background:linear-gradient(135deg,#15803d,#22c55e);
+                       box-shadow:0 4px 14px rgba(34,197,94,.3);" disabled>
+          <i class="bi bi-check-circle-fill"></i>Verifika &amp; Kria Konta
+        </button>
+      </form>
+
+      <!-- Footer links -->
+      <div class="rp-links">
+        <a href="{% url 'core:parent_register' %}">
+          <i class="bi bi-arrow-repeat"></i>Husu OTP fali
+        </a>
+        <a href="{% url 'core:login' %}" class="rp-link-muted">
+          <i class="bi bi-arrow-left"></i>Fila ba Login
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="auth-footer">
+    <div>Portal HAAP ida ne'e kria husi <strong style="color:rgba(255,255,255,.8);">World Mosaic</strong> ba no konsultasaun ho <strong style="color:rgba(255,255,255,.8);">Ministeriu da Edukasaun Timor-Leste</strong> nu'udar parte ida husi inisiativa <strong style="color:rgba(255,255,255,.8);">Mary Mackillop Today EdTech for Early Learning (ETEL)</strong> ne'ebe patrosina husi <strong style="color:rgba(255,255,255,.8);">O'Brien Foundation Australia</strong>.</div>
+    <div>© World Mosaic. Direitu rezervadu.</div>
+  </footer>
+
+</div><!-- /overlay-container -->
+
+<script>
+(function () {
+  var boxes     = Array.from(document.querySelectorAll('.otp-box'));
+  var hidden    = document.getElementById('otpHidden');
+  var verifyBtn = document.getElementById('verifyBtn');
+  var form      = document.getElementById('otpForm');
+
+  function sync() {
+    var val = boxes.map(function (b) { return b.value; }).join('');
+    hidden.value = val;
+    verifyBtn.disabled = val.length < 6;
+    boxes.forEach(function (b) {
+      b.classList.toggle('otp-filled', b.value !== '');
+    });
+  }
+
+  function shakeBoxes() {
+    var wrap = document.getElementById('otpBoxes');
+    wrap.classList.add('otp-shake');
+    boxes.forEach(function (b) { b.classList.add('otp-error'); });
+    setTimeout(function () {
+      wrap.classList.remove('otp-shake');
+      boxes.forEach(function (b) { b.classList.remove('otp-error'); });
+    }, 600);
+  }
+
+  boxes.forEach(function (box, i) {
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace') {
+        if (!this.value && i > 0) {
+          boxes[i - 1].value = '';
+          boxes[i - 1].focus();
+          sync();
+          e.preventDefault();
+        }
+      }
+      if (e.key === 'ArrowLeft'  && i > 0) { boxes[i - 1].focus(); e.preventDefault(); }
+      if (e.key === 'ArrowRight' && i < 5) { boxes[i + 1].focus(); e.preventDefault(); }
+    });
+
+    box.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(-1);
+      sync();
+      if (this.value && i < 5) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('focus', function () { this.select(); });
+  });
+
+  /* Paste support */
+  boxes.forEach(function (box) {
+    box.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var text = (e.clipboardData || window.clipboardData)
+                   .getData('text').replace(/\D/g, '').slice(0, 6);
+      text.split('').forEach(function (ch, idx) {
+        if (boxes[idx]) boxes[idx].value = ch;
+      });
+      sync();
+      boxes[Math.min(text.length, 5)].focus();
+    });
+  });
+
+  /* Form submit */
+  form.addEventListener('submit', function (e) {
+    sync();
+    if (hidden.value.length < 6) {
+      e.preventDefault();
+      shakeBoxes();
+      return;
+    }
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="bi bi-hourglass-split"></i>Verifying…';
+  });
+
+  {% if messages %}
+    {% for msg in messages %}{% if msg.tags == 'error' %}
+      shakeBoxes();
+    {% endif %}{% endfor %}
+  {% endif %}
+
+  boxes[0].focus();
+})();
+</script>
 {% endblock %}

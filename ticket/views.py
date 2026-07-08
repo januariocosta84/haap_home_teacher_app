@@ -41,7 +41,7 @@ class SupportTicketCreateView(LoginRequiredMixin,CreateView):
     model = SupportTicket
     form_class = SupportTicketForm
     template_name = 'ticket/support_ticket_form.html'
-    success_url = reverse_lazy('ticket:support-ticket-list')
+    success_url = reverse_lazy('ticket:ticket_list')
 
     # Example data
     equipment_items = [
@@ -197,7 +197,7 @@ class SupportTicketAddItemsView(TeacherOnlyMixin, LoginRequiredMixin, UpdateView
             request,
             f'Husu suporta konsege kria ho susesu. Tiket numeru: {self.object.ticket_number}'
         )
-        return redirect('ticket:support-ticket-detail', pk=self.object.pk)
+        return redirect('ticket:ticket_detail', pk=self.object.pk)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -294,7 +294,7 @@ class SupportTicketDetailView(LoginRequiredMixin, DetailView):
                 self.object.status = 'in_progress'
                 self.object.save()
             messages.success(request, 'Komentariu enviadu.')
-        return redirect('ticket:support-ticket-detail', pk=self.object.pk)
+        return redirect('ticket:ticket_detail', pk=self.object.pk)
 
 
 class SupportTicketListView(LoginRequiredMixin, ListView):
@@ -366,7 +366,7 @@ class SupportTicketUpdateView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
     template_name = 'ticket/support_ticket_update.html'
 
     def get_success_url(self):
-        return reverse_lazy('ticket:support-ticket-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('ticket:ticket_detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
         if form.cleaned_data.get('status') == 'resolved':

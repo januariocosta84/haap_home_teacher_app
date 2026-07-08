@@ -246,7 +246,7 @@
         </div>
       </div>
 
-      <a href="{% if object %}{% url 'equipment-detail' object.pk %}{% else %}{% url 'equipment-list' %}{% endif %}"
+      <a href="{% if object %}{% url 'equipment:equipment_detail' object.pk %}{% else %}{% url 'equipment:equipment_list' %}{% endif %}"
          style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;
                 padding:7px 18px;color:#fff;font-size:0.82rem;font-weight:600;text-decoration:none;
                 transition:background .15s;position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;">
@@ -494,7 +494,7 @@
                 <i class="bi bi-{% if object %}pencil-square{% else %}save{% endif %}"></i>
                 {% if object %}Atualiza Ekipamentu{% else %}Rai Ekipamentu{% endif %}
               </button>
-              <a href="{% if object %}{% url 'equipment-detail' object.pk %}{% else %}{% url 'equipment-list' %}{% endif %}"
+              <a href="{% if object %}{% url 'equipment:equipment_detail' object.pk %}{% else %}{% url 'equipment:equipment_list' %}{% endif %}"
                  class="ef-btn-secondary">
                 <i class="bi bi-x-lg"></i>Kansela
               </a>

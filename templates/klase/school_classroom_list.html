@@ -17,7 +17,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
-                            <a href="{% url 'klase:teacher-schools' %}" class="text-decoration-none">Lista Pre eskolar</a>
+                            <a href="{% url 'klase:teacher_school_list' %}" class="text-decoration-none">Lista Pre eskolar</a>
                         </li>
                         <li class="breadcrumb-item active">{{ preschool.name }}</li>
                     </ol>
@@ -95,7 +95,7 @@
                                                 {% for student in classroom.students|slice:":3" %}
                                                     <div class="list-group-item px-0 py-1">
                                                         <small>
-                                                            <a href="{% url 'core:child-activity' student.child__id %}" class="text-decoration-none fw-semibold">
+                                                            <a href="{% url 'core:api_child_activity' student.child__id %}" class="text-decoration-none fw-semibold">
                                                                 {{ student.child__first_name }}
                                                             </a>
                                                             <span class="badge bg-secondary">{{ student.child__user_id }}</span>
@@ -118,7 +118,7 @@
 
                                 <!-- Card Footer -->
                                 <div class="card-footer bg-white border-top">
-                                    <a href="{% url 'klase:classroom-detail' classroom.id %}" 
+                                    <a href="{% url 'klase:classroom_detail' classroom.id %}" 
                                        class="btn btn-primary btn-sm w-100">
                                         <i class="bi bi-arrow-right"></i> Hare Detalhes
                                     </a>

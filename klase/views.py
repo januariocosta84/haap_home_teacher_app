@@ -259,7 +259,7 @@ class ClassroomDetailView(View):
 
         if request.user.role == 'moe_admin':
             messages.error(request, "MoE admin bele haree klase, maibe labele aumenta alunu iha pajina ida ne'e.")
-            return redirect('klase:classroom-detail', classroom_id=classroom_id)
+            return redirect('klase:classroom_detail', classroom_id=classroom_id)
 
         classroom = get_object_or_404(
             Classroom,
@@ -271,7 +271,7 @@ class ClassroomDetailView(View):
 
         if not form.is_valid():
             messages.error(request, "Kodigu invalidu.")
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         child_code = form.cleaned_data['child_code']
 
@@ -283,7 +283,7 @@ class ClassroomDetailView(View):
                 request,
                 f"Kodigu '{child_code}' la existe iha sistema. Favor verifika kodigu ho los."
             )
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         # 2. Validate registered age group matches classroom group
         if child.age_group != classroom.group:
@@ -294,7 +294,7 @@ class ClassroomDetailView(View):
                 f"maibé klase ida ne'e uza {group_label.get(classroom.group, classroom.group)}. "
                 f"Labarik labele rejista iha grupo ne'ebé la tuir."
             )
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         # 3. Validate actual age from year_of_birth
         current_year = datetime.date.today().year
@@ -309,7 +309,7 @@ class ClassroomDetailView(View):
                 f"({child.year_of_birth}), maibé klase {classroom.group} presiza labarik tinan {min_age}–{max_age}. "
                 f"Labarik la elegível atu rejista iha klase ida ne'e."
             )
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         # 4. Check if already actively enrolled in THIS classroom
         this_enrollment = ClassroomChild.objects.filter(
@@ -321,7 +321,7 @@ class ClassroomDetailView(View):
                 request,
                 f"{child.first_name} rejistadu ona iha klase '{classroom.name}'."
             )
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         # 5. Check if actively enrolled in ANY OTHER classroom (one-class rule)
         other_enrollment = ClassroomChild.objects.filter(
@@ -339,7 +339,7 @@ class ClassroomDetailView(View):
                 f"({other_enrollment.classroom.preschool.name}). "
                 f"Favor hasai labarik hosi klase ne'ebé atual molok rejista iha klase seluk."
             )
-            return redirect('klase:classroom-detail', classroom_id=classroom.id)
+            return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
         # 6. All checks passed — enroll
         if this_enrollment:
@@ -357,7 +357,7 @@ class ClassroomDetailView(View):
             request,
             f"{child.first_name} adisiona ona ba klase '{classroom.name}' ho susesu."
         )
-        return redirect('klase:classroom-detail', classroom_id=classroom.id)
+        return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -382,7 +382,7 @@ class RemoveStudentFromClassroomView(View):
         enrollment.save(update_fields=['is_active'])
 
         messages.success(request, f"{child_name} remove ona hosi klase {classroom.name}.")
-        return redirect('klase:classroom-detail', classroom_id=classroom.id)
+        return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -640,7 +640,7 @@ class AddChildToClassroomView(View):
 
         if not form.is_valid():
             messages.error(request, "Invalid data.")
-            return redirect("classroom-detail", classroom_id=classroom.id)
+            return redirect("klase:classroom_detail", classroom_id=classroom.id)
 
         user_id = form.cleaned_data["user_id"]
         first_name = form.cleaned_data["first_name"]
@@ -653,7 +653,7 @@ class AddChildToClassroomView(View):
 
         if not child:
             messages.error(request, "Child not found.")
-            return redirect("classroom-detail", classroom_id=classroom.id)
+            return redirect("klase:classroom_detail", classroom_id=classroom.id)
 
         # 2. Check if already assigned
         if hasattr(child, "classroom_enrollment"):
@@ -661,7 +661,7 @@ class AddChildToClassroomView(View):
                 request,
                 f"{child.first_name} already belongs to a class."
             )
-            return redirect("classroom-detail", classroom_id=classroom.id)
+            return redirect("klase:classroom_detail", classroom_id=classroom.id)
 
         # 3. Age group validation
         if child.age_group != classroom.group:
@@ -669,7 +669,7 @@ class AddChildToClassroomView(View):
                 request,
                 "Child age group does not match classroom."
             )
-            return redirect("classroom-detail", classroom_id=classroom.id)
+            return redirect("klase:classroom_detail", classroom_id=classroom.id)
 
         # 4. Create enrollment
         ClassroomChild.objects.create(
@@ -680,7 +680,7 @@ class AddChildToClassroomView(View):
 
         messages.success(request, "Child added successfully.")
 
-        return redirect("classroom-detail", classroom_id=classroom.id)
+        return redirect("klase:classroom_detail", classroom_id=classroom.id)
 
 class EnrollChildView(LoginRequiredMixin, View):
     def post(self, request, classroom_id):

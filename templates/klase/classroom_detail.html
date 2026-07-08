@@ -19,15 +19,15 @@
                 <ol class="breadcrumb">
                     {% if request.user.role == "moe_admin" %}
                         <li class="breadcrumb-item">
-                            <a href="{% url 'preschools:preschool_detail' id=classroom.preschool_id %}" class="text-decoration-none">Lista Klase</a>
+                            <a href="{% url 'preschools:preschool_detail' pk=classroom.preschool_id %}" class="text-decoration-none">Lista Klase</a>
                         </li>
                         <li class="breadcrumb-item">{{ classroom.preschool_name }}</li>
                     {% else %}
                         <li class="breadcrumb-item">
-                            <a href="{% url 'klase:teacher-schools' %}" class="text-decoration-none">Lista Pre escolar</a>
+                            <a href="{% url 'klase:teacher_school_list' %}" class="text-decoration-none">Lista Pre escolar</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{% url 'klase:school-classrooms' classroom.preschool_id %}" class="text-decoration-none">
+                            <a href="{% url 'klase:school_classroom_list' classroom.preschool_id %}" class="text-decoration-none">
                                 {{ classroom.preschool_name }}
                             </a>
                         </li>
@@ -52,17 +52,17 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="{% url 'klase:download-classroom-children' classroom.id %}?format=xlsx">
+                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=xlsx">
                                     <i class="bi bi-file-earmark-spreadsheet"></i> Excel
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'klase:download-classroom-children' classroom.id %}?format=csv">
+                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=csv">
                                     <i class="bi bi-filetype-csv"></i> CSV
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'klase:download-classroom-children' classroom.id %}?format=pdf">
+                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=pdf">
                                     <i class="bi bi-file-earmark-pdf"></i> PDF
                                 </a>
                             </li>
@@ -105,7 +105,7 @@
                                             {% for student in students %}
                                                 <tr>
                                                     <td>
-                                                        <a href="{% url 'core:child-activity' student.child__id %}" class="text-decoration-none fw-bold">
+                                                        <a href="{% url 'core:api_child_activity' student.child__id %}" class="text-decoration-none fw-bold">
                                                             {{ student.child__first_name }}
                                                         </a>
                                                     </td>
@@ -121,7 +121,7 @@
                                                             <i class="bi bi-person-lines-fill"></i> Inan/Aman
                                                         </button>
                                                         {% if request.user.role != "moe_admin" %}
-                                                            <form method="POST" action="{% url 'klase:remove-student' classroom.id student.id %}" onsubmit="return confirm('Tem certeza que deseja remover este aluno da classe?');">
+                                                            <form method="POST" action="{% url 'klase:classroom_child_remove' classroom.id student.id %}" onsubmit="return confirm('Tem certeza que deseja remover este aluno da classe?');">
                                                                 {% csrf_token %}
                                                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                                                     <i class="bi bi-trash"></i> Remove

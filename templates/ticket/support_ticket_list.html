@@ -47,7 +47,7 @@
         </div>
         {% if user.role == 'teacher' %}
         <div class="col-auto">
-          <a href="{% url 'ticket:support-ticket-create' %}" class="btn btn-light fw-semibold rounded-pill px-4" style="color:#1d4ed8;">
+          <a href="{% url 'ticket:ticket_create' %}" class="btn btn-light fw-semibold rounded-pill px-4" style="color:#1d4ed8;">
             <i class="bi bi-plus-circle-fill me-1"></i>Kria Tiket Foun
           </a>
         </div>
@@ -99,7 +99,7 @@
         <div class="col-sm-6 col-md-3"></div>
         {% endif %}
         <div class="col-12 d-flex gap-2 justify-content-end">
-          <a href="{% url 'ticket:support-ticket-list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+          <a href="{% url 'ticket:ticket_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
             <i class="bi bi-x-lg me-1"></i>Limpa
           </a>
           <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
@@ -157,7 +157,7 @@
             </td>
             <td class="col-hide-md"><span class="text-muted" style="font-size:0.8rem;">{{ ticket.created_at|date:"d/m/Y" }}</span></td>
             <td style="text-align:center;">
-              <a href="{% url 'ticket:support-ticket-detail' ticket.pk %}"
+              <a href="{% url 'ticket:ticket_detail' ticket.pk %}"
                  class="btn btn-sm rounded-pill fw-semibold"
                  style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:0.78rem;padding:3px 12px;">
                 <i class="bi bi-eye me-1"></i>Detalhes
@@ -171,7 +171,7 @@
               <div class="fw-semibold mb-1" style="color:#64748b;">Laiha tiket suporta</div>
               <div style="font-size:0.83rem;color:#94a3b8;">
                 {% if user.role == 'teacher' %}
-                  <a href="{% url 'ticket:support-ticket-create' %}" class="text-primary fw-semibold">Kria tiket foun</a> hodi buka ajuda.
+                  <a href="{% url 'ticket:ticket_create' %}" class="text-primary fw-semibold">Kria tiket foun</a> hodi buka ajuda.
                 {% else %}
                   Seidauk iha tiket iha sistema.
                 {% endif %}

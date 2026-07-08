@@ -21,7 +21,7 @@ def child_registration(request):
                 request,
                 f"Labarik '{child.first_name}' rejistu ho susesu. Kodigu nia: {child.user_id}"
             )
-            return redirect('children_list')
+            return redirect('core:child_list')
     else:
         form = ChildRegistrationForm()
     return render(request,'core/child_registration.html', {'form': form})
@@ -34,7 +34,7 @@ def edit_child(request, child_id):
         if form.is_valid():
             form.save()
             messages.success(request, f"Labarik '{child.first_name}' aktualiza ho susesu.")
-            return redirect('children_list')
+            return redirect('core:child_list')
     else:
         form = ChildRegistrationForm(instance=child)
     return render(request, 'core/edit_child.html', {'form': form, 'child': child})
@@ -46,5 +46,5 @@ def delete_child(request, child_id):
         name = child.first_name
         child.delete()
         messages.warning(request, f"Child '{name}' has been deleted.")
-        return redirect('children_list')
+        return redirect('core:child_list')
     return render(request, 'core/delete_child.html', {'child': child})

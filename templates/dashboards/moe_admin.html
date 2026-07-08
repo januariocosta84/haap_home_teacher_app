@@ -79,13 +79,13 @@
         <div class="col-12 col-md-auto mt-2 mt-md-0">
           <div class="d-flex flex-wrap gap-2">
             {% if pending_teacher_requests > 0 %}
-            <a href="{% url 'preschools:preschool_teacher_requests' %}"
+            <a href="{% url 'preschools:teacher_request_list' %}"
                class="btn btn-warning fw-semibold rounded-pill px-3">
               <i class="bi bi-bell-fill me-1"></i>
               {{ pending_teacher_requests }} Pedidu
             </a>
             {% endif %}
-            <a href="{% url 'ticket:support-ticket-list' %}"
+            <a href="{% url 'ticket:ticket_list' %}"
                class="btn btn-light fw-semibold rounded-pill px-3"
                style="color: #1d4ed8;">
               <i class="bi bi-ticket-perforated me-1"></i>Tickets
@@ -108,7 +108,7 @@
         <div class="card-body p-4 text-white">
           <div class="section-label text-white opacity-75 mb-2">Utilizadores hotu</div>
           <h2 class="fw-bold mb-0 counter" data-target="{{ all_users }}">0</h2>
-          <a href="{% url 'core:user_management' %}"
+          <a href="{% url 'core:user_list' %}"
              class="text-white opacity-75 small text-decoration-none d-block mt-2">
             Haree hotu <i class="bi bi-arrow-right"></i>
           </a>
@@ -123,7 +123,7 @@
         <div class="card-body p-4 text-white">
           <div class="section-label text-white opacity-75 mb-2">Parentes</div>
           <h2 class="fw-bold mb-0 counter" data-target="{{ parents }}">0</h2>
-          <a href="{% url 'core:user_management' %}?tab=parents"
+          <a href="{% url 'core:user_list' %}?tab=parents"
              class="text-white opacity-75 small text-decoration-none d-block mt-2">
             Haree hotu <i class="bi bi-arrow-right"></i>
           </a>
@@ -138,7 +138,7 @@
         <div class="card-body p-4 text-white">
           <div class="section-label text-white opacity-75 mb-2">Professores</div>
           <h2 class="fw-bold mb-0 counter" data-target="{{ teachers }}">0</h2>
-          <a href="{% url 'core:user_management' %}?tab=teachers"
+          <a href="{% url 'core:user_list' %}?tab=teachers"
              class="text-white opacity-75 small text-decoration-none d-block mt-2">
             Haree hotu <i class="bi bi-arrow-right"></i>
           </a>
@@ -153,7 +153,7 @@
         <div class="card-body p-4 text-white">
           <div class="section-label text-white opacity-75 mb-2">Oan sira</div>
           <h2 class="fw-bold mb-0 counter" data-target="{{ children }}">0</h2>
-          <a href="{% url 'core:user_management' %}?tab=children"
+          <a href="{% url 'core:user_list' %}?tab=children"
              class="text-white opacity-75 small text-decoration-none d-block mt-2">
             Haree hotu <i class="bi bi-arrow-right"></i>
           </a>
@@ -199,7 +199,7 @@
                  style="width:44px;height:44px;background:#fff7ed;">
               <i class="bi bi-box-seam-fill" style="color:#ea580c;font-size:1.1rem;"></i>
             </div>
-            <a href="{% url 'equipment-list' %}"
+            <a href="{% url 'equipment:equipment_list' %}"
                class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size:0.72rem;">
               Haree
             </a>
@@ -219,7 +219,7 @@
                  style="width:44px;height:44px;background:#fefce8;">
               <i class="bi bi-bar-chart-line-fill" style="color:#ca8a04;font-size:1.1rem;"></i>
             </div>
-            <a href="{% url 'core:user_management' %}?tab=analysts"
+            <a href="{% url 'core:user_list' %}?tab=analysts"
                class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size:0.72rem;">
               Haree
             </a>
@@ -240,7 +240,7 @@
               <i class="bi bi-envelope-fill"
                  style="color:{% if pending_teacher_requests > 0 %}#dc2626{% else %}#94a3b8{% endif %};font-size:1.1rem;"></i>
             </div>
-            <a href="{% url 'preschools:preschool_teacher_requests' %}"
+            <a href="{% url 'preschools:teacher_request_list' %}"
                class="btn btn-sm {% if pending_teacher_requests > 0 %}btn-danger{% else %}btn-outline-secondary{% endif %} rounded-pill px-3"
                style="font-size:0.72rem;">
               Haree
@@ -328,7 +328,7 @@
           <h6 class="fw-bold mb-0">Tickets Foun</h6>
           <div class="text-muted small">10 ikus liu</div>
         </div>
-        <a href="{% url 'ticket:support-ticket-list' %}"
+        <a href="{% url 'ticket:ticket_list' %}"
            class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
           <i class="bi bi-list-ul me-1"></i>Haree Hotu
         </a>
@@ -352,7 +352,7 @@
           <tbody>
             {% for ticket in recent_tickets %}
             <tr class="ticket-row"
-                onclick="window.location='{% url 'ticket:support-ticket-detail' ticket.pk %}'"
+                onclick="window.location='{% url 'ticket:ticket_detail' ticket.pk %}'"
                 style="border-top:1px solid #f1f5f9;">
 
               <!-- Ticket number -->
@@ -431,7 +431,7 @@
 
     {% if recent_tickets %}
     <div class="card-footer bg-white border-0 px-4 py-3 text-center">
-      <a href="{% url 'ticket:support-ticket-list' %}"
+      <a href="{% url 'ticket:ticket_list' %}"
          class="text-decoration-none small fw-semibold"
          style="color:#1d4ed8;">
         Haree tickets hotu <i class="bi bi-arrow-right ms-1"></i>

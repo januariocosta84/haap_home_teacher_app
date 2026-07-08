@@ -13,8 +13,8 @@
 
   <!-- All Schools link -->
   <div style="padding: 8px 0 4px;">
-    <a href="{% url 'klase:teacher-schools' %}"
-       class="haap-cs-link {% if url_name == 'teacher-schools' %}active{% endif %}">
+    <a href="{% url 'klase:teacher_school_list' %}"
+       class="haap-cs-link {% if url_name == 'teacher_school_list' %}active{% endif %}">
       <i class="bi bi-house-fill"></i>
       <span class="haap-cs-school-name">Eskola hotu</span>
       {% if total_schools %}
@@ -28,7 +28,7 @@
   <div class="haap-cs-section-label">Hau nia Eskola</div>
 
   {% for school in schools %}
-  <a href="{% url 'klase:school-classrooms' school.id %}"
+  <a href="{% url 'klase:school_classroom_list' school.id %}"
      class="haap-cs-link {% if active_school_id == school.id %}active{% endif %}">
     <i class="bi bi-building"></i>
     <span class="haap-cs-school-name">{{ school.name }}</span>

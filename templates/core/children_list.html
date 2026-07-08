@@ -74,7 +74,7 @@
           </p>
         </div>
         <div class="col-auto">
-          <a href="{% url 'core:register_child' %}"
+          <a href="{% url 'core:child_create' %}"
              class="btn btn-light fw-semibold rounded-pill px-4"
              style="color:#15803d;">
             <i class="bi bi-plus-circle-fill me-1"></i>Rejista Oan Foun
@@ -167,20 +167,23 @@
 
         <!-- Action buttons -->
         <div class="d-flex gap-2 mt-auto">
-          <a href="{% url 'core:child-activity' child.id %}"
+          <a href="{% url 'core:api_child_activity' child.id %}"
              class="btn btn-sm rounded-pill flex-fill fw-semibold"
              style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">
             <i class="bi bi-graph-up me-1"></i>Atividade
           </a>
-          <a href="{% url 'core:edit_child' child.id %}"
-             class="btn btn-sm rounded-pill fw-semibold"
-             style="background:#fefce8;color:#854d0e;border:1px solid #fde68a;">
+          <button type="button" class="btn btn-sm rounded-pill fw-semibold"
+                  style="background:#fefce8;color:#854d0e;border:1px solid #fde68a;"
+                  data-bs-toggle="modal" data-bs-target="#editModal"
+                  data-edit-url="{% url 'core:child_update' child.id %}?embedded=1"
+                  data-item-name="{{ child.first_name }} {{ child.last_name }}">
             <i class="bi bi-pencil"></i>
-          </a>
-          <button class="btn btn-sm rounded-pill fw-semibold"
+          </button>
+          <button type="button" class="btn btn-sm rounded-pill fw-semibold"
                   style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteModal{{ child.id }}">
+                  data-bs-toggle="modal" data-bs-target="#deleteModal"
+                  data-delete-url="{% url 'core:child_delete' child.id %}"
+                  data-item-name="{{ child.first_name }} {{ child.last_name }}">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -188,33 +191,6 @@
       </div>
     </div>
     {% endwith %}
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal{{ child.id }}" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content" style="border-radius:16px;border:none;">
-          <div class="modal-body p-4 text-center">
-            <div class="mb-3">
-              <div class="child-avatar group-a mx-auto mb-3" style="width:56px;height:56px;">
-                {{ child.first_name|slice:":1"|upper }}
-              </div>
-              <h6 class="fw-bold mb-1">Hamos {{ child.first_name }}?</h6>
-              <p class="text-muted small mb-0">
-                Aksaun ne'e labele desfaz. Dadus hotu sei hamos.
-              </p>
-            </div>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-secondary rounded-pill flex-fill"
-                      data-bs-dismiss="modal">Kansela</button>
-              <a href="{% url 'core:delete_child' child.id %}"
-                 class="btn btn-danger rounded-pill flex-fill fw-semibold">
-                <i class="bi bi-trash me-1"></i>Hamos
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     {% endfor %}
   </div>
@@ -232,7 +208,7 @@
       <p class="text-muted mb-4">
         Tama informasaun oan ita nian hodi hahu rejistasaun.
       </p>
-      <a href="{% url 'core:register_child' %}"
+      <a href="{% url 'core:child_create' %}"
          class="btn btn-success rounded-pill px-5 fw-semibold">
         <i class="bi bi-plus-circle-fill me-2"></i>Rejista Oan Primeiru
       </a>
@@ -242,4 +218,8 @@
   {% endif %}
 
 </div>
+
+{% include 'partials/delete_modal.html' %}
+{% include 'partials/edit_modal.html' %}
+{% include 'partials/modal_js.html' %}
 {% endblock %}

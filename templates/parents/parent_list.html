@@ -73,7 +73,7 @@
                 class="btn rounded-pill fw-semibold"
                 style="background:#fff;color:#1d4ed8;border:none;font-size:0.82rem;"
                 id="exportPdfBtn"
-                data-export-url="{% url 'core:export_parents_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
+                data-export-url="{% url 'core:export_parent_pdf' %}{% if request.GET.municipality %}?municipality={{ request.GET.municipality }}{% endif %}"
                 data-bs-toggle="modal"
                 data-bs-target="#exportConfirmModal">
           <i class="bi bi-file-earmark-pdf-fill me-1"></i>Descarrega PDF
@@ -182,16 +182,18 @@
             </td>
             <td class="text-center" style="padding-right:1.5rem;">
               <div class="d-flex justify-content-center gap-1">
-                <a href="{% url 'core:edit_user' parent.id %}"
-                   class="haap-act-btn edit" title="Edita"
-                   data-bs-toggle="tooltip" data-bs-placement="top">
+                <button type="button" class="haap-act-btn edit" title="Edita"
+                   data-bs-toggle="modal" data-bs-target="#editModal"
+                   data-edit-url="{% url 'core:user_update' parent.id %}?embedded=1"
+                   data-item-name="{{ parent.get_full_name }}">
                   <i class="bi bi-pencil"></i>
-                </a>
-                <a href="{% url 'core:confirm_delete_user' parent.id %}"
-                   class="haap-act-btn del" title="Hamos"
-                   data-bs-toggle="tooltip" data-bs-placement="top">
+                </button>
+                <button type="button" class="haap-act-btn del" title="Hamos"
+                   data-bs-toggle="modal" data-bs-target="#deleteModal"
+                   data-delete-url="{% url 'core:user_delete' parent.id %}"
+                   data-item-name="{{ parent.get_full_name }}">
                   <i class="bi bi-trash3"></i>
-                </a>
+                </button>
               </div>
             </td>
           </tr>
@@ -293,6 +295,9 @@
 
 {% endblock %}
 
+{% include 'partials/delete_modal.html' %}
+{% include 'partials/edit_modal.html' %}
+
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -303,10 +308,10 @@ document.addEventListener('DOMContentLoaded', function () {
       confirmLink.setAttribute('href', exportBtn.getAttribute('data-export-url'));
     });
   }
-  // Tooltips
   document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
     new bootstrap.Tooltip(el, { trigger: 'hover' });
   });
 });
 </script>
+{% include 'partials/modal_js.html' %}
 {% endblock %}

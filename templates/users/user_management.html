@@ -129,7 +129,7 @@
           </p>
         </div>
         <div class="col-auto">
-          <a href="{% url 'core:register_user' %}"
+          <a href="{% url 'core:user_create' %}"
              class="btn btn-light fw-semibold rounded-pill px-4"
              style="color:#1d4ed8;">
             <i class="bi bi-person-plus-fill me-1"></i>Kria Utilizador Foun
@@ -344,18 +344,23 @@
                     {{ parent.created_at|date:"d M Y" }}
                   </td>
                   <td class="text-end" style="white-space:nowrap;">
-                    <a href="{% url 'core:view_user' parent.id %}"
+                    <a href="{% url 'core:user_detail' parent.id %}"
                        class="btn btn-outline-secondary action-pill me-1">
                       <i class="bi bi-eye me-1"></i>Ver
                     </a>
-                    <a href="{% url 'core:edit_user' parent.id %}"
-                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                    <button type="button" class="btn btn-warning action-pill me-1"
+                       style="color:#fff;"
+                       data-bs-toggle="modal" data-bs-target="#editModal"
+                       data-edit-url="{% url 'core:user_update' parent.id %}?embedded=1"
+                       data-item-name="{{ parent.get_full_name }}">
                       <i class="bi bi-pencil me-1"></i>Editar
-                    </a>
-                    <a href="{% url 'core:delete_user' parent.id %}"
-                       class="btn btn-danger action-pill">
+                    </button>
+                    <button type="button" class="btn btn-danger action-pill"
+                       data-bs-toggle="modal" data-bs-target="#deleteModal"
+                       data-delete-url="{% url 'core:user_delete' parent.id %}"
+                       data-item-name="{{ parent.get_full_name }}">
                       <i class="bi bi-trash me-1"></i>Eliminar
-                    </a>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -522,24 +527,29 @@
                     {% endif %}
                   </td>
                   <td class="text-end" style="white-space:nowrap;">
-                    <a href="{% url 'core:view_user' teacher.id %}"
+                    <a href="{% url 'core:user_detail' teacher.id %}"
                        class="btn btn-outline-secondary action-pill me-1">
                       <i class="bi bi-eye me-1"></i>Ver
                     </a>
-                    <a href="{% url 'core:edit_user' teacher.id %}"
-                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                    <button type="button" class="btn btn-warning action-pill me-1"
+                       style="color:#fff;"
+                       data-bs-toggle="modal" data-bs-target="#editModal"
+                       data-edit-url="{% url 'core:user_update' teacher.id %}?embedded=1"
+                       data-item-name="{{ teacher.get_full_name }}">
                       <i class="bi bi-pencil me-1"></i>Editar
-                    </a>
+                    </button>
                     {% if not teacher.is_active %}
-                    <a href="{% url 'core:approve_teacher' teacher.id %}"
+                    <a href="{% url 'core:user_approve' teacher.id %}"
                        class="btn btn-success action-pill me-1">
                       <i class="bi bi-check-lg me-1"></i>Aprova
                     </a>
                     {% endif %}
-                    <a href="{% url 'core:delete_user' teacher.id %}"
-                       class="btn btn-danger action-pill">
+                    <button type="button" class="btn btn-danger action-pill"
+                       data-bs-toggle="modal" data-bs-target="#deleteModal"
+                       data-delete-url="{% url 'core:user_delete' teacher.id %}"
+                       data-item-name="{{ teacher.get_full_name }}">
                       <i class="bi bi-trash me-1"></i>Eliminar
-                    </a>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -593,18 +603,23 @@
                     {% else %}—{% endif %}
                   </td>
                   <td class="text-end" style="white-space:nowrap;">
-                    <a href="{% url 'core:view_user' analyst.id %}"
+                    <a href="{% url 'core:user_detail' analyst.id %}"
                        class="btn btn-outline-secondary action-pill me-1">
                       <i class="bi bi-eye me-1"></i>Ver
                     </a>
-                    <a href="{% url 'core:edit_user' analyst.id %}"
-                       class="btn btn-warning action-pill me-1" style="color:#fff;">
+                    <button type="button" class="btn btn-warning action-pill me-1"
+                       style="color:#fff;"
+                       data-bs-toggle="modal" data-bs-target="#editModal"
+                       data-edit-url="{% url 'core:user_update' analyst.id %}?embedded=1"
+                       data-item-name="{{ analyst.get_full_name }}">
                       <i class="bi bi-pencil me-1"></i>Editar
-                    </a>
-                    <a href="{% url 'core:delete_user' analyst.id %}"
-                       class="btn btn-danger action-pill">
+                    </button>
+                    <button type="button" class="btn btn-danger action-pill"
+                       data-bs-toggle="modal" data-bs-target="#deleteModal"
+                       data-delete-url="{% url 'core:user_delete' analyst.id %}"
+                       data-item-name="{{ analyst.get_full_name }}">
                       <i class="bi bi-trash me-1"></i>Eliminar
-                    </a>
+                    </button>
                   </td>
                 </tr>
                 {% empty %}
@@ -663,7 +678,7 @@
                     </span>
                   </td>
                   <td class="text-end">
-                    <a href="{% url 'core:view_user' admin.id %}"
+                    <a href="{% url 'core:user_detail' admin.id %}"
                        class="btn btn-outline-secondary action-pill">
                       <i class="bi bi-eye me-1"></i>Ver
                     </a>
@@ -1085,4 +1100,8 @@ document.addEventListener('DOMContentLoaded', function () {
   } catch (e) {}
 });
 </script>
+
+{% include 'partials/delete_modal.html' %}
+{% include 'partials/edit_modal.html' %}
+{% include 'partials/modal_js.html' %}
 {% endblock %}

@@ -1,9 +1,12 @@
+import os
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from core.forms import ProfileForm, ProfileImageForm, ChangePasswordForm
 from core.audit import log_action
+
+DEFAULT_PROFILE_IMAGE = "apk/user.jpg"
 
 @login_required
 def profile_view(request):
@@ -24,7 +27,16 @@ def update_profile_image(request):
     if request.method == "POST":
         form = ProfileImageForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
+            old_image = request.user.image
+            old_path = None
+            if old_image and old_image.name and old_image.name != DEFAULT_PROFILE_IMAGE:
+                try:
+                    old_path = old_image.path
+                except Exception:
+                    old_path = None
             form.save()
+            if old_path and os.path.isfile(old_path):
+                os.remove(old_path)
             messages.success(request, "Perfil foto atualiza ho susesu.")
             return redirect('core:profile')
     else:
@@ -45,7 +57,7 @@ def change_password(request):
             # Verify current password
             if not user.check_password(current_password):
                 messages.error(request, "Password atual la loos.")
-                return redirect('core:change_password')
+                return redirect('core:password_change')
             
             # Set new password
             user.set_password(new_password)

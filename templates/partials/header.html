@@ -49,7 +49,7 @@
             </div>
           </div>
           <div class="border-top text-center py-2">
-            <a href="{% url 'ticket:support-ticket-list' %}"
+            <a href="{% url 'ticket:ticket_list' %}"
                class="text-primary fw-semibold"
                style="font-size:0.8rem;text-decoration:none;">
               Haree tiket hotu <i class="bi bi-arrow-right"></i>
@@ -151,7 +151,7 @@
             </a>
 
             {% comment %}
-            <a href="{% url 'core:update_profile_image' %}" class="dropdown-item modern-item">
+            <a href="{% url 'core:profile_image_update' %}" class="dropdown-item modern-item">
               <i class="bi bi-image"></i> Foto
             </a>
             {% endcomment %}

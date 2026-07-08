@@ -9,7 +9,7 @@
   <!-- ── Page header ── -->
   <div class="eu-page-header">
     {% if request.user.role == "moe_admin" %}
-    <a href="{% url 'core:user_management' %}" class="eu-back-link">
+    <a href="{% url 'core:user_list' %}" class="eu-back-link">
       <i class="bi bi-arrow-left"></i> Utilizadores
     </a>
     {% else %}
@@ -85,7 +85,7 @@
       <!-- Quick links -->
       {% if request.user.role == "moe_admin" %}
       <div class="eu-quick-links">
-        <a href="{% url 'core:view_user' user_obj.id %}" class="eu-quick-link">
+        <a href="{% url 'core:user_detail' user_obj.id %}" class="eu-quick-link">
           <i class="bi bi-eye"></i> Haree perfil
         </a>
       </div>
@@ -244,7 +244,7 @@
             <i class="bi bi-check-lg"></i> Guardar mudansa
           </button>
           {% if request.user.role == "moe_admin" %}
-          <a href="{% url 'core:user_management' %}" class="eu-btn-secondary">
+          <a href="{% url 'core:user_list' %}" class="eu-btn-secondary">
             Kansela
           </a>
           {% else %}
@@ -765,7 +765,7 @@ $(document).ready(function () {
       }
 
       if (timorPhoneRegex.test(phone)) {
-        fetch(`/check-whatsapp-number/?number=${encodeURIComponent(phone)}`)
+        fetch(`/check-whatsapp/?number=${encodeURIComponent(phone)}`)
           .then(res => res.json())
           .then(data => {
             if (data.exists) {

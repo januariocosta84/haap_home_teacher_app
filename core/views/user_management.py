@@ -25,7 +25,7 @@ class UserManagementView(View):
         # Only MoE admins can access user management
         if not request.user.is_authenticated or request.user.role != "moe_admin":
             messages.error(request, "Aksesu negadu.")
-            return redirect("core:children_list")
+            return redirect("core:child_list")
 
         # Query users by role
         parents = User.objects.filter(role="parent").order_by('-created_at')
@@ -72,7 +72,7 @@ def view_user(request, user_id):
     """Simple view for a single user (MoE admin only)."""
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     user = get_object_or_404(User, id=user_id)
     return render(request, "users/view_user.html", {"obj": user})
@@ -82,12 +82,12 @@ def view_user(request, user_id):
 def approve_teacher(request, user_id):
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     teacher = get_object_or_404(User, id=user_id, role="teacher")
     if teacher.is_active:
         messages.info(request, "Ita nia pedidu aprovadu ona.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     teacher.is_active = True
     teacher.is_verified = True
@@ -110,7 +110,7 @@ def approve_teacher(request, user_id):
     except Exception as exc:
         messages.warning(request, f"Teacher approved, but WhatsApp notification failed: {exc}")
 
-    return redirect("core:user_management")
+    return redirect("core:user_list")
 
 
 @login_required
@@ -121,7 +121,7 @@ def edit_user(request, user_id):
     # Permission check: only moe_admin can edit other users, each user can edit themselves
     if request.user.role != "moe_admin" and request.user.id != user_obj.id:
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     if request.method == "POST":
         old_role = user_obj.role
@@ -143,7 +143,7 @@ def edit_user(request, user_id):
             messages.success(request, "Utilizador atualizado ho sucesso.")
             # Redirect based on user role
             if request.user.role == "moe_admin":
-                return redirect("core:user_management")
+                return redirect("core:user_list")
             else:
                 # Regular users redirect to their profile page
                 return redirect("core:profile")
@@ -160,7 +160,7 @@ def delete_user(request, user_id):
     """Delete a user (MoE admin only). Shows confirmation form on GET, deletes on POST."""
     if request.user.role != "moe_admin":
         messages.error(request, "Aksesu negadu.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     user_obj = get_object_or_404(User, id=user_id)
     if request.method == "POST":
@@ -177,7 +177,7 @@ def delete_user(request, user_id):
             previous_value={'role': role},
         )
         messages.warning(request, f"User '{name}' has been deleted.")
-        return redirect("core:user_management")
+        return redirect("core:user_list")
 
     return render(request, "users/confirm_delete_user.html", {"user_obj": user_obj})
 
@@ -186,7 +186,7 @@ def delete_user(request, user_id):
 @login_required
 def user_list(request):
     # Keep legacy route working by redirecting to the unified management view
-    return redirect('core:user_management')
+    return redirect('core:user_list')
 
 
 @login_required
@@ -214,7 +214,7 @@ def add_user(request):
 #         print(f"OTP for {whatsapp_number}: {otp}")
 
 #         messages.success(request, f"OTP haruka ona ba {whatsapp_number}. Validu minutu 10.")
-#         return redirect('core:verify_otp')
+#         return redirect('core:password_otp_verify')
 
 #     return render(request, 'registration/forgot_password.html', {'form': form})
 def forgot_password(request):
@@ -261,7 +261,7 @@ def forgot_password(request):
             f"OTP haruka ona ba {whatsapp_number}. Validu minutu 10."
         )
 
-        return redirect('core:verify_otp')
+        return redirect('core:password_otp_verify')
 
     return render(request, 'registration/forgot_password.html', {
         'form': form
@@ -274,7 +274,7 @@ def verify_otp(request):
 
     if not whatsapp_number:
         messages.error(request, "Sesaun expirou. Tenta fali.")
-        return redirect('core:forgot_password')
+        return redirect('core:password_forgot')
 
     cache_key = f"reset_otp_{whatsapp_number}"
     attempt_key = f"otp_attempts_{whatsapp_number}"
@@ -288,7 +288,7 @@ def verify_otp(request):
         # OTP expired
         if not saved_otp:
             messages.error(request, "OTP expirou. Husu fali.")
-            return redirect('core:forgot_password')
+            return redirect('core:password_forgot')
 
         # Too many attempts
         if attempts >= MAX_OTP_ATTEMPTS:
@@ -296,7 +296,7 @@ def verify_otp(request):
             django_cache.delete(attempt_key)
 
             messages.error(request, "ita koko dala barak.")
-            return redirect('core:forgot_password')
+            return redirect('core:password_forgot')
 
         # Wrong OTP
         if entered_otp != saved_otp:
@@ -319,7 +319,7 @@ def verify_otp(request):
 
         request.session['otp_verified'] = True
 
-        return redirect('core:reset_password')
+        return redirect('core:password_reset')
 
     return render(request, 'registration/verify_otp.html')
 def reset_password(request):
@@ -328,7 +328,7 @@ def reset_password(request):
 
     if not whatsapp_number or not otp_verified:
         messages.error(request, "Sesaun expirou. Tenta fali.")
-        return redirect('core:forgot_password')
+        return redirect('core:password_forgot')
 
     form = ResetPasswordForm(request.POST or None)
 
@@ -340,7 +340,7 @@ def reset_password(request):
             )
         except User.DoesNotExist:
             messages.error(request, "Utilizador la existe.")
-            return redirect('core:forgot_password')
+            return redirect('core:password_forgot')
 
         user.set_password(
             form.cleaned_data['new_password']
@@ -381,7 +381,7 @@ def reset_password(request):
 
 #         if not saved_otp:
 #             messages.error(request, "OTP expirou. Husu fali.")
-#             return redirect('core:forgot_password')
+#             return redirect('core:password_forgot')
 
 #         if entered_otp != saved_otp:
 #             messages.error(request, "OTP sala. Tenta fali.")
@@ -389,7 +389,7 @@ def reset_password(request):
 
 #         django_cache.delete(cache_key)  # ← changed
 #         request.session['otp_verified'] = True
-#         return redirect('core:reset_password')
+#         return redirect('core:password_reset')
 
 #     return render(request, 'registration/verify_otp.html')
 
@@ -399,7 +399,7 @@ def reset_password(request):
 
 #     if not whatsapp_number or not otp_verified:
 #         messages.error(request, "Sesaun expirou. Tenta fali.")
-#         return redirect('core:forgot_password')
+#         return redirect('core:password_forgot')
 
 #     form = ResetPasswordForm(request.POST or None)
 

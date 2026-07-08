@@ -92,7 +92,7 @@
                 style="font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;">
               <i class="bi bi-bar-chart-fill me-2 text-primary"></i>Aktividade 14 Loron Ikus
             </h6>
-            <a href="{% url 'core:auditing_logs' %}"
+            <a href="{% url 'core:auditing_log_list' %}"
                class="btn btn-sm rounded-pill px-3"
                style="background:#eff6ff;color:#1d4ed8;font-size:.75rem;">
               Haree Hotu <i class="bi bi-arrow-right ms-1"></i>
@@ -160,7 +160,7 @@
           {% endif %}
         </div>
         <div class="card-footer bg-white border-0 pb-3 pt-0 px-4">
-          <a href="{% url 'core:auditing_logs' %}?status=failed"
+          <a href="{% url 'core:auditing_log_list' %}?status=failed"
              class="text-danger fw-semibold" style="font-size:.78rem;text-decoration:none;">
             Haree hotu <i class="bi bi-arrow-right"></i>
           </a>
@@ -235,7 +235,7 @@
               {% endfor %}
             </div>
             <div class="card-footer bg-white border-0 pb-3 pt-0 px-4">
-              <a href="{% url 'core:auditing_logs' %}?action=login"
+              <a href="{% url 'core:auditing_log_list' %}?action=login"
                  class="text-primary fw-semibold" style="font-size:.78rem;text-decoration:none;">
                 Haree historial login hotu <i class="bi bi-arrow-right"></i>
               </a>

@@ -30,7 +30,7 @@
 
   <!-- ═══ BACK + HERO ═══ -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="{% url 'ticket:support-ticket-list' %}"
+    <a href="{% url 'ticket:ticket_list' %}"
        class="btn btn-outline-secondary rounded-circle p-2 lh-1 flex-shrink-0">
       <i class="bi bi-arrow-left"></i>
     </a>
@@ -64,7 +64,7 @@
         </div>
         {% if user.role == 'moe_admin' %}
         <div class="col-auto">
-          <a href="{% url 'ticket:support-ticket-update' ticket.pk %}"
+          <a href="{% url 'ticket:ticket_update' ticket.pk %}"
              class="btn btn-light fw-semibold rounded-pill px-3"
              style="font-size:0.83rem;color:#1d4ed8;">
             <i class="bi bi-pencil-fill me-1"></i>Atualiza

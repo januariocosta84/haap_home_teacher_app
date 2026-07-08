@@ -22,7 +22,7 @@ def user_login(request):
                 if user.role == "moe_admin":
                     return redirect("core:moe_admin_dashboard")
                 elif user.role == "parent":
-                    return redirect("core:children_list")
+                    return redirect("core:child_list")
                 elif user.role == "municipality_analyst":
                     return redirect("core:municipality_dashboard")
                 elif user.role == "teacher":
@@ -37,7 +37,7 @@ def user_login(request):
                     #         "preschools:preschool_detail",
                     #         pk=approved_relation.preschool.id
                     #     )
-                    return redirect("preschools:preschool_list_claim")
+                    return redirect("preschools:teacher_preschool_list")
                 else:
                     messages.error(request, "Unknown role. Contact admin.")
                     return redirect("core:login")

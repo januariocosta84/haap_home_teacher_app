@@ -1,0 +1,23 @@
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" style="max-width:920px;">
+    <div class="modal-content border-0 shadow-lg rounded-4" style="min-height:75vh;">
+      <div class="modal-header border-bottom px-4" style="background:#f8fafc;">
+        <h5 class="modal-title fw-semibold" id="editModalLabel">
+          <i class="bi bi-pencil-square me-2 text-warning"></i>
+          <span id="editModalName">Editar</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0 position-relative">
+        <div id="editFrameSpinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:1;">
+          <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Loading…</span>
+          </div>
+        </div>
+        <iframe id="editFrame" src="about:blank"
+                style="width:100%;border:0;height:75vh;display:block;opacity:0;transition:opacity .2s;"
+                title="Editar"></iframe>
+      </div>
+    </div>
+  </div>
+</div>

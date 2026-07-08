@@ -8,11 +8,11 @@
     {% if user.role == "moe_admin" %}
     <a href="{% url 'core:moe_admin_dashboard' %}" class="brand-link">
     {% elif user.role == "parent" %}
-    <a href="{% url 'core:children_list' %}" class="brand-link">
+    <a href="{% url 'core:child_list' %}" class="brand-link">
     {% elif user.role == "municipality_analyst" %}
     <a href="{% url 'core:municipality_dashboard' %}" class="brand-link">
     {% elif user.role == "teacher" %}
-    <a href="{% url 'preschools:preschool_list_claim' %}" class="brand-link">
+    <a href="{% url 'preschools:teacher_preschool_list' %}" class="brand-link">
     {% else %}
     <a href="#" class="brand-link">
     {% endif %}
@@ -66,41 +66,41 @@
           <li class="nav-header">Gestão</li>
 
           <!-- Users group -->
-          <li class="nav-item {% if '/dashboard/users' in request.path or url_name == 'register_user' or url_name == 'view_user' or url_name == 'edit_user' %}menu-open{% endif %}">
+          <li class="nav-item {% if '/dashboard/users' in request.path or url_name == 'user_create' or url_name == 'user_detail' or url_name == 'user_update' %}menu-open{% endif %}">
             <a href="#"
-               class="nav-link {% if '/dashboard/users' in request.path or url_name == 'register_user' or url_name == 'view_user' or url_name == 'edit_user' %}active{% endif %}">
+               class="nav-link {% if '/dashboard/users' in request.path or url_name == 'user_create' or url_name == 'user_detail' or url_name == 'user_update' %}active{% endif %}">
               <i class="nav-icon bi bi-people-fill"></i>
               <p>Utilizadores <i class="nav-arrow bi bi-chevron-right"></i></p>
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'core:user_management' %}"
-                   class="nav-link {% if url_name == 'user_management' %}active{% endif %}">
+                <a href="{% url 'core:user_list' %}"
+                   class="nav-link {% if url_name == 'user_list' %}active{% endif %}">
                   <i class="nav-icon bi bi-grid-3x3-gap"></i>
                   <p>Hotu</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'core:user_management' %}?tab=parents" class="nav-link">
+                <a href="{% url 'core:user_list' %}?tab=parents" class="nav-link">
                   <i class="nav-icon bi bi-person-hearts"></i>
                   <p>Inan aman</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'core:user_management' %}?tab=teachers" class="nav-link">
+                <a href="{% url 'core:user_list' %}?tab=teachers" class="nav-link">
                   <i class="nav-icon bi bi-person-workspace"></i>
                   <p>Professores</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'core:user_management' %}?tab=analysts" class="nav-link">
+                <a href="{% url 'core:user_list' %}?tab=analysts" class="nav-link">
                   <i class="nav-icon bi bi-bar-chart-line"></i>
                   <p>Analistas</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'core:register_user' %}"
-                   class="nav-link {% if url_name == 'register_user' %}active{% endif %}">
+                <a href="{% url 'core:user_create' %}"
+                   class="nav-link {% if url_name == 'user_create' %}active{% endif %}">
                   <i class="nav-icon bi bi-person-plus"></i>
                   <p>Kria Foun</p>
                 </a>
@@ -111,7 +111,7 @@
           <!-- Preschools -->
           <li class="nav-item">
             <a href="{% url 'preschools:preschool_list' %}"
-               class="nav-link {% if ns == 'preschools' and url_name != 'preschool_list_claim' %}active{% endif %}">
+               class="nav-link {% if ns == 'preschools' and url_name != 'teacher_preschool_list' %}active{% endif %}">
               <i class="nav-icon bi bi-buildings"></i>
               <p>Pre-Eskolares</p>
             </a>
@@ -126,15 +126,15 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'equipment-list' %}"
-                   class="nav-link {% if url_name == 'equipment-list' %}active{% endif %}">
+                <a href="{% url 'equipment:equipment_list' %}"
+                   class="nav-link {% if url_name == 'equipment_list' %}active{% endif %}">
                   <i class="nav-icon bi bi-list-ul"></i>
                   <p>Lista</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'equipment-add' %}"
-                   class="nav-link {% if url_name == 'equipment-add' %}active{% endif %}">
+                <a href="{% url 'equipment:equipment_create' %}"
+                   class="nav-link {% if url_name == 'equipment_create' %}active{% endif %}">
                   <i class="nav-icon bi bi-plus-circle"></i>
                   <p>Adisiona</p>
                 </a>
@@ -145,7 +145,7 @@
           <!-- APK -->
           <li class="nav-item">
             <a href="{% url 'core:apk_list' %}"
-               class="nav-link {% if url_name == 'apk_list' or url_name == 'upload_apk' or url_name == 'edit_apk' %}active{% endif %}">
+               class="nav-link {% if url_name == 'apk_list' or url_name == 'apk_create' or url_name == 'apk_update' %}active{% endif %}">
               <i class="nav-icon bi bi-android2"></i>
               <p>Versoes APK</p>
             </a>
@@ -160,8 +160,8 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-list' %}"
-                   class="nav-link {% if url_name == 'support-ticket-list' %}active{% endif %}">
+                <a href="{% url 'ticket:ticket_list' %}"
+                   class="nav-link {% if url_name == 'ticket_list' %}active{% endif %}">
                   <i class="nav-icon bi bi-list-ul"></i>
                   <p>Lista Tiket</p>
                 </a>
@@ -173,22 +173,22 @@
           <li class="nav-header">Relatórios</li>
 
           <li class="nav-item">
-            <a href="{% url 'core:teacher_logs' %}"
-               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+            <a href="{% url 'core:teacher_log_list' %}"
+               class="nav-link {% if url_name == 'teacher_log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-journal-text"></i>
               <p>Atividade Professores</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:logs' %}"
-               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+            <a href="{% url 'core:log_list' %}"
+               class="nav-link {% if url_name == 'log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-activity"></i>
               <p>Atividades Alunos</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:class_association_report' %}"
-               class="nav-link {% if url_name == 'class_association_report' %}active{% endif %}">
+            <a href="{% url 'core:report_class_association' %}"
+               class="nav-link {% if url_name == 'report_class_association' %}active{% endif %}">
               <i class="nav-icon bi bi-diagram-3"></i>
               <p>Asosiasaun Klase</p>
             </a>
@@ -198,15 +198,15 @@
         {% elif user.role == "parent" %}
 
           <li class="nav-item">
-            <a href="{% url 'core:children_list' %}"
-               class="nav-link {% if url_name == 'children_list' %}active{% endif %}">
+            <a href="{% url 'core:child_list' %}"
+               class="nav-link {% if url_name == 'child_list' %}active{% endif %}">
               <i class="nav-icon bi bi-speedometer2"></i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:children_list' %}"
-               class="nav-link {% if url_name == 'children_list' %}active{% endif %}">
+            <a href="{% url 'core:child_list' %}"
+               class="nav-link {% if url_name == 'child_list' %}active{% endif %}">
               <i class="nav-icon bi bi-emoji-smile"></i>
               <p>Hau nia Oan</p>
             </a>
@@ -216,8 +216,8 @@
           <li class="nav-header">App</li>
 
           <li class="nav-item">
-            <a href="{% url 'core:latest_apk' %}"
-               class="nav-link {% if url_name == 'latest_apk' %}active{% endif %}">
+            <a href="{% url 'core:apk_list' %}"
+               class="nav-link {% if url_name == 'apk_list' %}active{% endif %}">
               <i class="nav-icon bi bi-android2"></i>
               <p>
                 Download HAAP
@@ -244,15 +244,15 @@
           <li class="nav-header">Relatórios</li>
 
           <li class="nav-item">
-            <a href="{% url 'core:teacher_logs' %}"
-               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+            <a href="{% url 'core:teacher_log_list' %}"
+               class="nav-link {% if url_name == 'teacher_log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-journal-text"></i>
               <p>Atividade Profesór</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:logs' %}"
-               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+            <a href="{% url 'core:log_list' %}"
+               class="nav-link {% if url_name == 'log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-activity"></i>
               <p>Atividades Alunos</p>
             </a>
@@ -262,15 +262,15 @@
         {% elif user.role == "teacher" %}
 
           <li class="nav-item">
-            <a href="{% url 'preschools:preschool_list_claim' %}"
-               class="nav-link {% if url_name == 'preschool_list_claim' %}active{% endif %}">
+            <a href="{% url 'preschools:teacher_preschool_list' %}"
+               class="nav-link {% if url_name == 'teacher_preschool_list' %}active{% endif %}">
               <i class="nav-icon bi bi-speedometer2"></i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'klase:teacher-schools' %}"
-               class="nav-link {% if url_name == 'teacher-schools' or url_name == 'school-classrooms' or url_name == 'classroom-detail' %}active{% endif %}">
+            <a href="{% url 'klase:teacher_school_list' %}"
+               class="nav-link {% if url_name == 'teacher_school_list' or url_name == 'school_classroom_list' or url_name == 'classroom_detail' %}active{% endif %}">
               <i class="nav-icon bi bi-buildings"></i>
               <p>Eskola &amp; Klase</p>
             </a>
@@ -287,15 +287,15 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-create' %}"
-                   class="nav-link {% if url_name == 'support-ticket-create' %}active{% endif %}">
+                <a href="{% url 'ticket:ticket_create' %}"
+                   class="nav-link {% if url_name == 'ticket_create' %}active{% endif %}">
                   <i class="nav-icon bi bi-plus-circle"></i>
                   <p>Kria Tiket</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'ticket:support-ticket-list' %}"
-                   class="nav-link {% if url_name == 'support-ticket-list' %}active{% endif %}">
+                <a href="{% url 'ticket:ticket_list' %}"
+                   class="nav-link {% if url_name == 'ticket_list' %}active{% endif %}">
                   <i class="nav-icon bi bi-list-ul"></i>
                   <p>Hau nia Tiket</p>
                 </a>
@@ -307,15 +307,15 @@
           <li class="nav-header">Relatórios</li>
 
           <li class="nav-item">
-            <a href="{% url 'core:teacher_logs' %}"
-               class="nav-link {% if url_name == 'teacher_logs' %}active{% endif %}">
+            <a href="{% url 'core:teacher_log_list' %}"
+               class="nav-link {% if url_name == 'teacher_log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-journal-text"></i>
               <p>Atividade Professores</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{% url 'core:logs' %}"
-               class="nav-link {% if url_name == 'logs' %}active{% endif %}">
+            <a href="{% url 'core:log_list' %}"
+               class="nav-link {% if url_name == 'log_list' %}active{% endif %}">
               <i class="nav-icon bi bi-activity"></i>
               <p>Atividades Alunos</p>
             </a>
