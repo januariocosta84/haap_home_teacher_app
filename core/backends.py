@@ -22,6 +22,13 @@ class EmailAuditingBackend(ModelBackend):
         except User.DoesNotExist:
             User().set_password(password)  # mitigate timing attacks
             return None
+        except User.MultipleObjectsReturned:
+            # Duplicate accounts — authenticate against the earliest-created one
+            user = User.objects.filter(
+                email__iexact=email.strip(), role='moe_auditing'
+            ).order_by('date_joined').first()
+            if user is None:
+                return None
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None

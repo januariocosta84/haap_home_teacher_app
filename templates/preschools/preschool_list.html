@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', function () {
         (!isExact
           ? '<div class="map-popup-approx"><i class="bi bi-info-circle me-1"></i>Lokalizasaun aproximadu ba munisípiu</div>'
           : '') +
-        '<a href="/preschool/list-preschool/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
+        '<a href="/preschool/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
       '</div>';
 
     L.marker([lat, lng], { icon: makeMarkerIcon(p.type, isExact) })

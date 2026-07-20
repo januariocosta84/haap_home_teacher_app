@@ -46,28 +46,23 @@
   </td>
   -->
 
-  <!-- Status (hidden from frontend)
+  <!-- Vizita -->
   <td>
-    {% if log.status == 'success' %}
-      <span class="tl-status tl-success"><i class="bi bi-check-circle-fill" style="font-size:.55rem;"></i>Success</span>
-    {% elif log.status == 'completed' %}
-      <span class="tl-status tl-completed"><i class="bi bi-check2-all" style="font-size:.65rem;"></i>Completed</span>
-    {% elif log.status == 'started' %}
-      <span class="tl-status tl-started"><i class="bi bi-play-circle-fill" style="font-size:.6rem;"></i>Started</span>
-    {% elif log.status == 'pending' %}
-      <span class="tl-status tl-pending"><i class="bi bi-clock-fill" style="font-size:.55rem;"></i>Pending</span>
-    {% elif log.status == 'failed' %}
-      <span class="tl-status tl-failed"><i class="bi bi-x-circle-fill" style="font-size:.55rem;"></i>Failed</span>
+    {% if log.vizita %}
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#eff6ff;
+                 color:#1d4ed8;border-radius:20px;padding:3px 11px;
+                 font-size:.75rem;font-weight:700;">
+      <i class="bi bi-repeat" style="font-size:.7rem;"></i>{{ log.vizita }}x
+    </span>
     {% else %}
-      <span class="tl-status tl-pending">{{ log.get_status_display }}</span>
+    <span style="color:#cbd5e1;">—</span>
     {% endif %}
   </td>
-  -->
 
 </tr>
 {% empty %}
 <tr>
-  <td colspan="5" class="border-0 p-0">
+  <td colspan="6" class="border-0 p-0">
     <div style="text-align:center;padding:4rem 2rem;">
       <i class="bi bi-journal-x" style="font-size:2.8rem;color:#cbd5e1;display:block;margin-bottom:.65rem;"></i>
       <div style="font-weight:700;color:#475569;margin-bottom:.3rem;">Laiha rejistu atividade</div>

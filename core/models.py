@@ -349,10 +349,10 @@ class ApkVersion(models.Model):
     released_at = models.DateTimeField(auto_now_add=True)
 
     def get_download_url(self):
-        if self.download_url:
-            return self.download_url
         if self.apk_file:
             return self.apk_file.url
+        if self.download_url:
+            return self.download_url
         return ""
 
     def save(self, *args, **kwargs):
