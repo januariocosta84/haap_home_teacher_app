@@ -239,14 +239,6 @@ class AppUsageLog(models.Model):
 # ---------------------------------
 class TeacherActivityLog(models.Model):
 
-    STATUS_CHOICES = [
-        ('success', 'Success'),
-        ('failed', 'Failed'),
-        ('pending', 'Pending'),
-        ('started', 'Started'),
-        ('completed', 'Completed'),
-    ]
-
     id = models.BigAutoField(primary_key=True)
 
     teacher = models.ForeignKey(
@@ -268,11 +260,7 @@ class TeacherActivityLog(models.Model):
     sub_theme = models.CharField(max_length=100, blank=True, null=True)
     activity_name = models.CharField(max_length=255, blank=True, null=True)
 
-    status = models.CharField(
-        max_length=30,
-        choices=STATUS_CHOICES,
-        default='success'
-    )
+    status = models.IntegerField(default=0)
 
     activity_date = models.DateField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)

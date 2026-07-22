@@ -1,14 +1,27 @@
 {% for log in logs %}
 <tr>
 
-  <!-- Date -->
-  <td style="padding-left:1.25rem;white-space:nowrap;">
-    <div style="font-size:0.82rem;font-weight:600;color:#1e293b;">{{ log.created_at|date:"d M Y" }}</div>
-    <div style="font-size:0.7rem;color:#94a3b8;">{{ log.created_at|date:"H:i" }}</div>
+  <!-- # -->
+  <td style="padding-left:1.25rem;color:#94a3b8;font-size:.78rem;font-weight:600;">
+    {{ forloop.counter }}
   </td>
 
-  <!-- Teacher -->
+  <!-- Tema -->
   <td>
+    {% if log.theme %}
+    <span class="theme-pill">{{ log.theme }}</span>
+    {% else %}
+    <span style="color:#cbd5e1;">—</span>
+    {% endif %}
+  </td>
+
+  <!-- Tipo (Sub-Tema) -->
+  <td>
+    <span style="font-size:0.82rem;color:#334155;font-weight:500;">{{ log.sub_theme|default:"—" }}</span>
+  </td>
+
+  <!-- Profesór -->
+  <td class="col-hide-sm">
     <div class="teacher-chip">
       <div class="teacher-av">
         {{ log.teacher.first_name|first|upper }}{{ log.teacher.last_name|first|upper }}
@@ -17,46 +30,18 @@
     </div>
   </td>
 
-  <!-- Preschool -->
-  <td class="col-hide-sm">
-    {% if log.preschool %}
-    <span style="font-size:0.82rem;color:#334155;">{{ log.preschool.name }}</span>
-    {% else %}
-    <span style="color:#cbd5e1;">—</span>
-    {% endif %}
+  <!-- Data -->
+  <td class="col-hide-sm" style="white-space:nowrap;" data-sort="{{ log.activity_date|date:'Y-m-d' }}">
+    <span style="font-size:0.82rem;font-weight:600;color:#1e293b;">{{ log.activity_date|date:"d M Y" }}</span>
   </td>
-
-  <!-- Theme -->
-  <td class="col-hide-sm">
-    {% if log.theme %}
-    <span class="theme-pill">{{ log.theme }}</span>
-    {% else %}
-    <span style="color:#cbd5e1;">—</span>
-    {% endif %}
-  </td>
-
-  <!-- Sub-theme -->
-  <td class="col-hide-xs">
-    <span style="font-size:0.78rem;color:#64748b;">{{ log.sub_theme|default:"—" }}</span>
-  </td>
-
-  <!-- Activity (hidden from frontend)
-  <td>
-    <span style="font-size:0.84rem;color:#1e293b;font-weight:500;">{{ log.activity_name|default:"—" }}</span>
-  </td>
-  -->
 
   <!-- Vizita -->
-  <td>
-    {% if log.vizita %}
-    <span style="display:inline-flex;align-items:center;gap:4px;background:#eff6ff;
-                 color:#1d4ed8;border-radius:20px;padding:3px 11px;
-                 font-size:.75rem;font-weight:700;">
-      <i class="bi bi-repeat" style="font-size:.7rem;"></i>{{ log.vizita }}x
+  <td class="text-center">
+    <span style="display:inline-flex;align-items:center;justify-content:center;
+                 background:#eff6ff;color:#1d4ed8;border-radius:20px;
+                 padding:3px 14px;font-size:.8rem;font-weight:700;min-width:36px;">
+      {{ log.status }}
     </span>
-    {% else %}
-    <span style="color:#cbd5e1;">—</span>
-    {% endif %}
   </td>
 
 </tr>

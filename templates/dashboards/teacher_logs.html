@@ -334,17 +334,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
         </div>
         {% endif %}
 
-        <div class="col-12 col-sm-6 col-lg-2">
-          <label class="tl-filter-label">Status</label>
-          <select name="status" class="form-select form-select-sm">
-            <option value="">Hotu status</option>
-            <option value="success"   {% if filter_status == "success"   %}selected{% endif %}>Success</option>
-            <option value="completed" {% if filter_status == "completed" %}selected{% endif %}>Completed</option>
-            <option value="started"   {% if filter_status == "started"   %}selected{% endif %}>Started</option>
-            <option value="pending"   {% if filter_status == "pending"   %}selected{% endif %}>Pending</option>
-            <option value="failed"    {% if filter_status == "failed"    %}selected{% endif %}>Failed</option>
-          </select>
-        </div>
 
         <div class="col-12 col-sm-6 col-lg-2">
           <label class="tl-filter-label">Data Husi</label>
@@ -379,153 +368,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
     </form>
   </div>
 
-  <!-- ══ TABS ══════════════════════════════════════════════════════════════ -->
-  <ul class="nav nav-pills mb-3 gap-1" id="tlTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link {% if active_tab != 'logs' %}active{% endif %} fw-semibold px-4"
-              id="tab-status" data-bs-toggle="pill" data-bs-target="#pane-status"
-              type="button" role="tab"
-              style="border-radius:10px;font-size:.82rem;">
-        <i class="bi bi-bar-chart-steps me-1"></i>Status Sub-Tema
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link {% if active_tab == 'logs' %}active{% endif %} fw-semibold px-4"
-              id="tab-logs" data-bs-toggle="pill" data-bs-target="#pane-logs"
-              type="button" role="tab"
-              style="border-radius:10px;font-size:.82rem;">
-        <i class="bi bi-list-ul me-1"></i>Rejistu Detalhadu
-      </button>
-    </li>
-  </ul>
-
-  <div class="tab-content">
-
-    <!-- ══ TAB 1: STATUS SUMMARY ════════════════════════════════════════════ -->
-    <div class="tab-pane fade {% if active_tab != 'logs' %}show active{% endif %}"
-         id="pane-status" role="tabpanel">
-
-      {% if status_summary %}
-        {% for teacher in status_summary %}
-        <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;overflow:hidden;">
-
-          <!-- Teacher header -->
-          <div class="card-header border-0 py-3 px-4"
-               style="background:linear-gradient(135deg,#eff6ff,#dbeafe);">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-              <div class="d-flex align-items-center gap-3">
-                <div style="width:40px;height:40px;border-radius:50%;background:#2563eb;
-                            display:flex;align-items:center;justify-content:center;
-                            font-size:.82rem;font-weight:800;color:#fff;flex-shrink:0;">
-                  {{ teacher.name|slice:":1"|upper }}
-                </div>
-                <div>
-                  <div class="fw-bold" style="color:#1e293b;font-size:.95rem;">{{ teacher.name }}</div>
-                  <div style="font-size:.72rem;color:#64748b;">
-                    {{ teacher.dates|length }} loron &middot; {{ teacher.sub_rows|length }} sub-tema &middot;
-                    <strong style="color:#2563eb;">{{ teacher.grand_total }}</strong> vizita total
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pivot table: sub-theme rows × date columns -->
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table align-middle mb-0" style="font-size:.82rem;min-width:600px;">
-                <thead>
-                  <tr style="background:#f8fafc;">
-                    <!-- Sub-theme column -->
-                    <th class="px-4 py-3 border-0"
-                        style="font-size:.68rem;font-weight:700;color:#64748b;
-                               text-transform:uppercase;letter-spacing:.05em;
-                               min-width:130px;white-space:nowrap;position:sticky;left:0;background:#f8fafc;z-index:2;">
-                      Sub-Tema
-                    </th>
-                    <!-- One column per date -->
-                    {% for date in teacher.dates %}
-                    <th class="py-3 text-center border-0"
-                        style="font-size:.68rem;font-weight:700;color:#64748b;
-                               text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;min-width:80px;">
-                      {{ date|date:"d/m" }}<br>
-                      <span style="font-weight:500;color:#94a3b8;letter-spacing:0;">{{ date|date:"D" }}</span>
-                    </th>
-                    {% endfor %}
-                    <!-- Row total -->
-                    <th class="py-3 text-center border-0"
-                        style="font-size:.68rem;font-weight:700;color:#1d4ed8;
-                               text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
-                               background:#eff6ff;min-width:70px;">
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for row in teacher.sub_rows %}
-                  <tr style="border-top:1px solid #f1f5f9;" class="pivot-row">
-                    <!-- Sub-theme label -->
-                    <td class="px-4 py-2"
-                        style="position:sticky;left:0;background:#fff;z-index:1;border-right:2px solid #e2e8f0;">
-                      <span class="theme-pill">{{ row.sub_theme }}</span>
-                    </td>
-                    <!-- Visit count per date -->
-                    {% for count in row.cells %}
-                    <td class="py-2 text-center" style="{% if count > 0 %}background:#f0f6ff;{% endif %}">
-                      {% if count > 0 %}
-                        <span class="fw-bold" style="color:#2563eb;font-size:.92rem;">{{ count }}</span>
-                      {% else %}
-                        <span style="color:#e2e8f0;font-size:.8rem;">—</span>
-                      {% endif %}
-                    </td>
-                    {% endfor %}
-                    <!-- Row total -->
-                    <td class="py-2 text-center" style="background:#eff6ff;">
-                      <span class="fw-bold" style="color:#1d4ed8;">{{ row.total }}</span>
-                    </td>
-                  </tr>
-                  {% endfor %}
-
-                  <!-- Column totals row -->
-                  <tr style="border-top:2px solid #dbeafe;background:#eff6ff;">
-                    <td class="px-4 py-2 fw-bold"
-                        style="font-size:.75rem;color:#1d4ed8;text-transform:uppercase;
-                               letter-spacing:.04em;position:sticky;left:0;background:#eff6ff;
-                               border-right:2px solid #bfdbfe;">
-                      Total
-                    </td>
-                    {% for t in teacher.totals %}
-                    <td class="py-2 text-center">
-                      <span class="fw-bold" style="color:#1d4ed8;">{{ t }}</span>
-                    </td>
-                    {% endfor %}
-                    <td class="py-2 text-center" style="background:#dbeafe;">
-                      <span class="fw-bold" style="color:#1e40af;font-size:.95rem;">{{ teacher.grand_total }}</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-        {% endfor %}
-
-      {% else %}
-      <div class="card border-0 shadow-sm text-center py-5" style="border-radius:16px;">
-        <div class="card-body py-5">
-          <i class="bi bi-bar-chart-steps d-block mb-3" style="font-size:2.5rem;color:#cbd5e1;"></i>
-          <h6 class="fw-semibold text-muted mb-1">Laiha dadus status</h6>
-          <p class="text-muted small mb-0">Seidauk iha rejistu sub-tema ba filtru ne'ebé hili.</p>
-        </div>
-      </div>
-      {% endif %}
-
-    </div><!-- /pane-status -->
-
-    <!-- ══ TAB 2: DETAIL LOG ════════════════════════════════════════════════ -->
-    <div class="tab-pane fade {% if active_tab == 'logs' %}show active{% endif %}"
-         id="pane-logs" role="tabpanel">
+  <!-- ══ DETAIL LOG ════════════════════════════════════════════════════════ -->
+  <div id="pane-logs">
 
       <div class="tl-table-card">
         <div class="dt-controls" id="dt-controls-top"></div>
@@ -533,12 +377,12 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
           <table id="teacherLogsTable" class="table table-hover mb-0">
             <thead>
               <tr>
-                <th style="padding-left:1.25rem;">Data</th>
-                <th>Profesór</th>
-                <th class="col-hide-sm">Pre-Eskolár</th>
-                <th class="col-hide-sm">Tema</th>
-                <th class="col-hide-xs">Sub-Tema</th>
-                <th>Vizita</th>
+                <th style="padding-left:1.25rem;width:50px;">#</th>
+                <th>Tema</th>
+                <th>Tipo</th>
+                <th class="col-hide-sm">Profesór</th>
+                <th class="col-hide-sm">Data</th>
+                <th class="text-center">Vizita</th>
               </tr>
             </thead>
             <tbody id="logs-body">
@@ -549,9 +393,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
         <div class="dt-footer" id="dt-footer"></div>
       </div>
 
-    </div><!-- /pane-logs -->
-
-  </div><!-- /tab-content -->
+  </div><!-- /pane-logs -->
 
 </div>
 {% endblock %}
@@ -572,14 +414,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function initDT() {
     if ($.fn.DataTable.isDataTable('#teacherLogsTable')) {
       dtTable = $('#teacherLogsTable').DataTable();
+      renderDtControls();
       return;
     }
 
     dtTable = $('#teacherLogsTable').DataTable({
-      order: [[0, 'desc']],
-      pageLength: 10,
-      lengthMenu: [10, 25, 50, 100],
-      dom: 'rt',          // only render table + no built-in header/footer
+      order: [[4, 'desc']],
+      pageLength: 100,
+      lengthMenu: [25, 50, 100, 200],
+      dom: 'rt',
       language: {
         search: '',
         searchPlaceholder: 'Buka...',
@@ -592,11 +435,9 @@ document.addEventListener('DOMContentLoaded', function () {
       },
       drawCallback: function () {
         renderDtControls();
-      },
-      initComplete: function () {
-        renderDtControls();
       }
     });
+    renderDtControls();  // called after dtTable is assigned
   }
 
   function renderDtControls() {
