@@ -379,9 +379,9 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
               <tr>
                 <th style="padding-left:1.25rem;width:50px;">#</th>
                 <th>Tema</th>
-                <th>Tipo</th>
-                <th class="col-hide-sm">Profesór</th>
-                <th class="col-hide-sm">Data</th>
+                <th>Tipu</th>
+                <th>Profesór</th>
+                <th>Data</th>
                 <th class="text-center">Vizita</th>
               </tr>
             </thead>
@@ -418,6 +418,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    $.fn.dataTable.ext.errMode = 'none';
     dtTable = $('#teacherLogsTable').DataTable({
       order: [[4, 'desc']],
       pageLength: 100,
@@ -430,7 +431,8 @@ document.addEventListener('DOMContentLoaded', function () {
         info: 'Hatudu _START_–_END_ husi _TOTAL_',
         infoEmpty: 'Laiha rejistu',
         infoFiltered: '(filtra husi _MAX_)',
-        zeroRecords: 'La hetan dadus ne\'ebé koresponde',
+        emptyTable: 'Laiha rejistu atividade ba profesór ne\'e.',
+        zeroRecords: 'La hetan dadus ne\'ebé koresponde ho filtru ne\'e.',
         paginate: { first: '«', last: '»', next: '›', previous: '‹' }
       },
       drawCallback: function () {

@@ -21,7 +21,7 @@
   </td>
 
   <!-- Profesór -->
-  <td class="col-hide-sm">
+  <td>
     <div class="teacher-chip">
       <div class="teacher-av">
         {{ log.teacher.first_name|first|upper }}{{ log.teacher.last_name|first|upper }}
@@ -31,7 +31,7 @@
   </td>
 
   <!-- Data -->
-  <td class="col-hide-sm" style="white-space:nowrap;" data-sort="{{ log.activity_date|date:'Y-m-d' }}">
+  <td style="white-space:nowrap;" data-sort="{{ log.activity_date|date:'Y-m-d' }}">
     <span style="font-size:0.82rem;font-weight:600;color:#1e293b;">{{ log.activity_date|date:"d M Y" }}</span>
   </td>
 
@@ -44,15 +44,5 @@
     </span>
   </td>
 
-</tr>
-{% empty %}
-<tr>
-  <td colspan="6" class="border-0 p-0">
-    <div style="text-align:center;padding:4rem 2rem;">
-      <i class="bi bi-journal-x" style="font-size:2.8rem;color:#cbd5e1;display:block;margin-bottom:.65rem;"></i>
-      <div style="font-weight:700;color:#475569;margin-bottom:.3rem;">Laiha rejistu atividade</div>
-      <div style="font-size:0.82rem;color:#94a3b8;">Seidauk iha log atividade profesór ne'ebé koresponde ho filtru ne'e.</div>
-    </div>
-  </td>
 </tr>
 {% endfor %}
