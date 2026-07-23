@@ -29,3 +29,1173 @@
 [2026-07-08 15:23:53]   equipments : dev=1  prod=2
 [2026-07-08 15:23:53]   apk_versions : dev=1  prod=2
 [2026-07-08 15:23:53] ====== SYNC DONE ======
+[2026-07-09 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-09 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-09 02:00:01] --- Pre-sync counts ---
+[2026-07-09 02:00:01] --- Pre-sync counts ---
+[2026-07-09 02:00:01]   users : dev=93  prod=95  ← diff
+[2026-07-09 02:00:01]   users : dev=93  prod=95  ← diff
+[2026-07-09 02:00:02]   children : dev=103  prod=105  ← diff
+[2026-07-09 02:00:02]   children : dev=103  prod=105  ← diff
+[2026-07-09 02:00:02]   preschools : dev=2  prod=3  ← diff
+[2026-07-09 02:00:02]   preschools : dev=2  prod=3  ← diff
+[2026-07-09 02:00:02]   klase_classroomchild : dev=6  prod=2  ← diff
+[2026-07-09 02:00:02]   klase_classroomchild : dev=6  prod=2  ← diff
+[2026-07-09 02:00:02]   support_tickets : dev=10  prod=1  ← diff
+[2026-07-09 02:00:02]   support_tickets : dev=10  prod=1  ← diff
+[2026-07-09 02:00:02]   ticket_supportticketdetail : dev=15  prod=0  ← diff
+[2026-07-09 02:00:02]   ticket_supportticketdetail : dev=15  prod=0  ← diff
+[2026-07-09 02:00:02]   ticket_supportticketmessage : dev=26  prod=1  ← diff
+[2026-07-09 02:00:02]   ticket_supportticketmessage : dev=26  prod=1  ← diff
+[2026-07-09 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-09 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-09 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-09 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-09 02:00:03] Dumping worldmosaic ...
+[2026-07-09 02:00:03] Dumping worldmosaic ...
+[2026-07-09 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260709_020001.sql
+[2026-07-09 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260709_020001.sql
+[2026-07-09 02:00:04] Importing into haap ...
+[2026-07-09 02:00:04] Importing into haap ...
+[2026-07-09 02:00:07] Import complete.
+[2026-07-09 02:00:07] Import complete.
+[2026-07-09 02:00:07] --- Post-sync counts ---
+[2026-07-09 02:00:07] --- Post-sync counts ---
+[2026-07-09 02:00:07]   users : dev=93  prod=96
+[2026-07-09 02:00:07]   users : dev=93  prod=96
+[2026-07-09 02:00:07]   children : dev=103  prod=105
+[2026-07-09 02:00:07]   children : dev=103  prod=105
+[2026-07-09 02:00:07]   preschools : dev=2  prod=4
+[2026-07-09 02:00:07]   preschools : dev=2  prod=4
+[2026-07-09 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-09 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-09 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-09 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-09 02:00:08]   klase_classroomchild : dev=6  prod=8
+[2026-07-09 02:00:08]   klase_classroomchild : dev=6  prod=8
+[2026-07-09 02:00:08]   support_tickets : dev=10  prod=10
+[2026-07-09 02:00:08]   support_tickets : dev=10  prod=10
+[2026-07-09 02:00:08]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-09 02:00:08]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-09 02:00:08]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-09 02:00:08]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-09 02:00:08]   ticket_notifications : dev=0  prod=1
+[2026-07-09 02:00:08]   ticket_notifications : dev=0  prod=1
+[2026-07-09 02:00:08]   teacher_activity_logs : dev=14  prod=14
+[2026-07-09 02:00:08]   teacher_activity_logs : dev=14  prod=14
+[2026-07-09 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-09 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-09 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-09 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-09 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-09 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-09 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-09 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-09 02:00:08]   sucos : dev=557  prod=557
+[2026-07-09 02:00:08]   sucos : dev=557  prod=557
+[2026-07-09 02:00:09]   aldeias : dev=2949  prod=2949
+[2026-07-09 02:00:09]   aldeias : dev=2949  prod=2949
+[2026-07-09 02:00:09]   equipments : dev=1  prod=2
+[2026-07-09 02:00:09]   equipments : dev=1  prod=2
+[2026-07-09 02:00:09]   apk_versions : dev=1  prod=2
+[2026-07-09 02:00:09]   apk_versions : dev=1  prod=2
+[2026-07-09 02:00:09] ====== SYNC DONE ======
+[2026-07-09 02:00:09] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-10 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-10 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-10 02:00:01] --- Pre-sync counts ---
+[2026-07-10 02:00:01] --- Pre-sync counts ---
+[2026-07-10 02:00:01]   users : dev=93  prod=96  ← diff
+[2026-07-10 02:00:01]   users : dev=93  prod=96  ← diff
+[2026-07-10 02:00:01]   children : dev=103  prod=105  ← diff
+[2026-07-10 02:00:01]   children : dev=103  prod=105  ← diff
+[2026-07-10 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-10 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-10 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-10 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-10 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-10 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-10 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-10 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-10 02:00:02]   ticket_supportticketmessage : dev=26  prod=27  ← diff
+[2026-07-10 02:00:02]   ticket_supportticketmessage : dev=26  prod=27  ← diff
+[2026-07-10 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-10 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-10 02:00:02]   teacher_activity_logs : dev=19  prod=14  ← diff
+[2026-07-10 02:00:02]   teacher_activity_logs : dev=19  prod=14  ← diff
+[2026-07-10 02:00:03]   municipalities : dev=17  prod=15  ← diff
+[2026-07-10 02:00:03]   municipalities : dev=17  prod=15  ← diff
+[2026-07-10 02:00:03]   administrative_posts : dev=85  prod=70  ← diff
+[2026-07-10 02:00:03]   administrative_posts : dev=85  prod=70  ← diff
+[2026-07-10 02:00:03]   sucos : dev=557  prod=477  ← diff
+[2026-07-10 02:00:03]   sucos : dev=557  prod=477  ← diff
+[2026-07-10 02:00:03]   aldeias : dev=2949  prod=2412  ← diff
+[2026-07-10 02:00:03]   aldeias : dev=2949  prod=2412  ← diff
+[2026-07-10 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-10 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-10 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-10 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-10 02:00:03] Dumping worldmosaic ...
+[2026-07-10 02:00:03] Dumping worldmosaic ...
+[2026-07-10 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260710_020001.sql
+[2026-07-10 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260710_020001.sql
+[2026-07-10 02:00:04] Importing into haap ...
+[2026-07-10 02:00:04] Importing into haap ...
+[2026-07-10 02:00:06] Import complete.
+[2026-07-10 02:00:06] Import complete.
+[2026-07-10 02:00:06] --- Post-sync counts ---
+[2026-07-10 02:00:06] --- Post-sync counts ---
+[2026-07-10 02:00:06]   users : dev=93  prod=96
+[2026-07-10 02:00:06]   users : dev=93  prod=96
+[2026-07-10 02:00:06]   children : dev=103  prod=105
+[2026-07-10 02:00:06]   children : dev=103  prod=105
+[2026-07-10 02:00:06]   preschools : dev=2  prod=4
+[2026-07-10 02:00:06]   preschools : dev=2  prod=4
+[2026-07-10 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-10 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-10 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-10 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-10 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-10 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-10 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-10 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-10 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-10 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-10 02:00:07]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-10 02:00:07]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-10 02:00:07]   ticket_notifications : dev=0  prod=1
+[2026-07-10 02:00:07]   ticket_notifications : dev=0  prod=1
+[2026-07-10 02:00:07]   teacher_activity_logs : dev=19  prod=19
+[2026-07-10 02:00:07]   teacher_activity_logs : dev=19  prod=19
+[2026-07-10 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-10 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-10 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-10 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-10 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-10 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-10 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-10 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-10 02:00:07]   sucos : dev=557  prod=557
+[2026-07-10 02:00:07]   sucos : dev=557  prod=557
+[2026-07-10 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-10 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-10 02:00:07]   equipments : dev=1  prod=2
+[2026-07-10 02:00:07]   equipments : dev=1  prod=2
+[2026-07-10 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-10 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-10 02:00:08] ====== SYNC DONE ======
+[2026-07-10 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-11 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-11 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-11 02:00:01] --- Pre-sync counts ---
+[2026-07-11 02:00:01] --- Pre-sync counts ---
+[2026-07-11 02:00:01]   users : dev=93  prod=96  ← diff
+[2026-07-11 02:00:01]   users : dev=93  prod=96  ← diff
+[2026-07-11 02:00:01]   children : dev=103  prod=105  ← diff
+[2026-07-11 02:00:01]   children : dev=103  prod=105  ← diff
+[2026-07-11 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-11 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-11 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-11 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-11 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-11 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-11 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-11 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-11 02:00:02]   ticket_supportticketmessage : dev=26  prod=27  ← diff
+[2026-07-11 02:00:02]   ticket_supportticketmessage : dev=26  prod=27  ← diff
+[2026-07-11 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-11 02:00:02]   ticket_notifications : dev=0  prod=1  ← diff
+[2026-07-11 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-11 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-11 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-11 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-11 02:00:03] Dumping worldmosaic ...
+[2026-07-11 02:00:03] Dumping worldmosaic ...
+[2026-07-11 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260711_020001.sql
+[2026-07-11 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260711_020001.sql
+[2026-07-11 02:00:04] Importing into haap ...
+[2026-07-11 02:00:04] Importing into haap ...
+[2026-07-11 02:00:06] Import complete.
+[2026-07-11 02:00:06] Import complete.
+[2026-07-11 02:00:06] --- Post-sync counts ---
+[2026-07-11 02:00:06] --- Post-sync counts ---
+[2026-07-11 02:00:06]   users : dev=93  prod=96
+[2026-07-11 02:00:06]   users : dev=93  prod=96
+[2026-07-11 02:00:06]   children : dev=103  prod=105
+[2026-07-11 02:00:06]   children : dev=103  prod=105
+[2026-07-11 02:00:07]   preschools : dev=2  prod=4
+[2026-07-11 02:00:07]   preschools : dev=2  prod=4
+[2026-07-11 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-11 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-11 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-11 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-11 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-11 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-11 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-11 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-11 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-11 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-11 02:00:07]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-11 02:00:07]   ticket_supportticketmessage : dev=26  prod=27
+[2026-07-11 02:00:07]   ticket_notifications : dev=0  prod=1
+[2026-07-11 02:00:07]   ticket_notifications : dev=0  prod=1
+[2026-07-11 02:00:07]   teacher_activity_logs : dev=19  prod=19
+[2026-07-11 02:00:07]   teacher_activity_logs : dev=19  prod=19
+[2026-07-11 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-11 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-11 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-11 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-11 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-11 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-11 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-11 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-11 02:00:08]   sucos : dev=557  prod=557
+[2026-07-11 02:00:08]   sucos : dev=557  prod=557
+[2026-07-11 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-11 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-11 02:00:08]   equipments : dev=1  prod=2
+[2026-07-11 02:00:08]   equipments : dev=1  prod=2
+[2026-07-11 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-11 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-11 02:00:08] ====== SYNC DONE ======
+[2026-07-11 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-12 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-12 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-12 02:00:01] --- Pre-sync counts ---
+[2026-07-12 02:00:01] --- Pre-sync counts ---
+[2026-07-12 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-12 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-12 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-12 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-12 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-12 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-12 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-12 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-12 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-12 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-12 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-12 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-12 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-12 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-12 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-12 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-12 02:00:02]   teacher_activity_logs : dev=35  prod=19  ← diff
+[2026-07-12 02:00:02]   teacher_activity_logs : dev=35  prod=19  ← diff
+[2026-07-12 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-12 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-12 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-12 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-12 02:00:03] Dumping worldmosaic ...
+[2026-07-12 02:00:03] Dumping worldmosaic ...
+[2026-07-12 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260712_020001.sql
+[2026-07-12 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260712_020001.sql
+[2026-07-12 02:00:04] Importing into haap ...
+[2026-07-12 02:00:04] Importing into haap ...
+[2026-07-12 02:00:06] Import complete.
+[2026-07-12 02:00:06] Import complete.
+[2026-07-12 02:00:06] --- Post-sync counts ---
+[2026-07-12 02:00:06] --- Post-sync counts ---
+[2026-07-12 02:00:06]   users : dev=93  prod=97
+[2026-07-12 02:00:06]   users : dev=93  prod=97
+[2026-07-12 02:00:06]   children : dev=103  prod=104
+[2026-07-12 02:00:06]   children : dev=103  prod=104
+[2026-07-12 02:00:07]   preschools : dev=2  prod=4
+[2026-07-12 02:00:07]   preschools : dev=2  prod=4
+[2026-07-12 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-12 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-12 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-12 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-12 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-12 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-12 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-12 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-12 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-12 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-12 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-12 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-12 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-12 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-12 02:00:08]   teacher_activity_logs : dev=35  prod=38
+[2026-07-12 02:00:08]   teacher_activity_logs : dev=35  prod=38
+[2026-07-12 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-12 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-12 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-12 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-12 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-12 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-12 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-12 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-12 02:00:08]   sucos : dev=557  prod=557
+[2026-07-12 02:00:08]   sucos : dev=557  prod=557
+[2026-07-12 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-12 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-12 02:00:08]   equipments : dev=1  prod=2
+[2026-07-12 02:00:08]   equipments : dev=1  prod=2
+[2026-07-12 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-12 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-12 02:00:08] ====== SYNC DONE ======
+[2026-07-12 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-13 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-13 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-13 02:00:01] --- Pre-sync counts ---
+[2026-07-13 02:00:01] --- Pre-sync counts ---
+[2026-07-13 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-13 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-13 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-13 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-13 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-13 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-13 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-13 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-13 02:00:01]   klase_classroomchild : dev=6  prod=7  ← diff
+[2026-07-13 02:00:01]   klase_classroomchild : dev=6  prod=7  ← diff
+[2026-07-13 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-13 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-13 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-13 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-13 02:00:02]   teacher_activity_logs : dev=81  prod=38  ← diff
+[2026-07-13 02:00:02]   teacher_activity_logs : dev=81  prod=38  ← diff
+[2026-07-13 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-13 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-13 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-13 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-13 02:00:03] Dumping worldmosaic ...
+[2026-07-13 02:00:03] Dumping worldmosaic ...
+[2026-07-13 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260713_020001.sql
+[2026-07-13 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260713_020001.sql
+[2026-07-13 02:00:04] Importing into haap ...
+[2026-07-13 02:00:04] Importing into haap ...
+[2026-07-13 02:00:05] Import complete.
+[2026-07-13 02:00:05] Import complete.
+[2026-07-13 02:00:05] --- Post-sync counts ---
+[2026-07-13 02:00:05] --- Post-sync counts ---
+[2026-07-13 02:00:05]   users : dev=93  prod=97
+[2026-07-13 02:00:05]   users : dev=93  prod=97
+[2026-07-13 02:00:05]   children : dev=103  prod=104
+[2026-07-13 02:00:05]   children : dev=103  prod=104
+[2026-07-13 02:00:06]   preschools : dev=2  prod=4
+[2026-07-13 02:00:06]   preschools : dev=2  prod=4
+[2026-07-13 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-13 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-13 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-13 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-13 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-13 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-13 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-13 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-13 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-13 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-13 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-13 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-13 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-13 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-13 02:00:06]   teacher_activity_logs : dev=81  prod=90
+[2026-07-13 02:00:06]   teacher_activity_logs : dev=81  prod=90
+[2026-07-13 02:00:06]   activity_result : dev=704  prod=704
+[2026-07-13 02:00:06]   activity_result : dev=704  prod=704
+[2026-07-13 02:00:06]   app_notifications : dev=168  prod=168
+[2026-07-13 02:00:06]   app_notifications : dev=168  prod=168
+[2026-07-13 02:00:06]   municipalities : dev=17  prod=17
+[2026-07-13 02:00:06]   municipalities : dev=17  prod=17
+[2026-07-13 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-13 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-13 02:00:06]   sucos : dev=557  prod=557
+[2026-07-13 02:00:06]   sucos : dev=557  prod=557
+[2026-07-13 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-13 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-13 02:00:07]   equipments : dev=1  prod=2
+[2026-07-13 02:00:07]   equipments : dev=1  prod=2
+[2026-07-13 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-13 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-13 02:00:07] ====== SYNC DONE ======
+[2026-07-13 02:00:07] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-14 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-14 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-14 02:00:01] --- Pre-sync counts ---
+[2026-07-14 02:00:01] --- Pre-sync counts ---
+[2026-07-14 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-14 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-14 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-14 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-14 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-14 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-14 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-14 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-14 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-14 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-14 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-14 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-14 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-14 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-14 02:00:03]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-14 02:00:03]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-14 02:00:03]   teacher_activity_logs : dev=323  prod=90  ← diff
+[2026-07-14 02:00:03]   teacher_activity_logs : dev=323  prod=90  ← diff
+[2026-07-14 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-14 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-14 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-14 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-14 02:00:04] Dumping worldmosaic ...
+[2026-07-14 02:00:04] Dumping worldmosaic ...
+[2026-07-14 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260714_020001.sql
+[2026-07-14 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260714_020001.sql
+[2026-07-14 02:00:04] Importing into haap ...
+[2026-07-14 02:00:04] Importing into haap ...
+[2026-07-14 02:00:05] Import complete.
+[2026-07-14 02:00:05] Import complete.
+[2026-07-14 02:00:05] --- Post-sync counts ---
+[2026-07-14 02:00:05] --- Post-sync counts ---
+[2026-07-14 02:00:05]   users : dev=93  prod=97
+[2026-07-14 02:00:05]   users : dev=93  prod=97
+[2026-07-14 02:00:05]   children : dev=103  prod=104
+[2026-07-14 02:00:05]   children : dev=103  prod=104
+[2026-07-14 02:00:06]   preschools : dev=2  prod=4
+[2026-07-14 02:00:06]   preschools : dev=2  prod=4
+[2026-07-14 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-14 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-14 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-14 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-14 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-14 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-14 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-14 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-14 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-14 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-14 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-14 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-14 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-14 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-14 02:00:06]   teacher_activity_logs : dev=323  prod=333
+[2026-07-14 02:00:06]   teacher_activity_logs : dev=323  prod=333
+[2026-07-14 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-14 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-14 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-14 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-14 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-14 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-14 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-14 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-14 02:00:07]   sucos : dev=557  prod=557
+[2026-07-14 02:00:07]   sucos : dev=557  prod=557
+[2026-07-14 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-14 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-14 02:00:07]   equipments : dev=1  prod=2
+[2026-07-14 02:00:07]   equipments : dev=1  prod=2
+[2026-07-14 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-14 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-14 02:00:07] ====== SYNC DONE ======
+[2026-07-14 02:00:07] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-15 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-15 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-15 02:00:01] --- Pre-sync counts ---
+[2026-07-15 02:00:01] --- Pre-sync counts ---
+[2026-07-15 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-15 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-15 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-15 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-15 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-15 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-15 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-15 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-15 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-15 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-15 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-15 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-15 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-15 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-15 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-15 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-15 02:00:02]   teacher_activity_logs : dev=332  prod=333  ← diff
+[2026-07-15 02:00:02]   teacher_activity_logs : dev=332  prod=333  ← diff
+[2026-07-15 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-15 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-15 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-15 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-15 02:00:02] Dumping worldmosaic ...
+[2026-07-15 02:00:02] Dumping worldmosaic ...
+[2026-07-15 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260715_020001.sql
+[2026-07-15 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260715_020001.sql
+[2026-07-15 02:00:03] Importing into haap ...
+[2026-07-15 02:00:03] Importing into haap ...
+[2026-07-15 02:00:04] Import complete.
+[2026-07-15 02:00:04] Import complete.
+[2026-07-15 02:00:04] --- Post-sync counts ---
+[2026-07-15 02:00:04] --- Post-sync counts ---
+[2026-07-15 02:00:05]   users : dev=93  prod=97
+[2026-07-15 02:00:05]   users : dev=93  prod=97
+[2026-07-15 02:00:05]   children : dev=103  prod=104
+[2026-07-15 02:00:05]   children : dev=103  prod=104
+[2026-07-15 02:00:05]   preschools : dev=2  prod=4
+[2026-07-15 02:00:05]   preschools : dev=2  prod=4
+[2026-07-15 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-15 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-15 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-15 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-15 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-15 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-15 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-15 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-15 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-15 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-15 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-15 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-15 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-15 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-15 02:00:05]   teacher_activity_logs : dev=332  prod=344
+[2026-07-15 02:00:05]   teacher_activity_logs : dev=332  prod=344
+[2026-07-15 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-15 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-15 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-15 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-15 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-15 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-15 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-15 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-15 02:00:06]   sucos : dev=557  prod=557
+[2026-07-15 02:00:06]   sucos : dev=557  prod=557
+[2026-07-15 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-15 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-15 02:00:06]   equipments : dev=1  prod=2
+[2026-07-15 02:00:06]   equipments : dev=1  prod=2
+[2026-07-15 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-15 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-15 02:00:06] ====== SYNC DONE ======
+[2026-07-15 02:00:06] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-16 02:00:02] ====== SYNC START: worldmosaic → haap ======
+[2026-07-16 02:00:02] ====== SYNC START: worldmosaic → haap ======
+[2026-07-16 02:00:02] --- Pre-sync counts ---
+[2026-07-16 02:00:02] --- Pre-sync counts ---
+[2026-07-16 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-16 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-16 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-16 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-16 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-16 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-16 02:00:03]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-16 02:00:03]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-16 02:00:03]   classrooms : dev=4  prod=6  ← diff
+[2026-07-16 02:00:03]   classrooms : dev=4  prod=6  ← diff
+[2026-07-16 02:00:03]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-16 02:00:03]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-16 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-16 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-16 02:00:03]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-16 02:00:03]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-16 02:00:03]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-16 02:00:03]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-16 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-16 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-16 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-16 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-16 02:00:04] Dumping worldmosaic ...
+[2026-07-16 02:00:04] Dumping worldmosaic ...
+[2026-07-16 02:00:05] Dump complete: 216 lines → /tmp/wm_sync_20260716_020001.sql
+[2026-07-16 02:00:05] Dump complete: 216 lines → /tmp/wm_sync_20260716_020001.sql
+[2026-07-16 02:00:05] Importing into haap ...
+[2026-07-16 02:00:05] Importing into haap ...
+[2026-07-16 02:00:06] Import complete.
+[2026-07-16 02:00:06] Import complete.
+[2026-07-16 02:00:06] --- Post-sync counts ---
+[2026-07-16 02:00:06] --- Post-sync counts ---
+[2026-07-16 02:00:07]   users : dev=93  prod=97
+[2026-07-16 02:00:07]   users : dev=93  prod=97
+[2026-07-16 02:00:07]   children : dev=103  prod=104
+[2026-07-16 02:00:07]   children : dev=103  prod=104
+[2026-07-16 02:00:07]   preschools : dev=2  prod=4
+[2026-07-16 02:00:07]   preschools : dev=2  prod=4
+[2026-07-16 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-16 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-16 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-16 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-16 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-16 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-16 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-16 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-16 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-16 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-16 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-16 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-16 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-16 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-16 02:00:07]   teacher_activity_logs : dev=332  prod=344
+[2026-07-16 02:00:07]   teacher_activity_logs : dev=332  prod=344
+[2026-07-16 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-16 02:00:08]   activity_result : dev=704  prod=704
+[2026-07-16 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-16 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-16 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-16 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-16 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-16 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-16 02:00:08]   sucos : dev=557  prod=557
+[2026-07-16 02:00:08]   sucos : dev=557  prod=557
+[2026-07-16 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-16 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-16 02:00:08]   equipments : dev=1  prod=2
+[2026-07-16 02:00:08]   equipments : dev=1  prod=2
+[2026-07-16 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-16 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-16 02:00:08] ====== SYNC DONE ======
+[2026-07-16 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-17 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-17 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-17 02:00:01] --- Pre-sync counts ---
+[2026-07-17 02:00:01] --- Pre-sync counts ---
+[2026-07-17 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-17 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-17 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-17 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-17 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-17 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-17 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-17 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-17 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-17 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-17 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-17 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-17 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-17 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-17 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-17 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-17 02:00:02]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-17 02:00:02]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-17 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-17 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-17 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-17 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-17 02:00:03] Dumping worldmosaic ...
+[2026-07-17 02:00:03] Dumping worldmosaic ...
+[2026-07-17 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260717_020001.sql
+[2026-07-17 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260717_020001.sql
+[2026-07-17 02:00:04] Importing into haap ...
+[2026-07-17 02:00:04] Importing into haap ...
+[2026-07-17 02:00:06] Import complete.
+[2026-07-17 02:00:06] Import complete.
+[2026-07-17 02:00:06] --- Post-sync counts ---
+[2026-07-17 02:00:06] --- Post-sync counts ---
+[2026-07-17 02:00:06]   users : dev=93  prod=97
+[2026-07-17 02:00:06]   users : dev=93  prod=97
+[2026-07-17 02:00:06]   children : dev=103  prod=104
+[2026-07-17 02:00:06]   children : dev=103  prod=104
+[2026-07-17 02:00:06]   preschools : dev=2  prod=4
+[2026-07-17 02:00:06]   preschools : dev=2  prod=4
+[2026-07-17 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-17 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-17 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-17 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-17 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-17 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-17 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-17 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-17 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-17 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-17 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-17 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-17 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-17 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-17 02:00:07]   teacher_activity_logs : dev=332  prod=344
+[2026-07-17 02:00:07]   teacher_activity_logs : dev=332  prod=344
+[2026-07-17 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-17 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-17 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-17 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-17 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-17 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-17 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-17 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-17 02:00:08]   sucos : dev=557  prod=557
+[2026-07-17 02:00:08]   sucos : dev=557  prod=557
+[2026-07-17 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-17 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-17 02:00:08]   equipments : dev=1  prod=2
+[2026-07-17 02:00:08]   equipments : dev=1  prod=2
+[2026-07-17 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-17 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-17 02:00:08] ====== SYNC DONE ======
+[2026-07-17 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-18 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-18 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-18 02:00:01] --- Pre-sync counts ---
+[2026-07-18 02:00:01] --- Pre-sync counts ---
+[2026-07-18 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-18 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-18 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-18 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-18 02:00:03]   preschools : dev=2  prod=4  ← diff
+[2026-07-18 02:00:03]   preschools : dev=2  prod=4  ← diff
+[2026-07-18 02:00:03]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-18 02:00:03]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-18 02:00:03]   classrooms : dev=4  prod=6  ← diff
+[2026-07-18 02:00:03]   classrooms : dev=4  prod=6  ← diff
+[2026-07-18 02:00:03]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-18 02:00:03]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-18 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-18 02:00:03]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-18 02:00:04]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-18 02:00:04]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-18 02:00:04]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-18 02:00:04]   teacher_activity_logs : dev=332  prod=344  ← diff
+[2026-07-18 02:00:05]   equipments : dev=1  prod=2  ← diff
+[2026-07-18 02:00:05]   equipments : dev=1  prod=2  ← diff
+[2026-07-18 02:00:05]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-18 02:00:05]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-18 02:00:05] Dumping worldmosaic ...
+[2026-07-18 02:00:05] Dumping worldmosaic ...
+[2026-07-18 02:00:06] Dump complete: 216 lines → /tmp/wm_sync_20260718_020001.sql
+[2026-07-18 02:00:06] Dump complete: 216 lines → /tmp/wm_sync_20260718_020001.sql
+[2026-07-18 02:00:06] Importing into haap ...
+[2026-07-18 02:00:06] Importing into haap ...
+[2026-07-18 02:00:08] Import complete.
+[2026-07-18 02:00:08] Import complete.
+[2026-07-18 02:00:08] --- Post-sync counts ---
+[2026-07-18 02:00:08] --- Post-sync counts ---
+[2026-07-18 02:00:08]   users : dev=93  prod=97
+[2026-07-18 02:00:08]   users : dev=93  prod=97
+[2026-07-18 02:00:08]   children : dev=103  prod=104
+[2026-07-18 02:00:08]   children : dev=103  prod=104
+[2026-07-18 02:00:08]   preschools : dev=2  prod=4
+[2026-07-18 02:00:08]   preschools : dev=2  prod=4
+[2026-07-18 02:00:08]   preschool_teachers : dev=3  prod=4
+[2026-07-18 02:00:08]   preschool_teachers : dev=3  prod=4
+[2026-07-18 02:00:08]   classrooms : dev=4  prod=6
+[2026-07-18 02:00:08]   classrooms : dev=4  prod=6
+[2026-07-18 02:00:08]   klase_classroomchild : dev=6  prod=8
+[2026-07-18 02:00:08]   klase_classroomchild : dev=6  prod=8
+[2026-07-18 02:00:08]   support_tickets : dev=10  prod=10
+[2026-07-18 02:00:08]   support_tickets : dev=10  prod=10
+[2026-07-18 02:00:08]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-18 02:00:08]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-18 02:00:08]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-18 02:00:08]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-18 02:00:09]   ticket_notifications : dev=0  prod=2
+[2026-07-18 02:00:09]   ticket_notifications : dev=0  prod=2
+[2026-07-18 02:00:09]   teacher_activity_logs : dev=332  prod=344
+[2026-07-18 02:00:09]   teacher_activity_logs : dev=332  prod=344
+[2026-07-18 02:00:09]   activity_result : dev=704  prod=704
+[2026-07-18 02:00:09]   activity_result : dev=704  prod=704
+[2026-07-18 02:00:09]   app_notifications : dev=168  prod=168
+[2026-07-18 02:00:09]   app_notifications : dev=168  prod=168
+[2026-07-18 02:00:09]   municipalities : dev=17  prod=17
+[2026-07-18 02:00:09]   municipalities : dev=17  prod=17
+[2026-07-18 02:00:09]   administrative_posts : dev=85  prod=85
+[2026-07-18 02:00:09]   administrative_posts : dev=85  prod=85
+[2026-07-18 02:00:09]   sucos : dev=557  prod=557
+[2026-07-18 02:00:09]   sucos : dev=557  prod=557
+[2026-07-18 02:00:09]   aldeias : dev=2949  prod=2949
+[2026-07-18 02:00:09]   aldeias : dev=2949  prod=2949
+[2026-07-18 02:00:09]   equipments : dev=1  prod=2
+[2026-07-18 02:00:09]   equipments : dev=1  prod=2
+[2026-07-18 02:00:09]   apk_versions : dev=1  prod=2
+[2026-07-18 02:00:09]   apk_versions : dev=1  prod=2
+[2026-07-18 02:00:09] ====== SYNC DONE ======
+[2026-07-18 02:00:09] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-19 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-19 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-19 02:00:01] --- Pre-sync counts ---
+[2026-07-19 02:00:01] --- Pre-sync counts ---
+[2026-07-19 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-19 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-19 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-19 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-19 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-19 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-19 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-19 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-19 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-19 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-19 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-19 02:00:01]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-19 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-19 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-19 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-19 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-19 02:00:02]   teacher_activity_logs : dev=15  prod=344  ← diff
+[2026-07-19 02:00:02]   teacher_activity_logs : dev=15  prod=344  ← diff
+[2026-07-19 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-19 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-19 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-19 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-19 02:00:02] Dumping worldmosaic ...
+[2026-07-19 02:00:02] Dumping worldmosaic ...
+[2026-07-19 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260719_020001.sql
+[2026-07-19 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260719_020001.sql
+[2026-07-19 02:00:03] Importing into haap ...
+[2026-07-19 02:00:03] Importing into haap ...
+[2026-07-19 02:00:05] Import complete.
+[2026-07-19 02:00:05] Import complete.
+[2026-07-19 02:00:05] --- Post-sync counts ---
+[2026-07-19 02:00:05] --- Post-sync counts ---
+[2026-07-19 02:00:05]   users : dev=93  prod=97
+[2026-07-19 02:00:05]   users : dev=93  prod=97
+[2026-07-19 02:00:05]   children : dev=103  prod=104
+[2026-07-19 02:00:05]   children : dev=103  prod=104
+[2026-07-19 02:00:05]   preschools : dev=2  prod=4
+[2026-07-19 02:00:05]   preschools : dev=2  prod=4
+[2026-07-19 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-19 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-19 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-19 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-19 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-19 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-19 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-19 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-19 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-19 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-19 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-19 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-19 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-19 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-19 02:00:05]   teacher_activity_logs : dev=15  prod=353
+[2026-07-19 02:00:05]   teacher_activity_logs : dev=15  prod=353
+[2026-07-19 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-19 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-19 02:00:06]   app_notifications : dev=168  prod=168
+[2026-07-19 02:00:06]   app_notifications : dev=168  prod=168
+[2026-07-19 02:00:06]   municipalities : dev=17  prod=17
+[2026-07-19 02:00:06]   municipalities : dev=17  prod=17
+[2026-07-19 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-19 02:00:06]   administrative_posts : dev=85  prod=85
+[2026-07-19 02:00:06]   sucos : dev=557  prod=557
+[2026-07-19 02:00:06]   sucos : dev=557  prod=557
+[2026-07-19 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-19 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-19 02:00:06]   equipments : dev=1  prod=2
+[2026-07-19 02:00:06]   equipments : dev=1  prod=2
+[2026-07-19 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-19 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-19 02:00:06] ====== SYNC DONE ======
+[2026-07-19 02:00:06] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-20 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-20 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-20 02:00:01] --- Pre-sync counts ---
+[2026-07-20 02:00:01] --- Pre-sync counts ---
+[2026-07-20 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-20 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-20 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-20 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-20 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-20 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-20 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-20 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-20 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-20 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-20 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-20 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-20 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-20 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-20 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-20 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-20 02:00:02]   teacher_activity_logs : dev=15  prod=353  ← diff
+[2026-07-20 02:00:02]   teacher_activity_logs : dev=15  prod=353  ← diff
+[2026-07-20 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-20 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-20 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-20 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-20 02:00:03] Dumping worldmosaic ...
+[2026-07-20 02:00:03] Dumping worldmosaic ...
+[2026-07-20 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260720_020001.sql
+[2026-07-20 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260720_020001.sql
+[2026-07-20 02:00:04] Importing into haap ...
+[2026-07-20 02:00:04] Importing into haap ...
+[2026-07-20 02:00:05] Import complete.
+[2026-07-20 02:00:05] Import complete.
+[2026-07-20 02:00:05] --- Post-sync counts ---
+[2026-07-20 02:00:05] --- Post-sync counts ---
+[2026-07-20 02:00:05]   users : dev=93  prod=97
+[2026-07-20 02:00:05]   users : dev=93  prod=97
+[2026-07-20 02:00:05]   children : dev=103  prod=104
+[2026-07-20 02:00:05]   children : dev=103  prod=104
+[2026-07-20 02:00:05]   preschools : dev=2  prod=4
+[2026-07-20 02:00:05]   preschools : dev=2  prod=4
+[2026-07-20 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-20 02:00:06]   preschool_teachers : dev=3  prod=4
+[2026-07-20 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-20 02:00:06]   classrooms : dev=4  prod=6
+[2026-07-20 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-20 02:00:06]   klase_classroomchild : dev=6  prod=8
+[2026-07-20 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-20 02:00:06]   support_tickets : dev=10  prod=10
+[2026-07-20 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-20 02:00:06]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-20 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-20 02:00:06]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-20 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-20 02:00:06]   ticket_notifications : dev=0  prod=2
+[2026-07-20 02:00:07]   teacher_activity_logs : dev=15  prod=353
+[2026-07-20 02:00:07]   teacher_activity_logs : dev=15  prod=353
+[2026-07-20 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-20 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-20 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-20 02:00:07]   app_notifications : dev=168  prod=168
+[2026-07-20 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-20 02:00:07]   municipalities : dev=17  prod=17
+[2026-07-20 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-20 02:00:07]   administrative_posts : dev=85  prod=85
+[2026-07-20 02:00:07]   sucos : dev=557  prod=557
+[2026-07-20 02:00:07]   sucos : dev=557  prod=557
+[2026-07-20 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-20 02:00:07]   aldeias : dev=2949  prod=2949
+[2026-07-20 02:00:07]   equipments : dev=1  prod=2
+[2026-07-20 02:00:07]   equipments : dev=1  prod=2
+[2026-07-20 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-20 02:00:07]   apk_versions : dev=1  prod=2
+[2026-07-20 02:00:07] ====== SYNC DONE ======
+[2026-07-20 02:00:07] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-21 02:00:02] ====== SYNC START: worldmosaic → haap ======
+[2026-07-21 02:00:02] ====== SYNC START: worldmosaic → haap ======
+[2026-07-21 02:00:02] --- Pre-sync counts ---
+[2026-07-21 02:00:02] --- Pre-sync counts ---
+[2026-07-21 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-21 02:00:02]   users : dev=93  prod=97  ← diff
+[2026-07-21 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-21 02:00:02]   children : dev=103  prod=104  ← diff
+[2026-07-21 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-21 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-21 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-21 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-21 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-21 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-21 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-21 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-21 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-21 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-21 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-21 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-21 02:00:03]   teacher_activity_logs : dev=27  prod=353  ← diff
+[2026-07-21 02:00:03]   teacher_activity_logs : dev=27  prod=353  ← diff
+[2026-07-21 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-21 02:00:03]   equipments : dev=1  prod=2  ← diff
+[2026-07-21 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-21 02:00:03]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-21 02:00:03] Dumping worldmosaic ...
+[2026-07-21 02:00:03] Dumping worldmosaic ...
+[2026-07-21 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260721_020002.sql
+[2026-07-21 02:00:04] Dump complete: 216 lines → /tmp/wm_sync_20260721_020002.sql
+[2026-07-21 02:00:04] Importing into haap ...
+[2026-07-21 02:00:04] Importing into haap ...
+[2026-07-21 02:00:04] Import complete.
+[2026-07-21 02:00:04] Import complete.
+[2026-07-21 02:00:04] --- Post-sync counts ---
+[2026-07-21 02:00:04] --- Post-sync counts ---
+[2026-07-21 02:00:05]   users : dev=93  prod=97
+[2026-07-21 02:00:05]   users : dev=93  prod=97
+[2026-07-21 02:00:05]   children : dev=103  prod=104
+[2026-07-21 02:00:05]   children : dev=103  prod=104
+[2026-07-21 02:00:05]   preschools : dev=2  prod=4
+[2026-07-21 02:00:05]   preschools : dev=2  prod=4
+[2026-07-21 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-21 02:00:05]   preschool_teachers : dev=3  prod=4
+[2026-07-21 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-21 02:00:05]   classrooms : dev=4  prod=6
+[2026-07-21 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-21 02:00:05]   klase_classroomchild : dev=6  prod=8
+[2026-07-21 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-21 02:00:05]   support_tickets : dev=10  prod=10
+[2026-07-21 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-21 02:00:05]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-21 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-21 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-21 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-21 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-21 02:00:05]   teacher_activity_logs : dev=27  prod=366
+[2026-07-21 02:00:05]   teacher_activity_logs : dev=27  prod=366
+[2026-07-21 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-21 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-21 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-21 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-21 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-21 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-21 02:00:05]   administrative_posts : dev=85  prod=85
+[2026-07-21 02:00:05]   administrative_posts : dev=85  prod=85
+[2026-07-21 02:00:06]   sucos : dev=557  prod=557
+[2026-07-21 02:00:06]   sucos : dev=557  prod=557
+[2026-07-21 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-21 02:00:06]   aldeias : dev=2949  prod=2949
+[2026-07-21 02:00:06]   equipments : dev=1  prod=2
+[2026-07-21 02:00:06]   equipments : dev=1  prod=2
+[2026-07-21 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-21 02:00:06]   apk_versions : dev=1  prod=2
+[2026-07-21 02:00:06] ====== SYNC DONE ======
+[2026-07-21 02:00:06] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-22 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-22 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-22 02:00:01] --- Pre-sync counts ---
+[2026-07-22 02:00:01] --- Pre-sync counts ---
+[2026-07-22 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-22 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-22 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-22 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-22 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-22 02:00:01]   preschools : dev=2  prod=4  ← diff
+[2026-07-22 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-22 02:00:01]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-22 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-22 02:00:01]   classrooms : dev=4  prod=6  ← diff
+[2026-07-22 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-22 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-22 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-22 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-22 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-22 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-22 02:00:02]   teacher_activity_logs : dev=29  prod=366  ← diff
+[2026-07-22 02:00:02]   teacher_activity_logs : dev=29  prod=366  ← diff
+[2026-07-22 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-22 02:00:04]   equipments : dev=1  prod=2  ← diff
+[2026-07-22 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-22 02:00:04]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-22 02:00:04] Dumping worldmosaic ...
+[2026-07-22 02:00:04] Dumping worldmosaic ...
+[2026-07-22 02:00:05] Dump complete: 216 lines → /tmp/wm_sync_20260722_020001.sql
+[2026-07-22 02:00:05] Dump complete: 216 lines → /tmp/wm_sync_20260722_020001.sql
+[2026-07-22 02:00:05] Importing into haap ...
+[2026-07-22 02:00:05] Importing into haap ...
+[2026-07-22 02:00:06] Import complete.
+[2026-07-22 02:00:06] Import complete.
+[2026-07-22 02:00:06] --- Post-sync counts ---
+[2026-07-22 02:00:06] --- Post-sync counts ---
+[2026-07-22 02:00:06]   users : dev=93  prod=97
+[2026-07-22 02:00:06]   users : dev=93  prod=97
+[2026-07-22 02:00:07]   children : dev=103  prod=104
+[2026-07-22 02:00:07]   children : dev=103  prod=104
+[2026-07-22 02:00:07]   preschools : dev=2  prod=4
+[2026-07-22 02:00:07]   preschools : dev=2  prod=4
+[2026-07-22 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-22 02:00:07]   preschool_teachers : dev=3  prod=4
+[2026-07-22 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-22 02:00:07]   classrooms : dev=4  prod=6
+[2026-07-22 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-22 02:00:07]   klase_classroomchild : dev=6  prod=8
+[2026-07-22 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-22 02:00:07]   support_tickets : dev=10  prod=10
+[2026-07-22 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-22 02:00:07]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-22 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-22 02:00:07]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-22 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-22 02:00:07]   ticket_notifications : dev=0  prod=2
+[2026-07-22 02:00:07]   teacher_activity_logs : dev=29  prod=368
+[2026-07-22 02:00:07]   teacher_activity_logs : dev=29  prod=368
+[2026-07-22 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-22 02:00:07]   activity_result : dev=704  prod=704
+[2026-07-22 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-22 02:00:08]   app_notifications : dev=168  prod=168
+[2026-07-22 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-22 02:00:08]   municipalities : dev=17  prod=17
+[2026-07-22 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-22 02:00:08]   administrative_posts : dev=85  prod=85
+[2026-07-22 02:00:08]   sucos : dev=557  prod=557
+[2026-07-22 02:00:08]   sucos : dev=557  prod=557
+[2026-07-22 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-22 02:00:08]   aldeias : dev=2949  prod=2949
+[2026-07-22 02:00:08]   equipments : dev=1  prod=2
+[2026-07-22 02:00:08]   equipments : dev=1  prod=2
+[2026-07-22 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-22 02:00:08]   apk_versions : dev=1  prod=2
+[2026-07-22 02:00:08] ====== SYNC DONE ======
+[2026-07-22 02:00:08] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log
+[2026-07-23 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-23 02:00:01] ====== SYNC START: worldmosaic → haap ======
+[2026-07-23 02:00:01] --- Pre-sync counts ---
+[2026-07-23 02:00:01] --- Pre-sync counts ---
+[2026-07-23 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-23 02:00:01]   users : dev=93  prod=97  ← diff
+[2026-07-23 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-23 02:00:01]   children : dev=103  prod=104  ← diff
+[2026-07-23 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-23 02:00:02]   preschools : dev=2  prod=4  ← diff
+[2026-07-23 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-23 02:00:02]   preschool_teachers : dev=3  prod=4  ← diff
+[2026-07-23 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-23 02:00:02]   classrooms : dev=4  prod=6  ← diff
+[2026-07-23 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-23 02:00:02]   klase_classroomchild : dev=6  prod=8  ← diff
+[2026-07-23 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-23 02:00:02]   ticket_supportticketmessage : dev=26  prod=29  ← diff
+[2026-07-23 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-23 02:00:02]   ticket_notifications : dev=0  prod=2  ← diff
+[2026-07-23 02:00:02]   teacher_activity_logs : dev=89  prod=368  ← diff
+[2026-07-23 02:00:02]   teacher_activity_logs : dev=89  prod=368  ← diff
+[2026-07-23 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-23 02:00:02]   equipments : dev=1  prod=2  ← diff
+[2026-07-23 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-23 02:00:02]   apk_versions : dev=1  prod=2  ← diff
+[2026-07-23 02:00:02] Dumping worldmosaic ...
+[2026-07-23 02:00:02] Dumping worldmosaic ...
+[2026-07-23 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260723_020001.sql
+[2026-07-23 02:00:03] Dump complete: 216 lines → /tmp/wm_sync_20260723_020001.sql
+[2026-07-23 02:00:03] Importing into haap ...
+[2026-07-23 02:00:03] Importing into haap ...
+[2026-07-23 02:00:04] Import complete.
+[2026-07-23 02:00:04] Import complete.
+[2026-07-23 02:00:04] --- Post-sync counts ---
+[2026-07-23 02:00:04] --- Post-sync counts ---
+[2026-07-23 02:00:04]   users : dev=93  prod=97
+[2026-07-23 02:00:04]   users : dev=93  prod=97
+[2026-07-23 02:00:04]   children : dev=103  prod=104
+[2026-07-23 02:00:04]   children : dev=103  prod=104
+[2026-07-23 02:00:04]   preschools : dev=2  prod=4
+[2026-07-23 02:00:04]   preschools : dev=2  prod=4
+[2026-07-23 02:00:04]   preschool_teachers : dev=3  prod=4
+[2026-07-23 02:00:04]   preschool_teachers : dev=3  prod=4
+[2026-07-23 02:00:04]   classrooms : dev=4  prod=6
+[2026-07-23 02:00:04]   classrooms : dev=4  prod=6
+[2026-07-23 02:00:04]   klase_classroomchild : dev=6  prod=8
+[2026-07-23 02:00:04]   klase_classroomchild : dev=6  prod=8
+[2026-07-23 02:00:04]   support_tickets : dev=10  prod=10
+[2026-07-23 02:00:04]   support_tickets : dev=10  prod=10
+[2026-07-23 02:00:04]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-23 02:00:04]   ticket_supportticketdetail : dev=15  prod=15
+[2026-07-23 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-23 02:00:05]   ticket_supportticketmessage : dev=26  prod=29
+[2026-07-23 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-23 02:00:05]   ticket_notifications : dev=0  prod=2
+[2026-07-23 02:00:05]   teacher_activity_logs : dev=89  prod=428
+[2026-07-23 02:00:05]   teacher_activity_logs : dev=89  prod=428
+[2026-07-23 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-23 02:00:05]   activity_result : dev=704  prod=704
+[2026-07-23 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-23 02:00:05]   app_notifications : dev=168  prod=168
+[2026-07-23 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-23 02:00:05]   municipalities : dev=17  prod=17
+[2026-07-23 02:00:05]   administrative_posts : dev=85  prod=85
+[2026-07-23 02:00:05]   administrative_posts : dev=85  prod=85
+[2026-07-23 02:00:05]   sucos : dev=557  prod=557
+[2026-07-23 02:00:05]   sucos : dev=557  prod=557
+[2026-07-23 02:00:05]   aldeias : dev=2949  prod=2949
+[2026-07-23 02:00:05]   aldeias : dev=2949  prod=2949
+[2026-07-23 02:00:05]   equipments : dev=1  prod=2
+[2026-07-23 02:00:05]   equipments : dev=1  prod=2
+[2026-07-23 02:00:05]   apk_versions : dev=1  prod=2
+[2026-07-23 02:00:05]   apk_versions : dev=1  prod=2
+[2026-07-23 02:00:05] ====== SYNC DONE ======
+[2026-07-23 02:00:05] ====== SYNC DONE ======
+
+  Done. Log: /var/www/new_app/haap_app/sync.log

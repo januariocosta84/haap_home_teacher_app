@@ -57,20 +57,15 @@ class Preschool(models.Model):
     email = models.EmailField(blank=True, null=True)
 
     # GEOLOCATION
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True
+    latitude = models.FloatField(
+    null=True,
+    blank=True
     )
 
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        null=True,
-        blank=True
+    longitude = models.FloatField(
+    null=True,
+    blank=True
     )
-
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
