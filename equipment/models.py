@@ -13,7 +13,8 @@ class Equipment(models.Model):
         ('tablet', 'Tablet'),
         ('projector', 'Projector'),
         ('screen', 'Screen'),
-        ('adapter', 'Adapter'),
+        ('dongle', 'Dongle'),
+        ('power_extension', 'Power Extension'),
     ]
 
     STATUS_CHOICES = [

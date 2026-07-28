@@ -183,13 +183,15 @@
                   {% if equipment.equipment_type == 'tablet' %}eq-type-tablet
                   {% elif equipment.equipment_type == 'projector' %}eq-type-projector
                   {% elif equipment.equipment_type == 'screen' %}eq-type-screen
-                  {% elif equipment.equipment_type == 'adapter' %}eq-type-adapter
+                  {% elif equipment.equipment_type == 'dongle' %}eq-type-adapter
+                  {% elif equipment.equipment_type == 'power_extension' %}eq-type-adapter
                   {% else %}eq-type-default{% endif %}">
                   <i class="bi
                     {% if equipment.equipment_type == 'tablet' %}bi-tablet
                     {% elif equipment.equipment_type == 'projector' %}bi-projector
                     {% elif equipment.equipment_type == 'screen' %}bi-display
-                    {% elif equipment.equipment_type == 'adapter' %}bi-plug
+                    {% elif equipment.equipment_type == 'dongle' %}bi-usb-plug
+                    {% elif equipment.equipment_type == 'power_extension' %}bi-plug
                     {% else %}bi-box-seam{% endif %}">
                   </i>
                 </div>

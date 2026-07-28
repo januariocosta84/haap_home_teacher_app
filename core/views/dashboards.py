@@ -36,7 +36,7 @@ def moe_admin_dashboard(request):
 @login_required
 def municipality_dashboard(request):
     if request.user.role != 'municipality_analyst':
-        return redirect('core:login')
+        return redirect('core:moe_admin_dashboard')
     user = request.user
     municipality = user.municipality
 
@@ -60,7 +60,7 @@ def municipality_dashboard(request):
         "parents_list": parents_list,
         "teachers_list": teachers_list,
         "teacher_logs": teacher_logs,
-        "log_status_choices": TeacherActivityLog.STATUS_CHOICES,
+        "log_status_choices": [],
     }
     return render(request, "dashboards/municipality_dashboard.html", context)
 

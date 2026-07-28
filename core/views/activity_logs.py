@@ -5,7 +5,7 @@ from io import BytesIO
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.views.generic import ListView
@@ -254,7 +254,10 @@ class ChildActivityView(LoginRequiredMixin, ListView):
         return context
 
 
-class TeacherActivityLogListView(LoginRequiredMixin, ListView):
+class TeacherActivityLogListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+
+    def test_func(self):
+        return self.request.user.role in ('moe_admin', 'teacher', 'municipality_analyst', 'moe_auditing')
     model = TeacherActivityLog
     template_name = "dashboards/teacher_logs.html"
     context_object_name = "logs"

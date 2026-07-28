@@ -507,5 +507,5 @@ class ClassroomUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy(
             "preschools:preschool_detail",
-            kwargs={"id": self.object.preschool.id}
+            kwargs={"pk": self.object.preschool.id}
         )

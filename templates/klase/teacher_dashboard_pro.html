@@ -86,12 +86,12 @@
 
                 <div class="mt-3 d-grid gap-2">
 
-                    <a href="{% url 'classroom-dashboard' c.id %}"
+                    <a href="{% url 'klase:classroom_detail' classroom_id=c.id %}"
                        class="btn btn-outline-primary btn-sm">
                         Open
                     </a>
 
-                    <a href="{% url 'assign-student' c.id %}"
+                    <a href="{% url 'klase:classroom_child_add' classroom_id=c.id %}"
                        class="btn btn-success btn-sm">
                         Assign Student
                     </a>

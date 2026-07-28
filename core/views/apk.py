@@ -153,7 +153,7 @@ def edit_apk(request, apk_id):
 @login_required
 def apk_list(request):
     # moe_admin: full management; parent: download-only (template hides admin buttons)
-    if request.user.role not in ('moe_admin', 'parent'):
+    if request.user.role not in ('moe_admin', 'parent', 'teacher'):
         return redirect('core:login')
     apks = ApkVersion.objects.order_by('-released_at')
     latest = apks.filter(is_latest=True).first()

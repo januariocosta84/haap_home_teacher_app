@@ -8,7 +8,22 @@ from klase.models import Classroom
 
 User = get_user_model()
 
+def _role_home(user):
+    """Return the redirect URL name for a logged-in user's home dashboard."""
+    role_map = {
+        'moe_admin':            'core:moe_admin_dashboard',
+        'moe_auditing':         'core:moe_admin_dashboard',
+        'municipality_analyst': 'core:municipality_dashboard',
+        'teacher':              'preschools:teacher_preschool_list',
+        'parent':               'core:child_list',
+    }
+    return role_map.get(user.role, 'core:moe_admin_dashboard')
+
+
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect(_role_home(request.user))
+
     if request.method == "POST":
         form = LoginForm(request, data=request.POST)
         if form.is_valid():

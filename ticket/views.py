@@ -297,13 +297,16 @@ class SupportTicketDetailView(LoginRequiredMixin, DetailView):
         return redirect('ticket:ticket_detail', pk=self.object.pk)
 
 
-class SupportTicketListView(LoginRequiredMixin, ListView):
+class SupportTicketListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """List view for support tickets"""
 
     model = SupportTicket
     template_name = 'ticket/support_ticket_list.html'
     context_object_name = 'tickets'
     paginate_by = 20
+
+    def test_func(self):
+        return self.request.user.role in ('teacher', 'moe_admin')
 
     def get_queryset(self):
         if self.request.user.role == 'teacher':
