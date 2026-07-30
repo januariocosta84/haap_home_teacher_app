@@ -26,12 +26,7 @@ __all__ = [
     'home', 'parent_home', 'admin_parent_child_list',
     'ChildrenReportView', 'ClassAssociationReportView', 'UserManagementView', 'register_user', 'view_user', 'approve_teacher', 'edit_user', 'delete_user',
     'get_children_by_parent', 'get_parents_by_municipality', 'load_administrative_posts', 'load_sucos', 'load_aldeias',
-    'custom_404', 
-    
-  
+    'custom_404',
+
+
 ]
-
-from django.shortcuts import render
-
-def custom_404(request, exception):
-    return render(request, '404.html', status=404)
