@@ -92,10 +92,10 @@
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
       <!-- HEADER -->
-      {% if not request.GET.embedded %}{% include 'partials/header.html' %}{% endif %}
+      {% if not request.GET.embedded and request.user.is_authenticated %}{% include 'partials/header.html' %}{% endif %}
 
       <!-- SIDEBAR -->
-      {% if not request.GET.embedded %}{% include 'partials/sidebar.html' %}{% endif %}
+      {% if not request.GET.embedded and request.user.is_authenticated %}{% include 'partials/sidebar.html' %}{% endif %}
 
       <!--begin::App Main-->
       <main class="app-main">
