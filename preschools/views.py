@@ -164,7 +164,9 @@ class PreschoolDetailView(DetailView):
             classroom_id__in=classroom_ids
         ).count()
         context['approved_teacher_count'] = self.object.teachers.filter(
-            is_approved=True
+            is_active=True,
+            is_approved=True,
+            teacher__is_active=True,
         ).count()
 
         # Equipment assigned to this preschool, grouped by type
@@ -436,6 +438,11 @@ class ClassroomCreateView(LoginRequiredMixin, CreateView):
         )
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['preschool'] = self.preschool
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['preschool'] = self.preschool
@@ -444,6 +451,22 @@ class ClassroomCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         classroom = form.save(commit=False)
         classroom.preschool = self.preschool
+
+        teacher = form.cleaned_data.get('teacher')
+        if teacher:
+            assigned = PreschoolTeacher.objects.filter(
+                teacher=teacher,
+                preschool=self.preschool,
+                is_active=True,
+                is_approved=True,
+            ).exists()
+            if not assigned:
+                form.add_error(
+                    'teacher',
+                    f"Profesór '{teacher.get_full_name()}' seidauk atribuidu ba pre-eskolár '{self.preschool.name}'. "
+                    "Favor atribui profesór ba pre-eskolár ne'e molok atribui klase."
+                )
+                return self.form_invalid(form)
 
         try:
             classroom.save()
@@ -570,7 +593,34 @@ class ClassroomUpdateView(LoginRequiredMixin, UpdateView):
             return redirect('core:moe_admin_dashboard')
         return super().dispatch(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['preschool'] = self.object.preschool
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['preschool'] = self.object.preschool
+        return context
+
     def form_valid(self, form):
+        teacher = form.cleaned_data.get('teacher')
+        if teacher:
+            preschool = self.object.preschool
+            assigned = PreschoolTeacher.objects.filter(
+                teacher=teacher,
+                preschool=preschool,
+                is_active=True,
+                is_approved=True,
+            ).exists()
+            if not assigned:
+                form.add_error(
+                    'teacher',
+                    f"Profesór '{teacher.get_full_name()}' seidauk atribuidu ba pre-eskolár '{preschool.name}'. "
+                    "Favor atribui profesór ba pre-eskolár ne'e molok atribui klase."
+                )
+                return self.form_invalid(form)
+
         old_name = self.object.name
         response = super().form_valid(form)
         obj = form.instance

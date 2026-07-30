@@ -1,9 +1,11 @@
 from django import forms
 
 from core.models import AdministrativePost, Aldeia, Municipality, Suco
-from .models import Preschool
-from django import forms
+from .models import Preschool, PreschoolTeacher
+from django.contrib.auth import get_user_model
 from klase.models import Classroom
+
+User = get_user_model()
 
 
 class PreschoolForm(forms.ModelForm):
@@ -187,3 +189,16 @@ class ClassroomForm(forms.ModelForm):
                 'class': 'form-select form-select-lg'
             }),
         }
+
+    def __init__(self, *args, preschool=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if preschool is not None:
+            assigned_ids = PreschoolTeacher.objects.filter(
+                preschool=preschool,
+                is_active=True,
+                is_approved=True,
+            ).values_list('teacher_id', flat=True)
+            self.fields['teacher'].queryset = User.objects.filter(
+                id__in=assigned_ids, role='teacher'
+            ).order_by('first_name', 'last_name')
+            self.fields['teacher'].empty_label = "— Hili profesór —"

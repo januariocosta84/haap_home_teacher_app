@@ -106,7 +106,10 @@
                   <label class="form-label fw-semibold" for="{{ form.teacher.id_for_label }}">Atribui profesór</label>
                   {{ form.teacher }}
                   {% if form.teacher.errors %}
-                    <div class="text-danger small mt-2">{{ form.teacher.errors|striptags }}</div>
+                  <div class="alert alert-warning d-flex align-items-start gap-2 mt-2 rounded-3 py-2 px-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill mt-1 flex-shrink-0" style="color:#b45309;"></i>
+                    <div style="font-size:.85rem;color:#92400e;">{{ form.teacher.errors|striptags }}</div>
+                  </div>
                   {% endif %}
                 </div>
 

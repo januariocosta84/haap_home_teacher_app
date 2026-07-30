@@ -168,6 +168,10 @@ def delete_user(request, user_id):
         name = f"{user_obj.first_name} {user_obj.last_name}"
         uid  = str(user_obj.id)
         role = user_obj.role
+        # Deactivate any preschool assignments before deleting
+        if role == 'teacher':
+            from preschools.models import PreschoolTeacher
+            PreschoolTeacher.objects.filter(teacher=user_obj).update(is_active=False)
         user_obj.delete()
         log_action(
             request=request,

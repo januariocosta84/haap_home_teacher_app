@@ -11,7 +11,7 @@ load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-(*yq(eersn2q4b11ya9121o4--0=u!+x-webh*uo371kokwup%')
 
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'False'
 
 _allowed = os.getenv('ALLOWED_HOSTS')
 ALLOWED_HOSTS = _allowed.split(',') if _allowed else ['192.168.1.23', 'localhost', '127.0.0.1', '154.26.155.43']
