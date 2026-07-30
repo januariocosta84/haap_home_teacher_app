@@ -528,7 +528,7 @@
 
           <div class="pf-sidebar-head">
             <div class="pf-sidebar-head-title">
-              {% if form.instance.pk %}Garda Mudansa{% else %}Salva Pre-Eskolár{% endif %}
+              {% if form.instance.pk %}Guardar Mudansa{% else %}Salva Pre-Eskolár{% endif %}
             </div>
             <div class="pf-sidebar-head-sub">
               Konfirma informasaun molok submete
@@ -538,7 +538,7 @@
           <div class="pf-sidebar-body">
             <button type="submit" class="pf-btn-primary" id="submit-button">
               <i class="bi bi-{% if form.instance.pk %}check-circle-fill{% else %}plus-circle-fill{% endif %}"></i>
-              {% if form.instance.pk %}Garda Mudansa{% else %}Rejista Pre-Eskolár{% endif %}
+              {% if form.instance.pk %}Guardar Mudansa{% else %}Rejista Pre-Eskolár{% endif %}
             </button>
 
             <a href="{% url 'preschools:preschool_list' %}" class="pf-btn-cancel">
