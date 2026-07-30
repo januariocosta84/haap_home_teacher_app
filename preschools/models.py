@@ -7,14 +7,14 @@ class Preschool(models.Model):
 
     TYPE_CHOICES = [
         ('government', 'Government'),
-        ('community', 'Community'),
         ('private', 'Private'),
-        ('playgroup', 'Playgroup'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     name = models.CharField(max_length=255)
+
+    emis_code = models.CharField(max_length=20, null=True, blank=True, verbose_name='EMIS Code')
 
     municipality = models.ForeignKey(
         Municipality,

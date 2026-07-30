@@ -13,6 +13,7 @@ class PreschoolForm(forms.ModelForm):
 
         fields = [
             'name',
+            'emis_code',
             'municipality',
             'administrative_post',
             'suco',
@@ -26,6 +27,7 @@ class PreschoolForm(forms.ModelForm):
 
         labels = {
             'name': 'Naran Pre-Escolar',
+            'emis_code': 'Kódigo EMIS',
             'municipality': 'Munisípiu',
             'administrative_post': 'Postu Administrativu',
             'suco': 'Suku',
@@ -41,6 +43,11 @@ class PreschoolForm(forms.ModelForm):
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Hatama naran pre-escolar'
+            }),
+
+            'emis_code': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: 1408'
             }),
 
             'municipality': forms.Select(attrs={

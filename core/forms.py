@@ -117,6 +117,17 @@ class ParentRegistrationForm(forms.ModelForm):
         return user
 
 class TeacherRegistrationForm(forms.ModelForm):
+    POSITION_CHOICES = [
+        ('manorin',     'Manorin'),
+        ('koordenador', 'Koordenador'),
+    ]
+    position = forms.ChoiceField(
+        choices=POSITION_CHOICES,
+        label='Pozisaun',
+        widget=forms.RadioSelect,
+        initial='manorin',
+    )
+
     whatsapp_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
         message="Hakerek numeru whatsapp (e.g., +67077123456)."
@@ -169,6 +180,7 @@ class TeacherRegistrationForm(forms.ModelForm):
         fields = [
             'first_name',
             'last_name',
+            'gender',
             'address',
             'whatsapp_number',
             'email',
@@ -984,3 +996,59 @@ class ResetPasswordForm(forms.Form):
         if p1 and p2 and p1 != p2:
             raise forms.ValidationError("Password sira ne'e la hanesan.")
         return cleaned_data
+
+
+class TeacherQuickRegisterForm(forms.ModelForm):
+    """Register a teacher by name/gender/position only — phone added later by admin."""
+
+    POSITION_CHOICES = [
+        ('manorin',     'Manorin'),
+        ('koordenador', 'Koordenador'),
+    ]
+    position = forms.ChoiceField(
+        choices=POSITION_CHOICES,
+        label='Pozisaun',
+        widget=forms.RadioSelect,
+        initial='manorin',
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'gender']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Naran uluk'}),
+            'last_name':  forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apelidu'}),
+        }
+        labels = {
+            'first_name': 'Naran Uluk',
+            'last_name':  'Naran Ikus',
+            'gender':     'Jéneru',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['gender'].widget = forms.RadioSelect(
+            choices=User.GENDER_CHOICES
+        )
+        self.fields['gender'].required = False
+
+
+class SetPhoneForm(forms.ModelForm):
+    """Set or update the WhatsApp login number for a teacher."""
+    whatsapp_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Numeru la válidu (ex: +67077123456)."
+    )
+    whatsapp_number = forms.CharField(
+        validators=[whatsapp_regex],
+        max_length=15,
+        label='Numeru WhatsApp',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control border-start-0',
+            'placeholder': '+6707XXXXXXX',
+        }),
+    )
+
+    class Meta:
+        model = User
+        fields = ['whatsapp_number']

@@ -293,31 +293,15 @@
             <div class="mb-4">
               <label class="ef-label">Tipu Ekipamentu <span class="ef-required">*</span></label>
               <div class="ef-type-grid" id="typeGrid">
-                <div class="ef-type-card" data-value="tablet">
+                {% for et in equipment_types %}
+                <div class="ef-type-card"
+                     data-value="{{ et.id }}"
+                     data-serial-required="{{ et.serial_number_required|lower }}">
                   <div class="ef-tc-check"><i class="bi bi-check"></i></div>
-                  <span class="ef-tc-icon">💻</span>
-                  <span class="ef-tc-label">Tablet</span>
+                  <span class="ef-tc-icon"><i class="bi {{ et.icon }}"></i></span>
+                  <span class="ef-tc-label">{{ et.name }}</span>
                 </div>
-                <div class="ef-type-card" data-value="projector">
-                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
-                  <span class="ef-tc-icon">📽️</span>
-                  <span class="ef-tc-label">Projector</span>
-                </div>
-                <div class="ef-type-card" data-value="screen">
-                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
-                  <span class="ef-tc-icon">🖥️</span>
-                  <span class="ef-tc-label">Screen</span>
-                </div>
-                <div class="ef-type-card" data-value="dongle">
-                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
-                  <span class="ef-tc-icon">🔌</span>
-                  <span class="ef-tc-label">Dongle</span>
-                </div>
-                <div class="ef-type-card" data-value="power_extension">
-                  <div class="ef-tc-check"><i class="bi bi-check"></i></div>
-                  <span class="ef-tc-icon">🔋</span>
-                  <span class="ef-tc-label">Power Extension</span>
-                </div>
+                {% endfor %}
               </div>
               <!-- real <select> hidden — value synced via JS -->
               <div style="display:none;">{{ form.equipment_type }}</div>
@@ -342,10 +326,10 @@
                 {% endif %}
               </div>
 
-              <!-- Serial number -->
-              <div class="col-md-6">
+              <!-- Serial number (tablet & projector only) -->
+              <div class="col-md-6" id="serialNumberWrapper">
                 <label class="ef-label" for="{{ form.serial_number.id_for_label }}">
-                  Numeru Serial <span class="ef-required">*</span>
+                  Numeru Serial <span class="ef-required" id="serialRequired">*</span>
                 </label>
                 <div class="ef-field-wrap">
                   <i class="bi bi-upc-scan ef-field-icon"></i>
@@ -548,11 +532,26 @@ document.addEventListener('DOMContentLoaded', function () {
   var typeSelect = document.getElementById('id_equipment_type');
   var typeCards  = document.querySelectorAll('#typeGrid .ef-type-card');
 
+  var serialWrapper = document.getElementById('serialNumberWrapper');
+  var serialInput   = document.getElementById('id_serial_number');
+  var serialStar    = document.getElementById('serialRequired');
+
+  function toggleSerial(needed) {
+    if (serialWrapper) serialWrapper.style.display = needed ? '' : 'none';
+    if (serialInput)   serialInput.required = needed;
+    if (serialStar)    serialStar.style.display = needed ? '' : 'none';
+    if (!needed && serialInput) serialInput.value = '';
+  }
+
   function setType(value) {
     if (typeSelect) typeSelect.value = value;
+    var serialRequired = false;
     typeCards.forEach(function (card) {
-      card.classList.toggle('selected', card.dataset.value === value);
+      var selected = card.dataset.value === value;
+      card.classList.toggle('selected', selected);
+      if (selected) serialRequired = card.dataset.serialRequired === 'true';
     });
+    toggleSerial(serialRequired);
   }
 
   typeCards.forEach(function (card) {
@@ -560,6 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* Initialise from Django value (edit mode or failed POST resubmit) */
+  toggleSerial(typeSelect ? typeSelect.value : '');
   if (typeSelect && typeSelect.value) {
     setType(typeSelect.value);
   }

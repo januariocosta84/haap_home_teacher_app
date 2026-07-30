@@ -7,15 +7,20 @@ from django.conf import settings
 from django.utils import timezone
 
 
-class Equipment(models.Model):
+class EquipmentType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    serial_number_required = models.BooleanField(default=False)
+    icon = models.CharField(max_length=60, default='bi-box-seam')
 
-    TYPE_CHOICES = [
-        ('tablet', 'Tablet'),
-        ('projector', 'Projector'),
-        ('screen', 'Screen'),
-        ('dongle', 'Dongle'),
-        ('power_extension', 'Power Extension'),
-    ]
+    class Meta:
+        db_table = 'equipment_types'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Equipment(models.Model):
 
     STATUS_CHOICES = [
         ('active', 'Active'),
@@ -26,9 +31,10 @@ class Equipment(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    equipment_type = models.CharField(
-        max_length=30,
-        choices=TYPE_CHOICES,
+    equipment_type = models.ForeignKey(
+        EquipmentType,
+        on_delete=models.PROTECT,
+        related_name='equipment_items',
         db_index=True,
     )
 
@@ -37,6 +43,8 @@ class Equipment(models.Model):
     serial_number = models.CharField(
         max_length=100,
         unique=True,
+        null=True,
+        blank=True,
     )
 
     preschool = models.ForeignKey(
@@ -81,7 +89,7 @@ class Equipment(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.get_equipment_type_display()} - {self.serial_number}"
+        return f"{self.equipment_type.name} - {self.serial_number or 'N/A'}"
 
 
 class EquipmentAssignmentHistory(models.Model):

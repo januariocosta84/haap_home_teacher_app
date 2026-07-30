@@ -1,0 +1,122 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{% if object %}Edita{% else %}Adisiona{% endif %} Tipu Ekipamentu{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="max-width:580px;">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0" style="color:#0B2D42;">
+      {% if object %}Edita Tipu: {{ object.name }}{% else %}Adisiona Tipu Foun{% endif %}
+    </h4>
+    <p class="text-muted mb-0" style="font-size:.85rem;">Konfigurasaun tipu ekipamentu, icone, no numeru serial.</p>
+  </div>
+
+  <div class="card shadow-sm border-0 p-4">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Name -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="color:#1e293b;">Naran Tipu <span class="text-danger">*</span></label>
+        <input type="text" name="name"
+               class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+               value="{{ form.name.value|default_if_none:'' }}"
+               placeholder="Ex: Tablet, Projector, Dongle..." required>
+        {% if form.name.errors %}
+        <div class="invalid-feedback">{{ form.name.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Icon picker -->
+      <div class="mb-3">
+        <label class="form-label fw-semibold" style="color:#1e293b;">Ícone <span class="text-danger">*</span></label>
+        <p class="text-muted mb-2" style="font-size:.78rem;">Hili ícone ne'ebé representa tipu ekipamentu ne'e.</p>
+
+        <input type="hidden" name="icon" id="iconInput" value="{{ form.icon.value|default_if_none:'bi-box-seam' }}">
+
+        <!-- Preview -->
+        <div class="d-flex align-items-center gap-2 mb-3 p-3 rounded" style="background:#f8fafc;border:1.5px solid #e2e8f0;">
+          <div id="iconPreview" style="width:44px;height:44px;border-radius:12px;background:#eff6ff;color:#2563eb;
+               display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+            <i id="iconPreviewIcon" class="bi {{ form.icon.value|default:'bi-box-seam' }}"></i>
+          </div>
+          <div>
+            <div class="fw-semibold" style="font-size:.85rem;color:#1e293b;">Ícone Seleksionadu</div>
+            <code id="iconPreviewName" style="font-size:.75rem;color:#64748b;">{{ form.icon.value|default:'bi-box-seam' }}</code>
+          </div>
+        </div>
+
+        <!-- Icon grid -->
+        <div class="icon-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:260px;overflow-y:auto;padding:4px;">
+          {% for ic in icon_choices %}
+          <div class="icon-opt {% if form.icon.value == ic or not form.icon.value and ic == 'bi-box-seam' %}selected{% endif %}"
+               data-icon="{{ ic }}"
+               title="{{ ic }}"
+               style="border:2px solid {% if form.icon.value == ic %}#2563eb{% else %}#e2e8f0{% endif %};
+                      border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;
+                      background:{% if form.icon.value == ic %}#eff6ff{% else %}#f8fafc{% endif %};
+                      transition:all .15s;user-select:none;">
+            <i class="bi {{ ic }}" style="font-size:1.3rem;color:{% if form.icon.value == ic %}#2563eb{% else %}#64748b{% endif %};"></i>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Serial number toggle -->
+      <div class="mb-4">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch"
+                 name="serial_number_required" id="id_serial_number_required"
+                 {% if form.serial_number_required.value %}checked{% endif %}>
+          <label class="form-check-label fw-semibold" for="id_serial_number_required"
+                 style="color:#1e293b;">
+            Presiza Numeru Serial?
+          </label>
+        </div>
+        <small class="text-muted">Aktiva se ekipamentu tipu ne'e presiza numeru serial úniku.</small>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">
+          <i class="bi bi-check-lg me-1"></i>
+          {% if object %}Atualiza{% else %}Salva{% endif %}
+        </button>
+        <a href="{% url 'equipment:equipment_type_list' %}" class="btn btn-outline-secondary px-4">
+          Kansela
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var input   = document.getElementById('iconInput');
+  var previewI = document.getElementById('iconPreviewIcon');
+  var previewN = document.getElementById('iconPreviewName');
+  var opts     = document.querySelectorAll('.icon-opt');
+
+  function selectIcon(ic) {
+    input.value = ic;
+    previewI.className = 'bi ' + ic;
+    previewN.textContent = ic;
+    opts.forEach(function (o) {
+      var chosen = o.dataset.icon === ic;
+      o.style.borderColor  = chosen ? '#2563eb' : '#e2e8f0';
+      o.style.background   = chosen ? '#eff6ff' : '#f8fafc';
+      o.querySelector('i').style.color = chosen ? '#2563eb' : '#64748b';
+      o.classList.toggle('selected', chosen);
+    });
+  }
+
+  opts.forEach(function (o) {
+    o.addEventListener('click', function () { selectIcon(o.dataset.icon); });
+  });
+
+  /* ensure initial selection is highlighted correctly */
+  if (input.value) selectIcon(input.value);
+})();
+</script>
+{% endblock %}

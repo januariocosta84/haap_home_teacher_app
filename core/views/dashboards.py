@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from core.models import User, Child, TeacherActivityLog
 from preschools.models import PreschoolTeacher, Preschool
-from equipment.models import Equipment
+from equipment.models import Equipment, EquipmentType
 from ticket.models import SupportTicket
 
 @login_required
@@ -63,6 +64,85 @@ def municipality_dashboard(request):
         "log_status_choices": [],
     }
     return render(request, "dashboards/municipality_dashboard.html", context)
+
+@login_required
+def equipment_dashboard(request):
+    if request.user.role not in ('moe_admin', 'moe_auditing', 'municipality_analyst'):
+        return redirect('core:login')
+
+    types = EquipmentType.objects.all().order_by('name')
+
+    # ── Per-type summary ──────────────────────────────────────────
+    type_stats = []
+    for t in types:
+        qs = Equipment.objects.filter(equipment_type=t)
+        type_stats.append({
+            'type': t,
+            'total':    qs.count(),
+            'active':   qs.filter(status='active').count(),
+            'inactive': qs.filter(status='inactive').count(),
+            'damaged':  qs.filter(status='damaged').count(),
+            'retired':  qs.filter(status='retired').count(),
+            'assigned': qs.filter(preschool__isnull=False).count(),
+            'unassigned': qs.filter(preschool__isnull=True).count(),
+        })
+
+    # ── Overall totals ────────────────────────────────────────────
+    all_eq = Equipment.objects.all()
+    totals = {
+        'total':      all_eq.count(),
+        'active':     all_eq.filter(status='active').count(),
+        'inactive':   all_eq.filter(status='inactive').count(),
+        'damaged':    all_eq.filter(status='damaged').count(),
+        'retired':    all_eq.filter(status='retired').count(),
+        'assigned':   all_eq.filter(preschool__isnull=False).count(),
+        'unassigned': all_eq.filter(preschool__isnull=True).count(),
+    }
+
+    # ── Per-municipality breakdown ────────────────────────────────
+    mun_rows = (
+        Equipment.objects
+        .filter(preschool__municipality__isnull=False)
+        .values('preschool__municipality__name', 'equipment_type__name')
+        .annotate(n=Count('id'))
+        .order_by('preschool__municipality__name', 'equipment_type__name')
+    )
+    # Build a dict: {mun_name: {type_name: count}}
+    mun_dict = {}
+    type_names = [t.name for t in types]
+    for row in mun_rows:
+        mun = row['preschool__municipality__name']
+        typ = row['equipment_type__name']
+        if mun not in mun_dict:
+            mun_dict[mun] = {t: 0 for t in type_names}
+        mun_dict[mun][typ] = row['n']
+
+    mun_table = [
+        {
+            'name': mun,
+            'counts_list': [counts.get(t, 0) for t in type_names],
+            'total': sum(counts.values()),
+        }
+        for mun, counts in sorted(mun_dict.items())
+    ]
+
+    # ── Recent assignments ────────────────────────────────────────
+    recent = (
+        Equipment.objects
+        .filter(preschool__isnull=False)
+        .select_related('equipment_type', 'preschool__municipality')
+        .order_by('-updated_at')[:20]
+    )
+
+    context = {
+        'type_stats':  type_stats,
+        'type_names':  type_names,
+        'totals':      totals,
+        'mun_table':   mun_table,
+        'recent':      recent,
+    }
+    return render(request, 'dashboards/equipment_dashboard.html', context)
+
 
 @login_required
 def teacher_dashboard(request):

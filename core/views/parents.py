@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views import View
 from core.forms import ParentForm, ParentRegisterForm, ParentRegistrationForm, TeacherRegistrationForm
-from core.models import User
+from core.models import User, TeacherPosition
+import datetime
 from core.views.user_management import send_whatsapp_otp
 from django.core.cache import cache as django_cache
 
@@ -206,7 +207,13 @@ class TeacherRegisterView(View):
                     {"form": form}
                 )
 
-            form.save()
+            teacher = form.save()
+            TeacherPosition.objects.create(
+                teacher=teacher,
+                position=form.cleaned_data['position'],
+                assigned_date=datetime.date.today(),
+                assigned_by=None,
+            )
             messages.success(
                 request,
                 "Registrasaun formadór pendente. Favor espera MoE admin aprova."

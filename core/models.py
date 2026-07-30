@@ -107,6 +107,13 @@ class User(AbstractUser):
     suco = models.ForeignKey(Suco, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
     aldeia = models.ForeignKey(Aldeia, on_delete=models.SET_NULL, null=True, blank=True, related_name="users")
 
+    GENDER_CHOICES = [
+        ('mane', 'Mane'),
+        ('feto', 'Feto'),
+        ('indeterminante', 'Indeterminante'),
+    ]
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, null=True, blank=True)
+
     is_verified = models.BooleanField(default=False)
     temp_password = models.CharField(max_length=128, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -158,7 +165,43 @@ class Location(models.Model):
 
 
 # ---------------------------------
-# 3. Child Profile
+# 3. Teacher Position History
+# ---------------------------------
+class TeacherPosition(models.Model):
+    POSITION_CHOICES = [
+        ('manorin',     'Manorin'),
+        ('koordenador', 'Koordenador'),
+    ]
+
+    teacher     = models.ForeignKey(
+        'User', on_delete=models.CASCADE,
+        related_name='position_history',
+        limit_choices_to={'role': 'teacher'}
+    )
+    position    = models.CharField(max_length=20, choices=POSITION_CHOICES)
+    assigned_date = models.DateField()
+    end_date    = models.DateField(null=True, blank=True)
+    assigned_by = models.ForeignKey(
+        'User', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='position_assignments_made'
+    )
+    notes       = models.TextField(blank=True, null=True)
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'teacher_positions'
+        ordering = ['-assigned_date', '-created_at']
+
+    def __str__(self):
+        return f"{self.teacher.get_full_name()} — {self.get_position_display()} ({self.assigned_date})"
+
+    @property
+    def is_current(self):
+        return self.end_date is None
+
+
+# ---------------------------------
+# 4. Child Profile
 # ---------------------------------
 class Child(models.Model):
     AGE_GROUP_CHOICES = [

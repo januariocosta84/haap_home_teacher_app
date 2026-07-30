@@ -270,6 +270,23 @@
                 </div>
               </div>
 
+              <!-- EMIS Code -->
+              <div class="col-md-6">
+                <div class="pf-field">
+                  <label class="pf-label" for="{{ form.emis_code.id_for_label }}">
+                    <i class="bi bi-upc-scan" style="color:#0891b2;"></i>
+                    Kódigo EMIS
+                  </label>
+                  <div class="pf-input-wrap">
+                    <i class="bi bi-upc pf-icon"></i>
+                    {{ form.emis_code }}
+                  </div>
+                  {% if form.emis_code.errors %}
+                    <div class="pf-field-error">{{ form.emis_code.errors|striptags }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
               <!-- Preschool Type -->
               <div class="col-md-6">
                 <div class="pf-field">

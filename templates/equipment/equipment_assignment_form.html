@@ -166,7 +166,7 @@
     </a>
     <div>
       <h4 class="fw-bold mb-0">Jestaun Atribuisaun</h4>
-      <p class="text-muted small mb-0">{{ equipment.get_equipment_type_display }} · {{ equipment.serial_number }}</p>
+      <p class="text-muted small mb-0">{{ equipment.equipment_type.name }} · {{ equipment.serial_number }}</p>
     </div>
   </div>
 
@@ -177,15 +177,7 @@
 
         <div class="col d-flex align-items-center gap-3">
           <div class="equip-icon-bubble">
-            {% if equipment.equipment_type == 'tablet' %}
-              <i class="bi bi-tablet-landscape"></i>
-            {% elif equipment.equipment_type == 'projector' %}
-              <i class="bi bi-projector-fill"></i>
-            {% elif equipment.equipment_type == 'screen' %}
-              <i class="bi bi-display"></i>
-            {% else %}
-              <i class="bi bi-plug-fill"></i>
-            {% endif %}
+              <i class="bi {{ equipment.equipment_type.icon }}"></i>
           </div>
           <div>
             <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.6);">
@@ -437,7 +429,7 @@
               Ekipamentu ida ne'e
             </div>
             <div style="font-size:0.83rem;color:#334155;">
-              <div><span class="text-muted" style="font-size:0.77rem;">Tipu:</span> {{ equipment.get_equipment_type_display }}</div>
+              <div><span class="text-muted" style="font-size:0.77rem;">Tipu:</span> {{ equipment.equipment_type.name }}</div>
               <div><span class="text-muted" style="font-size:0.77rem;">Serial:</span> <code style="font-size:0.8rem;">{{ equipment.serial_number }}</code></div>
               <div><span class="text-muted" style="font-size:0.77rem;">Modelo:</span> {{ equipment.model_number }}</div>
               <div>

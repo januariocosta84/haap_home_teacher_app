@@ -61,8 +61,8 @@
           <label class="eq-filter-label">Tipu</label>
           <select name="equipment_type" class="eq-filter-select form-control">
             <option value="">Tipu hotu</option>
-            {% for value, label in equipment_types %}
-              <option value="{{ value }}" {% if request.GET.equipment_type == value %}selected{% endif %}>{{ label }}</option>
+            {% for et in equipment_types %}
+              <option value="{{ et.id }}" {% if request.GET.equipment_type == et.id|stringformat:"s" %}selected{% endif %}>{{ et.name }}</option>
             {% endfor %}
           </select>
         </div>
@@ -179,24 +179,11 @@
             <!-- Type -->
             <td style="padding-left:1.5rem;">
               <div class="d-flex align-items-center gap-2">
-                <div class="eq-type-icon
-                  {% if equipment.equipment_type == 'tablet' %}eq-type-tablet
-                  {% elif equipment.equipment_type == 'projector' %}eq-type-projector
-                  {% elif equipment.equipment_type == 'screen' %}eq-type-screen
-                  {% elif equipment.equipment_type == 'dongle' %}eq-type-adapter
-                  {% elif equipment.equipment_type == 'power_extension' %}eq-type-adapter
-                  {% else %}eq-type-default{% endif %}">
-                  <i class="bi
-                    {% if equipment.equipment_type == 'tablet' %}bi-tablet
-                    {% elif equipment.equipment_type == 'projector' %}bi-projector
-                    {% elif equipment.equipment_type == 'screen' %}bi-display
-                    {% elif equipment.equipment_type == 'dongle' %}bi-usb-plug
-                    {% elif equipment.equipment_type == 'power_extension' %}bi-plug
-                    {% else %}bi-box-seam{% endif %}">
-                  </i>
+                <div class="eq-type-icon eq-type-default">
+                  <i class="bi {{ equipment.equipment_type.icon }}"></i>
                 </div>
                 <span style="font-weight:600;color:#1e293b;font-size:0.84rem;">
-                  {{ equipment.get_equipment_type_display }}
+                  {{ equipment.equipment_type.name }}
                 </span>
               </div>
             </td>

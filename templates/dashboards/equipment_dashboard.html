@@ -1,0 +1,325 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Relatóriu Ekipamentu{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Hero ── */
+.eq-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #1d4ed8 100%);
+  padding: 1.85rem 2.25rem;
+  margin-bottom: 1.75rem;
+  position: relative; overflow: hidden;
+}
+.eq-hero::before {
+  content:''; position:absolute; top:-50px; right:-50px;
+  width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,.05);
+}
+.eq-hero::after {
+  content:''; position:absolute; bottom:-60px; left:40%;
+  width:260px; height:260px; border-radius:50%; background:rgba(255,255,255,.03);
+}
+.eq-hero-icon {
+  width:52px; height:52px; border-radius:14px;
+  background:rgba(255,255,255,.15);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1.4rem; color:#fff; flex-shrink:0;
+}
+
+/* ── Stat tiles ── */
+.eq-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.eq-stat {
+  background:#fff; border-radius:14px;
+  border:1px solid #f1f5f9;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  padding:1.1rem 1.25rem;
+  position:relative; overflow:hidden;
+}
+.eq-stat-val { font-size:1.85rem; font-weight:800; line-height:1; color:#0f172a; letter-spacing:-1px; }
+.eq-stat-label { font-size:0.71rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#94a3b8; margin-top:4px; }
+.eq-stat-icon {
+  position:absolute; right:14px; top:14px;
+  font-size:1.6rem; opacity:.12;
+}
+
+/* ── Type cards ── */
+.type-card {
+  background:#fff; border-radius:16px;
+  border:1px solid #f1f5f9;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  padding:1.25rem 1.5rem;
+  transition:box-shadow .15s;
+}
+.type-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); }
+.type-icon-wrap {
+  width:48px; height:48px; border-radius:12px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1.3rem; flex-shrink:0;
+}
+.type-name { font-weight:700; font-size:0.95rem; color:#0f172a; }
+.type-total { font-size:1.6rem; font-weight:800; color:#0f172a; letter-spacing:-0.5px; }
+
+/* ── Mini progress ── */
+.mini-bar { height:6px; border-radius:3px; background:#f1f5f9; overflow:hidden; margin-top:8px; }
+.mini-bar-fill { height:100%; border-radius:3px; }
+
+/* ── Status badge ── */
+.sb { display:inline-flex; align-items:center; gap:3px; border-radius:20px; padding:2px 8px; font-size:0.7rem; font-weight:700; }
+.sb-active   { background:#f0fdf4; color:#15803d; }
+.sb-inactive { background:#f1f5f9; color:#475569; }
+.sb-damaged  { background:#fef2f2; color:#dc2626; }
+.sb-retired  { background:#fefce8; color:#854d0e; }
+.sb-assigned { background:#eff6ff; color:#1d4ed8; }
+.sb-unassigned { background:#f5f3ff; color:#6d28d9; }
+
+/* ── Section card ── */
+.sec-card {
+  background:#fff; border-radius:16px;
+  border:1px solid #f1f5f9;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  margin-bottom:1.5rem; overflow:hidden;
+}
+.sec-header {
+  padding:.85rem 1.5rem; border-bottom:1px solid #f1f5f9;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.sec-title { font-weight:700; font-size:.9rem; color:#0f172a; }
+
+/* ── Table ── */
+.eq-table { font-size:0.83rem; margin:0; }
+.eq-table thead th {
+  background:#f8fafc; font-size:10.5px; font-weight:700;
+  color:#64748b; text-transform:uppercase; letter-spacing:.05em;
+  border-bottom:2px solid #eef2f7; padding:.65rem 1rem; white-space:nowrap;
+}
+.eq-table tbody td { padding:.7rem 1rem; vertical-align:middle; border-color:#f1f5f9; }
+.eq-table tbody tr:hover { background:#f8fafc; }
+
+/* ── Mun table numbers ── */
+.mun-n { font-variant-numeric:tabular-nums; font-weight:600; color:#1e293b; }
+.mun-zero { color:#cbd5e1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- ══ HERO ════════════════════════════════════════════════════════════════ -->
+  <div class="eq-hero" style="position:relative;z-index:0;">
+    <div style="position:relative;z-index:1;" class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="eq-hero-icon"><i class="bi bi-box-seam"></i></div>
+        <div>
+          <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.55);">
+            Relatóriu Jeral
+          </div>
+          <h4 class="fw-bold text-white mb-0" style="letter-spacing:-.3px;">Dashboard Ekipamentu</h4>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.65);margin-top:2px;">
+            Projector · Tablet · Dongle · Power Extension · Screen
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'equipment:equipment_list' %}"
+         class="btn rounded-pill px-4 fw-semibold"
+         style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);font-size:.82rem;">
+        <i class="bi bi-list-ul me-1"></i>Lista Ekipamentu
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ OVERALL STAT TILES ═══════════════════════════════════════════════ -->
+  <div class="eq-stat-grid">
+    <div class="eq-stat">
+      <div class="eq-stat-val">{{ totals.total }}</div>
+      <div class="eq-stat-label">Total Ekipamentu</div>
+      <i class="bi bi-box-seam eq-stat-icon" style="color:#2563eb;"></i>
+    </div>
+    <div class="eq-stat">
+      <div class="eq-stat-val" style="color:#15803d;">{{ totals.active }}</div>
+      <div class="eq-stat-label">Ativu</div>
+      <i class="bi bi-check-circle eq-stat-icon" style="color:#16a34a;"></i>
+    </div>
+    <div class="eq-stat">
+      <div class="eq-stat-val" style="color:#1d4ed8;">{{ totals.assigned }}</div>
+      <div class="eq-stat-label">Atribuidu</div>
+      <i class="bi bi-building eq-stat-icon" style="color:#2563eb;"></i>
+    </div>
+    <div class="eq-stat">
+      <div class="eq-stat-val" style="color:#6d28d9;">{{ totals.unassigned }}</div>
+      <div class="eq-stat-label">La Atribuidu</div>
+      <i class="bi bi-inbox eq-stat-icon" style="color:#6d28d9;"></i>
+    </div>
+    <div class="eq-stat">
+      <div class="eq-stat-val" style="color:#dc2626;">{{ totals.damaged }}</div>
+      <div class="eq-stat-label">Estragu</div>
+      <i class="bi bi-exclamation-triangle eq-stat-icon" style="color:#dc2626;"></i>
+    </div>
+    <div class="eq-stat">
+      <div class="eq-stat-val" style="color:#b45309;">{{ totals.retired }}</div>
+      <div class="eq-stat-label">Retirado</div>
+      <i class="bi bi-archive eq-stat-icon" style="color:#b45309;"></i>
+    </div>
+  </div>
+
+  <!-- ══ PER-TYPE CARDS ═══════════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+    {% for ts in type_stats %}
+    {% with icon=ts.type.icon %}
+    <div class="col-12 col-sm-6 col-xl-4">
+      <div class="type-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="type-icon-wrap" style="background:#eff6ff;">
+            <i class="bi {{ icon }}" style="color:#2563eb;"></i>
+          </div>
+          <div>
+            <div class="type-name">{{ ts.type.name }}</div>
+            <div class="type-total">{{ ts.total }}</div>
+          </div>
+          <div class="ms-auto text-end">
+            {% if ts.total > 0 %}
+            <div style="font-size:0.72rem;color:#94a3b8;">Atribuidu</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#1d4ed8;">{{ ts.assigned }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Progress bar: assigned vs total -->
+        {% if ts.total > 0 %}
+        <div class="mini-bar">
+          <div class="mini-bar-fill" style="background:#2563eb;width:{% widthratio ts.assigned ts.total 100 %}%;"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2" style="font-size:0.72rem;color:#94a3b8;">
+          <span>{{ ts.assigned }} atribuidu</span>
+          <span>{{ ts.unassigned }} livre</span>
+        </div>
+        {% else %}
+        <div style="font-size:0.8rem;color:#cbd5e1;text-align:center;padding:.5rem 0;">Seidauk iha rekord</div>
+        {% endif %}
+
+        <!-- Status badges -->
+        {% if ts.total > 0 %}
+        <div class="d-flex flex-wrap gap-1 mt-3 pt-3" style="border-top:1px solid #f1f5f9;">
+          <span class="sb sb-active"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{{ ts.active }} Ativu</span>
+          {% if ts.inactive %}<span class="sb sb-inactive">{{ ts.inactive }} Inativu</span>{% endif %}
+          {% if ts.damaged %}<span class="sb sb-damaged"><i class="bi bi-exclamation-circle" style="font-size:.65rem;"></i>{{ ts.damaged }} Estragu</span>{% endif %}
+          {% if ts.retired %}<span class="sb sb-retired">{{ ts.retired }} Retirado</span>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+  </div>
+
+  <!-- ══ MUNICIPALITY BREAKDOWN ════════════════════════════════════════════ -->
+  <div class="sec-card">
+    <div class="sec-header">
+      <div class="sec-title"><i class="bi bi-geo-alt-fill me-2" style="color:#2563eb;"></i>Distribuisaun ba Munisípiu</div>
+      <span style="font-size:0.75rem;color:#94a3b8;">Ekipamentu atribuidu de'it</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table eq-table mb-0">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">Munisípiu</th>
+            {% for tn in type_names %}
+            <th class="text-center">{{ tn }}</th>
+            {% endfor %}
+            <th class="text-center">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in mun_table %}
+          <tr>
+            <td style="padding-left:1.5rem;font-weight:600;color:#1e293b;">
+              <i class="bi bi-geo-alt me-1" style="color:#94a3b8;"></i>{{ row.name }}
+            </td>
+            {% for n in row.counts_list %}
+            <td class="text-center">
+              {% if n %}
+              <span class="mun-n">{{ n }}</span>
+              {% else %}
+              <span class="mun-zero">—</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+            <td class="text-center">
+              <span style="font-weight:800;color:#1d4ed8;">{{ row.total }}</span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="{{ type_names|length|add:2 }}" class="text-center text-muted py-4" style="font-size:.83rem;">
+              Seidauk iha ekipamentu atribuidu ba munisípiu.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ RECENT ASSIGNMENTS ════════════════════════════════════════════════ -->
+  <div class="sec-card">
+    <div class="sec-header">
+      <div class="sec-title"><i class="bi bi-clock-history me-2" style="color:#2563eb;"></i>Atribuisaun Resénte</div>
+      <a href="{% url 'equipment:equipment_list' %}" style="font-size:0.78rem;color:#2563eb;text-decoration:none;font-weight:600;">
+        Haree hotu <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <div class="table-responsive">
+      <table class="table eq-table mb-0">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">Tipu</th>
+            <th>Modelu</th>
+            <th>Numeru Série</th>
+            <th>Eskola</th>
+            <th>Munisípiu</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for eq in recent %}
+          <tr>
+            <td style="padding-left:1.5rem;">
+              <div class="d-flex align-items-center gap-2">
+                <span style="width:30px;height:30px;border-radius:8px;background:#eff6ff;
+                             display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="bi {{ eq.equipment_type.icon }}" style="color:#2563eb;font-size:.85rem;"></i>
+                </span>
+                <span style="font-weight:600;color:#1e293b;">{{ eq.equipment_type.name }}</span>
+              </div>
+            </td>
+            <td style="color:#475569;">{{ eq.model_number|default:"—" }}</td>
+            <td><code style="font-size:0.78rem;background:#f8fafc;padding:2px 6px;border-radius:5px;color:#334155;">{{ eq.serial_number }}</code></td>
+            <td style="color:#334155;">{{ eq.preschool.name|default:"—" }}</td>
+            <td style="color:#64748b;">{{ eq.preschool.municipality|default:"—" }}</td>
+            <td>
+              <span class="sb sb-{{ eq.status }}">
+                {% if eq.status == 'active' %}<i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{% endif %}
+                {{ eq.get_status_display }}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4" style="font-size:.83rem;">
+              Seidauk iha ekipamentu atribuidu.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

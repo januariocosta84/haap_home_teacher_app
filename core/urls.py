@@ -2,6 +2,7 @@ from django.urls import path
 
 from core.api_view import ActivityResultCreateAPIView, LoginAPIView, LogoutAPIView
 from core.views import *
+from core.views.dashboards import equipment_dashboard
 from core.views.activity_logs import ChildActivityView, TeacherActivityLogListView
 from core.views.analytics_api import get_municipalities_api, summary_stats_api, trend_data_api
 from core.views.apk import (
@@ -16,7 +17,7 @@ from core.views.auditing_portal import (
 )
 from core.views.parents import verify_register_otp
 from core.views.send import send_whatsapp
-from core.views.user_management import forgot_password, reset_password, verify_otp
+from core.views.user_management import forgot_password, reset_password, verify_otp, assign_position, register_teacher_quick, set_teacher_phone, assign_teacher_schools
 
 app_name = 'core'
 
@@ -39,6 +40,7 @@ urlpatterns = [
     # ── Dashboards ────────────────────────────────────────────
     path('dashboard/moe/',          moe_admin_dashboard,   name='moe_admin_dashboard'),
     path('dashboard/municipality/', municipality_dashboard, name='municipality_dashboard'),
+    path('dashboard/equipment/',    equipment_dashboard,   name='equipment_dashboard'),
 
     # ── Profile ───────────────────────────────────────────────
     path('dashboard/profile/',                  profile_view,          name='profile'),
@@ -51,7 +53,11 @@ urlpatterns = [
     path('dashboard/users/<uuid:user_id>/approve/',  approve_teacher,  name='user_approve'),
     path('dashboard/users/<uuid:user_id>/edit/',     edit_user,        name='user_update'),
     path('dashboard/users/<uuid:user_id>/delete/',   delete_user,      name='user_delete'),
-    path('dashboard/users/register/',                register_user,    name='user_create'),
+    path('dashboard/users/<uuid:user_id>/position/',  assign_position,       name='assign_position'),
+    path('dashboard/users/<uuid:user_id>/set-phone/', set_teacher_phone,    name='teacher_set_phone'),
+    path('dashboard/users/<uuid:user_id>/schools/',   assign_teacher_schools, name='assign_teacher_schools'),
+    path('dashboard/users/register/',                 register_user,        name='user_create'),
+    path('dashboard/users/register-quick/',           register_teacher_quick, name='teacher_quick_register'),
 
     # ── Children ──────────────────────────────────────────────
     path('dashboard/children/',                     children_list,     name='child_list'),

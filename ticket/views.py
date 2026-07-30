@@ -23,6 +23,7 @@ from ticket.forms import (
     TicketReplyForm,
 )
 from preschools.models import Preschool
+from core.audit import log_action
 
 app_name = 'ticket'
 
@@ -131,6 +132,15 @@ class SupportTicketCreateView(LoginRequiredMixin,CreateView):
                 app_features=self.request.POST.get(f'app_features_{item}'),
             )
 
+        log_action(
+            request=self.request,
+            user=self.request.user,
+            action='create',
+            module='ticket',
+            description=f"Kria tiket suporta {ticket.ticket_number} ba eskola '{ticket.preschool.name}'.",
+            record_id=str(ticket.id),
+            record_name=ticket.ticket_number,
+        )
         messages.success(self.request, 'Ticket suporta kria ho susesu.')
         return redirect(self.success_url)
 
@@ -193,6 +203,15 @@ class SupportTicketAddItemsView(TeacherOnlyMixin, LoginRequiredMixin, UpdateView
             messages.error(request, 'Favor hili pelomenu ida item.')
             return self.get(request, *args, **kwargs)
 
+        log_action(
+            request=request,
+            user=request.user,
+            action='update',
+            module='ticket',
+            description=f"Adisiona item ba tiket {self.object.ticket_number} (ekipamentu: {len(equipment_items)}, formasaun: {len(training_items)}).",
+            record_id=str(self.object.id),
+            record_name=self.object.ticket_number,
+        )
         messages.success(
             request,
             f'Husu suporta konsege kria ho susesu. Tiket numeru: {self.object.ticket_number}'
@@ -293,6 +312,15 @@ class SupportTicketDetailView(LoginRequiredMixin, DetailView):
             if request.user.role == 'moe_admin' and self.object.status == 'open':
                 self.object.status = 'in_progress'
                 self.object.save()
+            log_action(
+                request=request,
+                user=request.user,
+                action='other',
+                module='ticket',
+                description=f"Hatama resposta ba tiket {self.object.ticket_number}.",
+                record_id=str(self.object.id),
+                record_name=self.object.ticket_number,
+            )
             messages.success(request, 'Komentariu enviadu.')
         return redirect('ticket:ticket_detail', pk=self.object.pk)
 
@@ -372,12 +400,25 @@ class SupportTicketUpdateView(AdminOnlyMixin, LoginRequiredMixin, UpdateView):
         return reverse_lazy('ticket:ticket_detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
+        old_status = self.object.status
         if form.cleaned_data.get('status') == 'resolved':
             from django.utils import timezone
             form.instance.resolved_at = timezone.now()
 
+        response = super().form_valid(form)
+        log_action(
+            request=self.request,
+            user=self.request.user,
+            action='update',
+            module='ticket',
+            description=f"Atualiza tiket {self.object.ticket_number}: status '{old_status}' → '{self.object.status}'.",
+            record_id=str(self.object.id),
+            record_name=self.object.ticket_number,
+            previous_value={'status': old_status},
+            new_value={'status': self.object.status},
+        )
         messages.success(self.request, 'Tiket updates ho susesu.')
-        return super().form_valid(form)
+        return response
 
 
 def get_ticket_by_number(request):

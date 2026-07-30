@@ -1,6 +1,6 @@
 from django import forms
 from core.models import User
-from equipment.models import Equipment, EquipmentAssignmentHistory
+from equipment.models import Equipment, EquipmentAssignmentHistory, EquipmentType
 from klase.models import Classroom
 from preschools.models import Preschool
 
@@ -34,7 +34,8 @@ class EquipmentForm(forms.ModelForm):
 
         widgets = {
             'equipment_type': forms.Select(attrs={
-                'class': 'form-select'
+                'class': 'form-select',
+                'id': 'id_equipment_type',
             }),
 
             'model_number': forms.TextInput(attrs={
@@ -76,6 +77,10 @@ class EquipmentForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
+        self.fields['serial_number'].required = False
+        self.fields['equipment_type'].queryset = EquipmentType.objects.all()
+        self.fields['equipment_type'].empty_label = 'Hili Tipu Ekipamentu'
+
         self.fields['preschool'].queryset = Preschool.objects.all()
 
         self.fields['classroom'].queryset = Classroom.objects.none()
@@ -113,6 +118,12 @@ class EquipmentForm(forms.ModelForm):
     def clean(self):
 
         cleaned_data = super().clean()
+
+        equipment_type = cleaned_data.get('equipment_type')
+        serial_number  = cleaned_data.get('serial_number')
+
+        if equipment_type and equipment_type.serial_number_required and not serial_number:
+            self.add_error('serial_number', f'Numeru Serial obrigatóriu ba {equipment_type.name}.')
 
         preschool = cleaned_data.get('preschool')
         classroom = cleaned_data.get('classroom')

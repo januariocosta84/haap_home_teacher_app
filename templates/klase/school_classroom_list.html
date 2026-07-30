@@ -1,140 +1,210 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/klase.css' %}">{% endblock %}
+{% block title %}{{ preschool.name }} — Klase Sira{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Hero ── */
+.sc-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #2563eb 100%);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  position: relative; overflow: hidden;
+}
+.sc-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.sc-hero-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,.15);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: #fff; flex-shrink: 0;
+}
+.sc-back {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+  padding: 3px 12px; font-size: .78rem; font-weight: 600;
+  text-decoration: none; transition: all .15s;
+}
+.sc-back:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+/* ── Stat tiles ── */
+.sc-stat {
+  background: #fff; border-radius: 14px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  padding: 1rem 1.25rem; text-align: center;
+}
+.sc-stat-val { font-size: 1.75rem; font-weight: 800; color: #0f172a; line-height: 1; }
+.sc-stat-lbl { font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #94a3b8; margin-top: 3px; }
+
+/* ── Classroom cards ── */
+.kl-card {
+  background: #fff; border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: box-shadow .18s, transform .18s;
+  overflow: hidden; height: 100%;
+  display: flex; flex-direction: column;
+}
+.kl-card:hover {
+  box-shadow: 0 8px 24px rgba(37,99,235,.12);
+  transform: translateY(-3px);
+}
+.kl-card-top {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  padding: 1rem 1.25rem .85rem;
+}
+.kl-card-body { padding: 1rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
+.kl-group-pill {
+  display: inline-flex; align-items: center;
+  background: rgba(255,255,255,.2); color: #fff;
+  border-radius: 20px; padding: 2px 9px;
+  font-size: .67rem; font-weight: 700;
+}
+
+/* ── Student list items ── */
+.student-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-bottom: 1px solid #f8fafc;
+}
+.student-row:last-child { border-bottom: 0; }
+.student-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #eff6ff; color: #2563eb;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .65rem; font-weight: 700; flex-shrink: 0;
+}
+
+/* ── CTA ── */
+.kl-cta {
+  display: block; text-align: center; text-decoration: none;
+  background: #2563eb; color: #fff; font-weight: 700; font-size: .83rem;
+  border-radius: 10px; padding: 10px 16px; margin-top: auto;
+  transition: background .15s, transform .12s;
+}
+.kl-cta:hover { background: #1d4ed8; color: #fff; transform: translateY(-1px); }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="d-flex" style="min-height: calc(100vh - 60px);">
-    <!-- SIDEBAR -->
-    {% include "klase/partials/teacher_sidebar.html" with active_school_id=preschool.id %}
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="sc-hero" style="position:relative;z-index:0;">
+    <div style="position:relative;z-index:1;">
+      <!-- Breadcrumb -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'klase:teacher_school_list' %}" class="sc-back">
+          <i class="bi bi-arrow-left"></i> Hau nia Eskola
+        </a>
+        <span style="color:rgba(255,255,255,.4);font-size:.8rem;">/</span>
+        <span style="color:rgba(255,255,255,.65);font-size:.78rem;">{{ preschool.name }}</span>
+      </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="flex-grow-1 py-5" style="overflow-y: auto;">
-        <div class="container-lg">
-            <!-- BREADCRUMB & HEADER -->
-            <div class="mb-4">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'klase:teacher_school_list' %}" class="text-decoration-none">Lista Pre eskolar</a>
-                        </li>
-                        <li class="breadcrumb-item active">{{ preschool.name }}</li>
-                    </ol>
-                </nav>
-
-                <div>
-                    <h2 class="mb-1">{{ preschool.name }}</h2>
-                    <small class="text-muted">{{ preschool.preschool_type }}</small>
-                </div>
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="sc-hero-icon"><i class="bi bi-building"></i></div>
+          <div>
+            <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);">
+              {{ preschool.preschool_type }}
             </div>
-
-            <!-- STATS -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="text-muted mb-0">Total Klase</h6>
-                            <h3 class="mb-0">{{ total_classrooms }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="text-muted mb-0">Total alunos</h6>
-                            <h3 class="mb-0">{{ total_students }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="text-muted mb-0">Grupu A</h6>
-                            <h3 class="mb-0">{{ group_a_count }}</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center shadow-sm border-0">
-                        <div class="card-body">
-                            <h6 class="text-muted mb-0">Grupu B</h6>
-                            <h3 class="mb-0">{{ group_b_count }}</h3>
-                        </div>
-                    </div>
-                </div>
+            <h4 class="fw-bold text-white mb-0" style="letter-spacing:-.3px;">{{ preschool.name }}</h4>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:2px;">
+              {{ total_classrooms }} klase &nbsp;·&nbsp; {{ total_students }} estudante
             </div>
-
-            <!-- CLASSROOMS -->
-            {% if classrooms %}
-                <div class="row g-4">
-                    {% for classroom in classrooms %}
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card shadow-sm h-100 hover-card">
-                                <!-- Card Header -->
-                                <div class="card-header bg-white border-bottom">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title mb-0">{{ classroom.name }}</h5>
-                                        <span class="badge bg-primary rounded-pill">Group {{ classroom.group }}</span>
-                                    </div>
-                                </div>
-
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <!-- Student Count -->
-                                    <div class="mb-3 p-2 bg-light rounded text-center">
-                                        <small class="text-muted d-block">Total Alunus</small>
-                                        <h4 class="mb-0">{{ classroom.student_count }}</h4>
-                                    </div>
-
-                                    <!-- Enrolled Students Preview -->
-                                    {% if classroom.students %}
-                                        <div class="mb-3">
-                                            <small class="text-muted d-block mb-2"><i class="bi bi-people-fill"></i> Alunus</small>
-                                            <div class="list-group list-group-sm">
-                                                {% for student in classroom.students|slice:":3" %}
-                                                    <div class="list-group-item px-0 py-1">
-                                                        <small>
-                                                            <a href="{% url 'core:api_child_activity' student.child__id %}" class="text-decoration-none fw-semibold">
-                                                                {{ student.child__first_name }}
-                                                            </a>
-                                                            <span class="badge bg-secondary">{{ student.child__user_id }}</span>
-                                                        </small>
-                                                    </div>
-                                                {% endfor %}
-                                                {% if classroom.students|length > 3 %}
-                                                    <div class="list-group-item px-0 py-1">
-                                                        <small class="text-muted">+{{ classroom.students|length|add:"-3" }} more...</small>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-sm alert-info mb-3 p-2">
-                                            Laiha alunu iha klase ida ne'e.
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                <!-- Card Footer -->
-                                <div class="card-footer bg-white border-top">
-                                    <a href="{% url 'klase:classroom_detail' classroom.id %}" 
-                                       class="btn btn-primary btn-sm w-100">
-                                        <i class="bi bi-arrow-right"></i> Hare Detalhes
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i> Laiha klase iha eskola ida ne'e.
-                </div>
-            {% endif %}
+          </div>
         </div>
+        <!-- Quick stats chips -->
+        <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1;">
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:7px 14px;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">{{ group_a_count }}</div>
+            <div style="font-size:.66rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase;">Grupu A</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:7px 14px;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:#fff;line-height:1;">{{ group_b_count }}</div>
+            <div style="font-size:.66rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase;">Grupu B</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- ══ CLASSROOM CARDS ═════════════════════════════════════════════════════ -->
+  {% if classrooms %}
+  <div class="row g-4">
+    {% for classroom in classrooms %}
+    <div class="col-12 col-sm-6 col-xl-4">
+      <div class="kl-card">
+
+        <!-- Top -->
+        <div class="kl-card-top">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="kl-group-pill">Grupo {{ classroom.group }}</span>
+            <span style="background:rgba(255,255,255,.15);color:#fff;border-radius:20px;
+                         padding:2px 9px;font-size:.67rem;font-weight:700;">
+              {{ classroom.student_count }} estudante
+            </span>
+          </div>
+          <div style="font-weight:700;font-size:.95rem;color:#fff;">{{ classroom.name }}</div>
+        </div>
+
+        <!-- Body -->
+        <div class="kl-card-body">
+          {% if classroom.students %}
+          <div style="font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;">
+            <i class="bi bi-people me-1"></i>Estudante
+          </div>
+          <div style="margin-bottom:10px;">
+            {% for student in classroom.students|slice:":4" %}
+            <div class="student-row">
+              <div class="student-avatar">
+                {{ student.child__first_name|first|upper }}
+              </div>
+              <div style="font-size:.82rem;font-weight:600;color:#1e293b;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                {{ student.child__first_name }}
+              </div>
+              <span style="font-size:.68rem;background:#f1f5f9;color:#64748b;border-radius:6px;padding:1px 6px;font-weight:600;flex-shrink:0;">
+                {{ student.child__user_id }}
+              </span>
+            </div>
+            {% endfor %}
+            {% if classroom.students|length > 4 %}
+            <div style="font-size:.75rem;color:#94a3b8;margin-top:5px;padding-top:5px;border-top:1px solid #f1f5f9;">
+              +{{ classroom.students|length|add:"-4" }} estudante seluk…
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <div style="background:#f8fafc;border:1px dashed #e2e8f0;border-radius:10px;
+                      padding:.9rem;text-align:center;margin-bottom:10px;">
+            <i class="bi bi-people" style="color:#cbd5e1;font-size:1.2rem;display:block;margin-bottom:4px;"></i>
+            <div style="font-size:.78rem;color:#94a3b8;">Laiha alunu iha klase ne'e</div>
+          </div>
+          {% endif %}
+
+          <a href="{% url 'klase:classroom_detail' classroom.id %}" class="kl-cta">
+            <i class="bi bi-arrow-right-circle me-2"></i>Haree Klase
+          </a>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="text-align:center;padding:4rem 2rem;border:2px dashed #e2e8f0;border-radius:16px;background:#fff;">
+    <i class="bi bi-door-open d-block mb-3" style="font-size:2.5rem;color:#cbd5e1;"></i>
+    <div style="font-weight:700;font-size:1rem;color:#475569;margin-bottom:.4rem;">Laiha klase iha eskola ne'e</div>
+    <div style="font-size:.85rem;color:#94a3b8;">Admin sei kria klase no atribui formadór.</div>
+  </div>
+  {% endif %}
+
 </div>
-
-
 {% endblock %}

@@ -46,7 +46,7 @@
 
           <!-- Personal info -->
           <div class="reg-section-divider"><i class="bi bi-person me-1"></i>Informasaun Pessoál</div>
-          <div class="row g-3 mb-1">
+          <div class="row g-3 mb-3">
             <div class="col-md-6">
               <label class="form-label">Naran Uluk <span class="text-danger">*</span></label>
               {{ form.first_name }}
@@ -55,6 +55,61 @@
               <label class="form-label">Naran Ikus</label>
               {{ form.last_name }}
             </div>
+          </div>
+
+          <!-- Position -->
+          <div class="mb-3">
+            <label class="form-label">Pozisaun <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3 mt-1">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="position" id="pos_manorin" value="manorin"
+                       {% if form.position.value != 'koordenador' %}checked{% endif %}>
+                <label class="form-check-label" for="pos_manorin">
+                  <i class="bi bi-person-fill text-primary me-1"></i>Manorin
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="position" id="pos_koordenador" value="koordenador"
+                       {% if form.position.value == 'koordenador' %}checked{% endif %}>
+                <label class="form-check-label" for="pos_koordenador">
+                  <i class="bi bi-person-fill-gear text-warning me-1"></i>Koordenador
+                </label>
+              </div>
+            </div>
+            {% if form.position.errors %}
+            <div class="text-danger" style="font-size:0.82rem;margin-top:4px;">{{ form.position.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Gender -->
+          <div class="mb-3">
+            <label class="form-label">Jéneru <span class="text-danger">*</span></label>
+            <div class="d-flex gap-3 mt-1">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="gender_mane" value="mane"
+                       {% if form.gender.value == 'mane' %}checked{% endif %}>
+                <label class="form-check-label" for="gender_mane">
+                  <i class="bi bi-gender-male text-primary me-1"></i>Mane
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="gender_feto" value="feto"
+                       {% if form.gender.value == 'feto' %}checked{% endif %}>
+                <label class="form-check-label" for="gender_feto">
+                  <i class="bi bi-gender-female text-danger me-1"></i>Feto
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="gender_indeterminante" value="indeterminante"
+                       {% if form.gender.value == 'indeterminante' %}checked{% endif %}>
+                <label class="form-check-label" for="gender_indeterminante">
+                  <i class="bi bi-gender-ambiguous text-secondary me-1"></i>Indeterminante
+                </label>
+              </div>
+            </div>
+            {% if form.gender.errors %}
+            <div class="text-danger" style="font-size:0.82rem;margin-top:4px;">{{ form.gender.errors.0 }}</div>
+            {% endif %}
           </div>
 
           <!-- Contact -->

@@ -1,268 +1,394 @@
 {% extends "core/base.html" %}
 {% load static %}
 
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/klase.css' %}">{% endblock %}
+{% block title %}{{ classroom.name }} — {{ classroom.preschool_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Hero ── */
+.cd-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #2563eb 100%);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  position: relative; overflow: hidden;
+}
+.cd-hero::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.cd-hero-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: rgba(255,255,255,.15);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: #fff; flex-shrink: 0;
+}
+.cd-back {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,.15); color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+  padding: 3px 12px; font-size: .78rem; font-weight: 600;
+  text-decoration: none; transition: all .15s;
+}
+.cd-back:hover { background: rgba(255,255,255,.25); color: #fff; }
+
+/* ── Student table ── */
+.cd-table { font-size: .84rem; margin: 0; }
+.cd-table thead th {
+  background: #f8fafc; font-size: 10.5px; font-weight: 700;
+  color: #64748b; text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 2px solid #eef2f7; padding: .65rem 1rem; white-space: nowrap;
+}
+.cd-table tbody td { padding: .75rem 1rem; vertical-align: middle; border-color: #f1f5f9; }
+.cd-table tbody tr:hover { background: #f8fafc; }
+
+/* ── Panel cards ── */
+.cd-panel {
+  background: #fff; border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  overflow: hidden;
+}
+.cd-panel-head {
+  padding: .85rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.cd-panel-body { padding: 1.25rem; }
+
+/* ── Add-child card header ── */
+.cd-add-head {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  padding: .85rem 1.25rem;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Avatar ── */
+.cd-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #eff6ff; color: #2563eb;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; flex-shrink: 0;
+}
+
+/* ── Download dropdown ── */
+.btn-dl {
+  background: rgba(255,255,255,.15); color: #fff;
+  border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+  padding: 5px 14px; font-size: .8rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background .15s;
+}
+.btn-dl:hover { background: rgba(255,255,255,.25); color: #fff; }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<div class="d-flex" style="min-height: calc(100vh - 60px);">
-    <!-- SIDEBAR -->
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <div class="cd-hero" style="position:relative;z-index:0;">
+    <div style="position:relative;z-index:1;">
+      <!-- Breadcrumb -->
+      <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+        {% if request.user.role == "moe_admin" %}
+          <a href="{% url 'preschools:preschool_detail' pk=classroom.preschool_id %}" class="cd-back">
+            <i class="bi bi-arrow-left"></i> {{ classroom.preschool_name }}
+          </a>
+        {% else %}
+          <a href="{% url 'klase:teacher_school_list' %}" class="cd-back">
+            <i class="bi bi-arrow-left"></i> Hau nia Eskola
+          </a>
+          <span style="color:rgba(255,255,255,.4);font-size:.8rem;">/</span>
+          <a href="{% url 'klase:school_classroom_list' classroom.preschool_id %}" class="cd-back">
+            {{ classroom.preschool_name }}
+          </a>
+        {% endif %}
+        <span style="color:rgba(255,255,255,.4);font-size:.8rem;">/</span>
+        <span style="color:rgba(255,255,255,.65);font-size:.78rem;">{{ classroom.name }}</span>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="cd-hero-icon"><i class="bi bi-door-open"></i></div>
+          <div>
+            <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);">
+              Grupo {{ classroom.group }} &nbsp;·&nbsp; {{ classroom.preschool_name }}
+            </div>
+            <h4 class="fw-bold text-white mb-0" style="letter-spacing:-.3px;">{{ classroom.name }}</h4>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:2px;">
+              {{ student_count }} estudante rejistadu
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex gap-2 align-items-center flex-wrap" style="position:relative;z-index:1;">
+          <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:7px 16px;text-align:center;">
+            <div style="font-size:1.3rem;font-weight:800;color:#fff;line-height:1;">{{ student_count }}</div>
+            <div style="font-size:.66rem;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.05em;text-transform:uppercase;">Estudante</div>
+          </div>
+          <div class="dropdown">
+            <button class="btn-dl dropdown-toggle border-0" type="button" data-bs-toggle="dropdown">
+              <i class="bi bi-download"></i> Download
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius:12px;border:1px solid #f1f5f9;font-size:.85rem;">
+              <li>
+                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=xlsx">
+                  <i class="bi bi-file-earmark-spreadsheet text-success me-2"></i>Excel
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=csv">
+                  <i class="bi bi-filetype-csv text-primary me-2"></i>CSV
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=pdf">
+                  <i class="bi bi-file-earmark-pdf text-danger me-2"></i>PDF
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ALERTS ════════════════════════════════════════════════════════════ -->
+  {% if messages %}
+  <div class="mb-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"
+         style="border-radius:12px;font-size:.85rem;">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ══ MAIN LAYOUT ════════════════════════════════════════════════════════ -->
+  <div class="row g-4">
+
+    <!-- ── Student list ── -->
+    <div class="{% if request.user.role != 'moe_admin' %}col-12 col-lg-8{% else %}col-12{% endif %}">
+      <div class="cd-panel">
+        <div class="cd-panel-head">
+          <div style="font-weight:700;font-size:.9rem;color:#0f172a;">
+            <i class="bi bi-people me-2" style="color:#2563eb;"></i>Rejistu Alunu
+          </div>
+          <span style="background:#eff6ff;color:#1d4ed8;border-radius:20px;padding:2px 10px;font-size:.72rem;font-weight:700;">
+            {{ student_count }} alunu
+          </span>
+        </div>
+
+        {% if students %}
+        <div class="table-responsive">
+          <table class="table cd-table mb-0">
+            <thead>
+              <tr>
+                <th style="padding-left:1.25rem;">#</th>
+                <th>Naran Alunu</th>
+                <th>Kodigu</th>
+                <th>Grupu Idade</th>
+                <th style="text-align:right;padding-right:1.25rem;">Aksaun</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td style="padding-left:1.25rem;color:#94a3b8;font-size:.78rem;">{{ forloop.counter }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="cd-avatar">{{ student.child__first_name|first|upper }}</div>
+                    <a href="{% url 'core:api_child_activity' student.child__id %}"
+                       class="text-decoration-none fw-600" style="color:#1e293b;font-weight:600;">
+                      {{ student.child__first_name }}
+                    </a>
+                  </div>
+                </td>
+                <td>
+                  <code style="background:#f8fafc;padding:2px 8px;border-radius:6px;font-size:.78rem;color:#334155;">
+                    {{ student.child__user_id }}
+                  </code>
+                </td>
+                <td>
+                  <span style="background:#f1f5f9;color:#475569;border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:700;">
+                    Grupo {{ student.child__age_group }}
+                  </span>
+                </td>
+                <td style="text-align:right;padding-right:1.25rem;">
+                  <div class="d-flex justify-content-end gap-2 flex-wrap">
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            style="border-radius:8px;font-size:.75rem;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#parentModal{{ student.child__id }}">
+                      <i class="bi bi-person-lines-fill me-1"></i>Inan/Aman
+                    </button>
+                    {% if request.user.role != "moe_admin" %}
+                    <form method="POST"
+                          action="{% url 'klase:classroom_child_remove' classroom.id student.id %}"
+                          onsubmit="return confirm('Hasai {{ student.child__first_name }} husi klase ne\'e?');"
+                          style="margin:0;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius:8px;font-size:.75rem;">
+                        <i class="bi bi-trash3 me-1"></i>Hasai
+                      </button>
+                    </form>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div style="padding:3rem 1.5rem;text-align:center;">
+          <i class="bi bi-people d-block mb-2" style="font-size:2rem;color:#cbd5e1;"></i>
+          <div style="font-size:.85rem;font-weight:600;color:#94a3b8;">Laiha alunu rejistadu iha klase ida ne'e</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ── Add student (teachers only) ── -->
     {% if request.user.role != "moe_admin" %}
-        {% include "klase/partials/teacher_sidebar.html" with active_school_id=classroom.preschool_id %}
+    <div class="col-12 col-lg-4">
+
+      <!-- Add child card -->
+      <div class="cd-panel mb-3">
+        <div class="cd-add-head">
+          <i class="bi bi-person-plus text-white" style="font-size:1rem;"></i>
+          <span style="font-weight:700;color:#fff;font-size:.88rem;">Adisiona Alunu ba Klase</span>
+        </div>
+        <div class="cd-panel-body">
+          <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_child_code" class="form-label fw-semibold" style="font-size:.83rem;color:#374151;">
+                Kodigu Alunu
+              </label>
+              <div class="input-group" style="border-radius:10px;overflow:hidden;">
+                <input type="text" id="id_child_code" name="child_code"
+                       class="form-control"
+                       placeholder="CHD-ABC123"
+                       autocomplete="off" required
+                       style="font-size:.85rem;border-color:#e2e8f0;">
+                <button class="btn btn-outline-secondary" type="button"
+                        onclick="document.getElementById('id_child_code').focus();">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+              <div style="font-size:.73rem;color:#94a3b8;margin-top:5px;">
+                <i class="bi bi-lightbulb me-1"></i>Husu kodigu Alunu ba Inan ka Aman sira
+              </div>
+              {% if form.child_code.errors %}
+              <div style="color:#dc2626;font-size:.78rem;margin-top:4px;">
+                {{ form.child_code.errors|join:"" }}
+              </div>
+              {% endif %}
+            </div>
+            <button type="submit" class="btn btn-success w-100"
+                    style="border-radius:10px;font-weight:700;font-size:.85rem;padding:.65rem;">
+              <i class="bi bi-plus-lg me-2"></i>Adisiona Alunu
+            </button>
+          </form>
+
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:.85rem;margin-top:1rem;">
+            <div style="font-size:.73rem;font-weight:700;color:#15803d;margin-bottom:4px;">
+              <i class="bi bi-info-circle me-1"></i>Pasu sira atu adisiona
+            </div>
+            <ol style="font-size:.73rem;color:#166534;margin:0;padding-left:1.1rem;line-height:1.7;">
+              <li>Husu kodigu ba Inan ka Aman sira</li>
+              <li>Hakerek iha text box leten</li>
+              <li>Klika "Adisiona Alunu"</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class info card -->
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:1rem 1.25rem;">
+        <div style="font-size:.73rem;font-weight:700;color:#1d4ed8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">
+          <i class="bi bi-door-open me-1"></i>Info Klase
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:rgba(255,255,255,.7);border-radius:10px;padding:.6rem .8rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:#1e3a5f;line-height:1;">{{ classroom.group }}</div>
+            <div style="font-size:.65rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em;">Grupu</div>
+          </div>
+          <div style="background:rgba(255,255,255,.7);border-radius:10px;padding:.6rem .8rem;text-align:center;">
+            <div style="font-size:1.2rem;font-weight:800;color:#1e3a5f;line-height:1;">{{ student_count }}</div>
+            <div style="font-size:.65rem;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.04em;">Alunu</div>
+          </div>
+        </div>
+      </div>
+    </div>
     {% endif %}
 
-    <!-- MAIN CONTENT -->
-    <div class="flex-grow-1 py-5" style="overflow-y: auto;">
-        <div class="container-lg">
-            <!-- BREADCRUMB -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    {% if request.user.role == "moe_admin" %}
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'preschools:preschool_detail' pk=classroom.preschool_id %}" class="text-decoration-none">Lista Klase</a>
-                        </li>
-                        <li class="breadcrumb-item">{{ classroom.preschool_name }}</li>
-                    {% else %}
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'klase:teacher_school_list' %}" class="text-decoration-none">Lista Pre escolar</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'klase:school_classroom_list' classroom.preschool_id %}" class="text-decoration-none">
-                                {{ classroom.preschool_name }}
-                            </a>
-                        </li>
-                    {% endif %}
-                    <li class="breadcrumb-item active">{{ classroom.name }}</li>
-                </ol>
-            </nav>
-
-            <!-- PAGE HEADER -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="mb-1">{{ classroom.name }}</h2>
-                    <small class="text-muted">
-                        <strong>Group {{ classroom.group }}</strong> | 
-                        <strong>{{ classroom.preschool_name }}</strong>
-                    </small>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-download"></i> Download Rejistu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=xlsx">
-                                    <i class="bi bi-file-earmark-spreadsheet"></i> Excel
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=csv">
-                                    <i class="bi bi-filetype-csv"></i> CSV
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'klase:classroom_children_download' classroom.id %}?format=pdf">
-                                    <i class="bi bi-file-earmark-pdf"></i> PDF
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <span class="badge bg-primary rounded-pill fs-6">{{ student_count }} Students</span>
-                </div>
-            </div>
-
-            <!-- ALERTS -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <div class="row g-4">
-                <!-- LEFT COLUMN: STUDENTS LIST -->
-                <div class="col-lg-8">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="card-title mb-0">Rejistu Alunu</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if students %}
-                                <div class="table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Nome Alunu</th>
-                                                <th>Kodigu Alunu</th>
-                                                <th>Grupu Idade</th>
-                                                <th>Aksaun</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for student in students %}
-                                                <tr>
-                                                    <td>
-                                                        <a href="{% url 'core:api_child_activity' student.child__id %}" class="text-decoration-none fw-bold">
-                                                            {{ student.child__first_name }}
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <code class="bg-light p-2 rounded">{{ student.child__user_id }}</code>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge bg-secondary">Group {{ student.child__age_group }}</span>
-                                                    </td>
-                                                    <td>
-                                                      <div class="d-flex flex-wrap gap-1">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#parentModal{{ student.child__id }}">
-                                                            <i class="bi bi-person-lines-fill"></i> Inan/Aman
-                                                        </button>
-                                                        {% if request.user.role != "moe_admin" %}
-                                                            <form method="POST" action="{% url 'klase:classroom_child_remove' classroom.id student.id %}" onsubmit="return confirm('Tem certeza que deseja remover este aluno da classe?');">
-                                                                {% csrf_token %}
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                    <i class="bi bi-trash"></i> Remove
-                                                                </button>
-                                                            </form>
-                                                        {% endif %}
-                                                      </div>
-                                                    </td>
-                                                </tr>
-
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {% for student in students %}
-                                    <div class="modal fade" id="parentModal{{ student.child__id }}" tabindex="-1" aria-labelledby="parentModalLabel{{ student.child__id }}" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="parentModalLabel{{ student.child__id }}">
-                                                        {{ student.child__first_name }}
-                                                    </h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <dl class="row mb-0">
-                                                        <dt class="col-sm-4">Naran Inan/Aman</dt>
-                                                        <dd class="col-sm-8">
-                                                            {% if student.child__parent__first_name or student.child__parent__last_name %}
-                                                                {{ student.child__parent__first_name }} {{ student.child__parent__last_name }}
-                                                            {% else %}
-                                                                {{ student.child__parent__username }}
-                                                            {% endif %}
-                                                        </dd>
-
-                                                        <dt class="col-sm-4">WhatsApp</dt>
-                                                        <dd class="col-sm-8">
-                                                            {% if student.child__parent__whatsapp_number %}
-                                                                <a href="https://wa.me/{{ student.child__parent__whatsapp_number }}" class="text-decoration-none">
-                                                                    {{ student.child__parent__whatsapp_number }}
-                                                                </a>
-                                                            {% else %}
-                                                                <span class="text-muted">Laiha numeru</span>
-                                                            {% endif %}
-                                                        </dd>
-                                                    </dl>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Taka</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <div class="alert alert-info mb-0">
-                                    <i class="bi bi-info-circle"></i> Laiha alunu rejistadu iha klase ida ne'e.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIGHT COLUMN: ADD CHILD FORM -->
-                {% if request.user.role != "moe_admin" %}
-                <div class="col-lg-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light border-bottom">
-                            <h5 class="card-title mb-0">Adisiona alunu ba klase</h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" class="needs-validation" novalidate>
-                                {% csrf_token %}
-
-                                <div class="mb-3">
-                                    <label for="id_child_code" class="form-label">Kodigu Alunu</label>
-                                    <div class="input-group">
-                                        <input 
-                                            type="text" 
-                                            id="id_child_code"
-                                            name="child_code" 
-                                            class="form-control form-control-sm"
-                                            placeholder="e.g., CHD-ABC123"
-                                            autocomplete="off"
-                                            required
-                                        >
-                                        <button class="btn btn-outline-secondary" type="button" 
-                                                onclick="document.getElementById('id_child_code').focus();">
-                                            <i class="bi bi-search"></i>
-                                        </button>
-                                    </div>
-                                    <small class="text-muted d-block mt-2">
-                                        <i class="bi bi-lightbulb"></i> Husu kodigu Alunu ba Inan ou Aman sira (user_id)
-                                    </small>
-                                    
-                                    {% if form.child_code.errors %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form.child_code.errors|join:"" }}
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                <button type="submit" class="btn btn-success btn-md w-100">
-                                    <i class="bi bi-plus-circle"></i> Adisiona Alunu
-                                </button>
-                            </form>
-
-                            <!-- Info Box -->
-                            <div class="alert alert-light mt-4 border-start border-info" role="alert">
-                                <small>
-                                    <strong>Pasu sira atu adisiona alunu:</strong>
-                                    <ol class="mb-0 mt-2">
-                                        <li>Husu kodigu ba Inan ka Aman sira</li>
-                                        <li>Hakerek iha text box</li>
-                                        <li>Click "adisiona Alunu" para rejista</li>
-                                    </ol>
-                                </small>
-                            </div>
-
-                            <!-- Class Info -->
-                            <div class="alert alert-info mt-4" role="alert">
-                                <small>
-                                    <strong>Informasaun Klase:</strong><br>
-                                    <strong>Grupu:</strong> {{ classroom.group }}<br>
-                                    <strong>Alunu:</strong> {{ student_count }}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+  </div>
 </div>
 
+<!-- ══ PARENT MODALS ══════════════════════════════════════════════════════ -->
+{% for student in students %}
+<div class="modal fade" id="parentModal{{ student.child__id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:16px;border:none;overflow:hidden;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);border:none;padding:1rem 1.25rem;">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);
+                      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;">
+            {{ student.child__first_name|first|upper }}
+          </div>
+          <h6 class="modal-title fw-bold text-white mb-0">{{ student.child__first_name }}</h6>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:1.25rem;">
+        <div style="background:#f8fafc;border-radius:12px;padding:1rem;">
+          <div style="font-size:.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;">
+            Informasaun Inan/Aman
+          </div>
+          <dl class="row mb-0" style="font-size:.85rem;">
+            <dt class="col-sm-4" style="color:#64748b;font-weight:600;">Naran</dt>
+            <dd class="col-sm-8" style="color:#1e293b;font-weight:600;">
+              {% if student.child__parent__first_name or student.child__parent__last_name %}
+                {{ student.child__parent__first_name }} {{ student.child__parent__last_name }}
+              {% else %}
+                {{ student.child__parent__username|default:"—" }}
+              {% endif %}
+            </dd>
+            <dt class="col-sm-4" style="color:#64748b;font-weight:600;">WhatsApp</dt>
+            <dd class="col-sm-8">
+              {% if student.child__parent__whatsapp_number %}
+              <a href="https://wa.me/{{ student.child__parent__whatsapp_number }}"
+                 class="text-decoration-none" style="color:#059669;font-weight:600;">
+                <i class="bi bi-whatsapp me-1"></i>{{ student.child__parent__whatsapp_number }}
+              </a>
+              {% else %}
+              <span style="color:#94a3b8;">Laiha numeru</span>
+              {% endif %}
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #f1f5f9;padding:.75rem 1.25rem;">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal"
+                style="border-radius:8px;">Taka</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
 <script>
-// Auto-focus the child code input on page load
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('id_child_code').focus();
+    var input = document.getElementById('id_child_code');
+    if (input) input.focus();
 });
 </script>
-
 {% endblock %}

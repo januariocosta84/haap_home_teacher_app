@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Rejistu Lalais Formadór{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width:680px;">
+
+  <!-- Hero -->
+  <div class="rounded-4 p-4 mb-4 d-flex align-items-center gap-3"
+       style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1d4ed8 100%);">
+    <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.15);
+                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <i class="bi bi-person-plus-fill text-white" style="font-size:1.3rem;"></i>
+    </div>
+    <div>
+      <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);">
+        Rejistu Lalais
+      </div>
+      <h5 class="fw-bold text-white mb-0">Rejistu Formadór</h5>
+      <div style="font-size:.78rem;color:rgba(255,255,255,.6);">Naran, pozisaun no jéneru de'it — tau telefone depois</div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Name row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6">
+            <label class="form-label fw-semibold" style="font-size:.82rem;">Naran Uluk <span class="text-danger">*</span></label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+            <div class="text-danger" style="font-size:.78rem;">{{ form.first_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="col-12 col-sm-6">
+            <label class="form-label fw-semibold" style="font-size:.82rem;">Naran Ikus <span class="text-danger">*</span></label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+            <div class="text-danger" style="font-size:.78rem;">{{ form.last_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Position -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold" style="font-size:.82rem;">Pozisaun <span class="text-danger">*</span></label>
+          <div class="d-flex gap-3 flex-wrap mt-1">
+            {% for radio in form.position %}
+            <div class="form-check form-check-inline m-0">
+              {{ radio.tag }}
+              <label class="form-check-label ms-1" for="{{ radio.id_for_label }}"
+                     style="font-size:.88rem;font-weight:600;cursor:pointer;">
+                {{ radio.choice_label }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          {% if form.position.errors %}
+          <div class="text-danger mt-1" style="font-size:.78rem;">{{ form.position.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Gender -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold" style="font-size:.82rem;">Jéneru</label>
+          <div class="d-flex gap-3 flex-wrap mt-1">
+            {% for radio in form.gender %}
+            <div class="form-check form-check-inline m-0">
+              {{ radio.tag }}
+              <label class="form-check-label ms-1" for="{{ radio.id_for_label }}"
+                     style="font-size:.88rem;cursor:pointer;">
+                {% if radio.choice_label == 'Mane' %}<i class="bi bi-gender-male me-1" style="color:#2563eb;"></i>
+                {% elif radio.choice_label == 'Feto' %}<i class="bi bi-gender-female me-1" style="color:#db2777;"></i>
+                {% else %}<i class="bi bi-gender-ambiguous me-1" style="color:#7c3aed;"></i>{% endif %}
+                {{ radio.choice_label }}
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'core:user_list' %}" class="btn btn-light rounded-pill px-4">Kansela</a>
+          <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-person-check me-1"></i>Rejistu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

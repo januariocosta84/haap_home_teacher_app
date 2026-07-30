@@ -245,6 +245,12 @@
         </div>
       </div>
       <div class="d-flex align-items-center gap-2 flex-wrap" style="position:relative;z-index:1;">
+        <button type="button" id="mapToggleBtn" onclick="toggleMap()"
+                class="btn rounded-pill px-4 fw-semibold"
+                style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5);font-size:0.82rem;">
+          <i class="bi bi-map me-1" id="mapToggleIcon"></i>
+          <span id="mapToggleLabel">Hatudu Mapa</span>
+        </button>
         {% if user.role == 'moe_admin' %}
         <a href="{% url 'preschools:preschool_create' %}"
            class="btn rounded-pill px-4 fw-semibold"
@@ -313,8 +319,8 @@
     </form>
   </div>
 
-  <!-- ══ MAP SECTION — always visible ═════════════════════════════════════ -->
-  <div id="mapSection">
+  <!-- ══ MAP SECTION — toggled via button ════════════════════════════════ -->
+  <div id="mapSection" style="display:none;">
     <div class="card border-0" style="border-radius:16px;overflow:hidden;
          box-shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.04);margin-bottom:1.25rem;">
 
@@ -364,6 +370,13 @@
           <i class="bi bi-geo" style="color:#94a3b8;"></i>
           {{ map_count }} total · {{ gps_count }} GPS exatu
         </span>
+        <button type="button" onclick="toggleMap()"
+                style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;
+                       background:#fff;border:1px solid #e2e8f0;border-radius:20px;
+                       padding:3px 14px;font-size:0.75rem;font-weight:600;color:#475569;
+                       cursor:pointer;transition:all .15s;">
+          <i class="bi bi-eye-slash"></i> Subar Mapa
+        </button>
       </div>
 
     </div>
@@ -423,9 +436,16 @@
                 </div>
                 <div>
                   <div class="ps-name">{{ preschool.name }}</div>
-                  {% if preschool.suco %}
-                  <div class="ps-location"><i class="bi bi-geo-alt me-1"></i>{{ preschool.suco }}</div>
-                  {% endif %}
+                  <div class="d-flex align-items-center gap-2 mt-1">
+                    {% if preschool.emis_code %}
+                    <span style="background:#eff6ff;color:#2563eb;border-radius:5px;padding:1px 6px;font-size:0.68rem;font-weight:700;">
+                      EMIS {{ preschool.emis_code }}
+                    </span>
+                    {% endif %}
+                    {% if preschool.suco %}
+                    <div class="ps-location" style="margin:0;"><i class="bi bi-geo-alt me-1"></i>{{ preschool.suco }}</div>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
             </td>
@@ -444,9 +464,8 @@
             <td>
               <span class="type-badge type-{{ preschool.preschool_type }}">
                 {% if preschool.preschool_type == 'government' %}<i class="bi bi-bank2"></i>
-                {% elif preschool.preschool_type == 'community' %}<i class="bi bi-people-fill"></i>
                 {% elif preschool.preschool_type == 'private' %}<i class="bi bi-briefcase-fill"></i>
-                {% else %}<i class="bi bi-stars"></i>{% endif %}
+                {% else %}<i class="bi bi-building"></i>{% endif %}
                 {{ preschool.get_preschool_type_display }}
               </span>
             </td>
@@ -583,6 +602,95 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+/* ── Map toggle + lazy init ── */
+var _psLeafletMap = null;
+var _mapInitialised = false;
+
+function initLeafletMap() {
+  if (_mapInitialised) return;
+  _mapInitialised = true;
+
+  var map = L.map('psMap', { zoomControl: true });
+  _psLeafletMap = map;
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(map);
+
+  var bounds = [];
+
+  _psMapData.forEach(function (p) {
+    var lat, lng, isExact;
+    if (p.has_gps) {
+      lat = p.lat; lng = p.lng; isExact = true;
+    } else {
+      var c = getMunCenter(p.municipality);
+      lat = c[0] + (Math.random() - 0.5) * 0.012;
+      lng = c[1] + (Math.random() - 0.5) * 0.012;
+      isExact = false;
+    }
+
+    var color = _typeColors[p.type] || '#475569';
+    var bg    = _typeBg[p.type]    || '#f8fafc';
+
+    var popup =
+      '<div class="map-popup">' +
+        '<div class="map-popup-title">' + p.name + '</div>' +
+        '<span class="map-popup-type" style="background:' + bg + ';color:' + color + ';">' +
+          p.type_display +
+        '</span>' +
+        (p.municipality
+          ? '<div class="map-popup-muni"><i class="bi bi-geo-alt" style="color:#94a3b8;margin-right:3px;"></i>' + p.municipality + '</div>'
+          : '') +
+        (!isExact
+          ? '<div class="map-popup-approx"><i class="bi bi-info-circle me-1"></i>Lokalizasaun aproximadu ba munisípiu</div>'
+          : '') +
+        '<a href="/preschool/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
+      '</div>';
+
+    L.marker([lat, lng], { icon: makeMarkerIcon(p.type, isExact) })
+      .bindPopup(popup, { maxWidth: 240 })
+      .addTo(map);
+
+    bounds.push([lat, lng]);
+  });
+
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 13);
+  } else if (bounds.length > 1) {
+    map.fitBounds(bounds, { padding: [40, 40] });
+  } else {
+    map.setView(_defaultCenter, 9);
+  }
+}
+
+function toggleMap() {
+  var section = document.getElementById('mapSection');
+  var btn     = document.getElementById('mapToggleBtn');
+  var label   = document.getElementById('mapToggleLabel');
+  var icon    = document.getElementById('mapToggleIcon');
+  var visible = section.style.display !== 'none';
+
+  if (visible) {
+    section.style.display = 'none';
+    label.textContent = 'Hatudu Mapa';
+    icon.className = 'bi bi-map';
+    btn.classList.remove('active');
+  } else {
+    section.style.display = '';
+    label.textContent = 'Subar Mapa';
+    icon.className = 'bi bi-map-fill';
+    btn.classList.add('active');
+    /* init on first show, then just resize */
+    if (!_mapInitialised) {
+      setTimeout(initLeafletMap, 50);
+    } else {
+      setTimeout(function () { _psLeafletMap.invalidateSize(); }, 50);
+    }
+  }
+}
+
 /* ── Raw data from Django ── */
 var _psMapData = {{ map_data_json|safe }};
 
@@ -667,64 +775,6 @@ document.addEventListener('DOMContentLoaded', function () {
   /* auto-submit on municipality select change */
   var munSel = document.querySelector('select[name="municipality"]');
   if (munSel) munSel.addEventListener('change', function () { this.closest('form').submit(); });
-
-  /* ── Initialise Leaflet ── */
-  var map = L.map('psMap', { zoomControl: true });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 18
-  }).addTo(map);
-
-  var bounds = [];
-
-  _psMapData.forEach(function (p) {
-    var lat, lng, isExact;
-    if (p.has_gps) {
-      lat = p.lat; lng = p.lng; isExact = true;
-    } else {
-      var c = getMunCenter(p.municipality);
-      /* small jitter so stacked approximate markers spread out */
-      lat = c[0] + (Math.random() - 0.5) * 0.012;
-      lng = c[1] + (Math.random() - 0.5) * 0.012;
-      isExact = false;
-    }
-
-    var color = _typeColors[p.type] || '#475569';
-    var bg    = _typeBg[p.type]    || '#f8fafc';
-
-    var popup =
-      '<div class="map-popup">' +
-        '<div class="map-popup-title">' + p.name + '</div>' +
-        '<span class="map-popup-type" style="background:' + bg + ';color:' + color + ';">' +
-          p.type_display +
-        '</span>' +
-        (p.municipality
-          ? '<div class="map-popup-muni"><i class="bi bi-geo-alt" style="color:#94a3b8;margin-right:3px;"></i>' + p.municipality + '</div>'
-          : '') +
-        (!isExact
-          ? '<div class="map-popup-approx"><i class="bi bi-info-circle me-1"></i>Lokalizasaun aproximadu ba munisípiu</div>'
-          : '') +
-        '<a href="/preschool/' + p.pk + '/" class="map-popup-link">Haree detallu &rarr;</a>' +
-      '</div>';
-
-    L.marker([lat, lng], { icon: makeMarkerIcon(p.type, isExact) })
-      .bindPopup(popup, { maxWidth: 240 })
-      .addTo(map);
-
-    bounds.push([lat, lng]);
-  });
-
-  /* fit view */
-  if (bounds.length === 1) {
-    map.setView(bounds[0], 13);
-  } else if (bounds.length > 1) {
-    map.fitBounds(bounds, { padding: [40, 40] });
-  } else {
-    map.setView(_defaultCenter, 9);
-  }
-
-  /* keep map sized correctly after layout changes */
-  setTimeout(function () { map.invalidateSize(); }, 100);
 });
 </script>
 

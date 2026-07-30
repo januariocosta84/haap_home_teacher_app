@@ -3,6 +3,7 @@ from django.urls import path
 from preschools import views
 from .views import (
     ClassroomCreateView,
+    ClassroomDeleteView,
     ClassroomDetailView,
     ClassroomUpdateView,
     PreschoolCreateView,
@@ -37,5 +38,6 @@ urlpatterns = [
     path('<uuid:id>/classroom/create/',   ClassroomCreateView.as_view(),  name='classroom_create'),
     path('classroom/<uuid:id>/',          ClassroomDetailView.as_view(),  name='classroom_detail'),
     path('classroom/<uuid:id>/edit/',     ClassroomUpdateView.as_view(),  name='classroom_update'),
+    path('classroom/<uuid:id>/delete/',   ClassroomDeleteView.as_view(),  name='classroom_delete'),
     path('classroom/<uuid:id>/enroll/',   views.enroll_child,             name='classroom_enroll'),
 ]

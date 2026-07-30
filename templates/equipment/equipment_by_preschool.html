@@ -1,0 +1,250 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Ekipamentu — {{ preschool.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.eq-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #1d4ed8 100%);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  position: relative; overflow: hidden;
+}
+.eq-hero::before {
+  content:''; position:absolute; top:-50px; right:-50px;
+  width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.05);
+}
+.eq-hero-icon {
+  width:48px; height:48px; border-radius:12px;
+  background:rgba(255,255,255,.15);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1.3rem; color:#fff; flex-shrink:0;
+}
+
+/* ── Summary tiles ── */
+.eq-type-tile {
+  background:#fff; border-radius:14px;
+  border:1px solid #f1f5f9;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+  padding:.9rem 1.1rem;
+  display:flex; align-items:center; gap:.75rem;
+}
+.eq-type-icon {
+  width:40px; height:40px; border-radius:10px;
+  background:#eff6ff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; color:#2563eb; flex-shrink:0;
+}
+
+/* ── Table ── */
+.eq-table { font-size:0.83rem; margin:0; }
+.eq-table thead th {
+  background:#f8fafc; font-size:10.5px; font-weight:700;
+  color:#64748b; text-transform:uppercase; letter-spacing:.05em;
+  border-bottom:2px solid #eef2f7; padding:.65rem 1rem; white-space:nowrap;
+}
+.eq-table tbody td { padding:.7rem 1rem; vertical-align:middle; border-color:#f1f5f9; }
+.eq-table tbody tr:hover { background:#f8fafc; }
+
+/* ── Status badge ── */
+.sb { display:inline-flex; align-items:center; gap:3px; border-radius:20px; padding:2px 8px; font-size:0.7rem; font-weight:700; }
+.sb-active   { background:#f0fdf4; color:#15803d; }
+.sb-inactive { background:#f1f5f9; color:#475569; }
+.sb-damaged  { background:#fef2f2; color:#dc2626; }
+.sb-retired  { background:#fefce8; color:#854d0e; }
+
+/* ── Export buttons ── */
+.btn-export-excel {
+  background:#f0fdf4; color:#15803d;
+  border:1px solid #bbf7d0; font-weight:600; font-size:.82rem;
+  border-radius:20px; padding:5px 16px;
+  display:inline-flex; align-items:center; gap:5px;
+  text-decoration:none; transition:all .15s;
+}
+.btn-export-excel:hover { background:#dcfce7; color:#14532d; }
+.btn-export-pdf {
+  background:#fef2f2; color:#dc2626;
+  border:1px solid #fecaca; font-weight:600; font-size:.82rem;
+  border-radius:20px; padding:5px 16px;
+  display:inline-flex; align-items:center; gap:5px;
+  text-decoration:none; transition:all .15s;
+}
+.btn-export-pdf:hover { background:#fee2e2; color:#991b1b; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- ══ HERO ════════════════════════════════════════════════════════════════ -->
+  <div class="eq-hero" style="position:relative;z-index:0;">
+    <div style="position:relative;z-index:1;">
+      <!-- Back breadcrumb -->
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <a href="{% url 'preschools:preschool_detail' preschool.pk %}"
+           style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);
+                  color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.3);border-radius:20px;
+                  padding:3px 12px;font-size:.78rem;font-weight:600;text-decoration:none;">
+          <i class="bi bi-arrow-left"></i> {{ preschool.name }}
+        </a>
+        <span style="color:rgba(255,255,255,.4);font-size:.8rem;">/</span>
+        <span style="color:rgba(255,255,255,.65);font-size:.78rem;">Ekipamentu</span>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="eq-hero-icon"><i class="bi bi-box-seam"></i></div>
+          <div>
+            <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.5);">
+              Lista Ekipamentu
+            </div>
+            <h5 class="fw-bold text-white mb-0">{{ preschool.name }}</h5>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.65);">
+              <i class="bi bi-geo-alt me-1"></i>{{ preschool.municipality|default:"—" }}
+              &nbsp;·&nbsp; {{ equipments.count }} item rejista
+            </div>
+          </div>
+        </div>
+
+        <!-- Export buttons -->
+        <div class="d-flex gap-2 flex-wrap" style="position:relative;z-index:1;">
+          <a href="{% url 'equipment:equipment_preschool_export_excel' preschool.pk %}"
+             class="btn-export-excel">
+            <i class="bi bi-file-earmark-excel-fill"></i>Excel
+          </a>
+          <a href="{% url 'equipment:equipment_preschool_export_pdf' preschool.pk %}"
+             class="btn-export-pdf">
+            <i class="bi bi-file-earmark-pdf-fill"></i>PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TYPE SUMMARY TILES ════════════════════════════════════════════════ -->
+  {% if equipments %}
+  {% regroup equipments|dictsort:"equipment_type.name" by equipment_type as type_groups %}
+  <div class="row g-3 mb-4">
+    {% for group in type_groups %}
+    <div class="col-6 col-sm-4 col-md-3 col-xl-2">
+      <div class="eq-type-tile">
+        <div class="eq-type-icon">
+          <i class="bi {{ group.grouper.icon }}"></i>
+        </div>
+        <div>
+          <div style="font-size:.75rem;font-weight:700;color:#0f172a;line-height:1.2;">{{ group.grouper.name }}</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#1d4ed8;letter-spacing:-.5px;line-height:1.1;">{{ group.list|length }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ══ FULL TABLE ════════════════════════════════════════════════════════ -->
+  <div style="background:#fff;border-radius:16px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden;">
+
+    <!-- Table header bar -->
+    <div style="padding:.85rem 1.5rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <div style="font-weight:700;font-size:.9rem;color:#0f172a;">
+        <i class="bi bi-list-ul me-2" style="color:#2563eb;"></i>Lista Kompletu
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'equipment:equipment_preschool_export_excel' preschool.pk %}"
+           class="btn-export-excel" style="font-size:.75rem;padding:4px 12px;">
+          <i class="bi bi-file-earmark-excel-fill"></i>Download Excel
+        </a>
+        <a href="{% url 'equipment:equipment_preschool_export_pdf' preschool.pk %}"
+           class="btn-export-pdf" style="font-size:.75rem;padding:4px 12px;">
+          <i class="bi bi-file-earmark-pdf-fill"></i>Download PDF
+        </a>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table eq-table mb-0">
+        <thead>
+          <tr>
+            <th style="padding-left:1.5rem;">#</th>
+            <th>Tipu</th>
+            <th>Modelu</th>
+            <th>Numeru Série</th>
+            <th>Status</th>
+            <th>Klase</th>
+            <th>Nóta</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for eq in equipments %}
+          <tr>
+            <td style="padding-left:1.5rem;color:#94a3b8;font-size:.78rem;">{{ forloop.counter }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span style="width:28px;height:28px;border-radius:7px;background:#eff6ff;
+                             display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="bi {{ eq.equipment_type.icon }}" style="color:#2563eb;font-size:.78rem;"></i>
+                </span>
+                <span style="font-weight:600;color:#1e293b;">{{ eq.equipment_type.name }}</span>
+              </div>
+            </td>
+            <td style="color:#475569;">{{ eq.model_number|default:"—" }}</td>
+            <td>
+              <code style="font-size:.78rem;background:#f8fafc;padding:2px 6px;border-radius:5px;color:#334155;">
+                {{ eq.serial_number|default:"—" }}
+              </code>
+            </td>
+            <td>
+              <span class="sb sb-{{ eq.status }}">
+                {% if eq.status == 'active' %}<i class="bi bi-circle-fill" style="font-size:.4rem;"></i>{% endif %}
+                {{ eq.get_status_display }}
+              </span>
+            </td>
+            <td style="color:#64748b;">{{ eq.classroom.name|default:"—" }}</td>
+            <td style="color:#94a3b8;font-size:.78rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              {{ eq.notes|default:"—" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-box-seam d-block mb-2" style="font-size:1.5rem;opacity:.35;"></i>
+              Seidauk iha ekipamentu atribuidu ba eskola ne'e.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div style="padding:.75rem 1.5rem;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;">
+      <span style="font-size:.78rem;color:#64748b;">
+        Haree {{ page_obj.start_index }}–{{ page_obj.end_index }} hosi {{ page_obj.paginator.count }}
+      </span>
+      <div class="d-flex gap-1">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size:.78rem;">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+        {% endif %}
+        <span class="btn btn-sm btn-primary rounded-pill px-3" style="font-size:.78rem;">
+          {{ page_obj.number }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="btn btn-sm btn-outline-secondary rounded-pill px-3" style="font-size:.78rem;">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}

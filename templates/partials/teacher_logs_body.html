@@ -31,8 +31,10 @@
   </td>
 
   <!-- Data -->
-  <td style="white-space:nowrap;" data-sort="{{ log.activity_date|date:'Y-m-d' }}">
+  <td style="white-space:nowrap;" data-sort="{{ log.created_at|date:'Y-m-d H:i:s' }}">
     <span style="font-size:0.82rem;font-weight:600;color:#1e293b;">{{ log.activity_date|date:"d M Y" }}</span>
+    <br>
+    <span style="font-size:0.74rem;color:#94a3b8;"><i class="bi bi-clock" style="font-size:0.68rem;"></i> {{ log.created_at|date:"H:i" }}</span>
   </td>
 
   <!-- Vizita -->

@@ -1,0 +1,192 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Atribui Pozisaun — {{ teacher.get_full_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.pos-card {
+  border-radius: 16px; border: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.04);
+  margin-bottom: 1.5rem;
+}
+.pos-hero {
+  border-radius: 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 55%, #1d4ed8 100%);
+  padding: 1.6rem 2rem; margin-bottom: 1.75rem; position: relative; overflow: hidden;
+}
+.pos-hero::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,.07);
+}
+.pos-option {
+  border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem 1.25rem;
+  cursor: pointer; transition: all .15s; background: #fff;
+}
+.pos-option:hover { border-color: #93c5fd; background: #f0f6ff; }
+.pos-option input[type=radio]:checked ~ .pos-option-label { color: #1d4ed8; }
+input[type=radio]:checked + .pos-option { border-color: #2563eb; background: #eff6ff; }
+.pos-option-label { font-weight: 700; font-size: 0.95rem; }
+.pos-option-sub { font-size: 0.78rem; color: #64748b; margin-top: 2px; }
+.history-row { font-size: 0.83rem; }
+.badge-pos-manorin     { background: #eff6ff; color: #1d4ed8; }
+.badge-pos-koordenador { background: #fef9c3; color: #854d0e; }
+.badge-pos {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700;
+}
+.badge-current { background: #f0fdf4; color: #15803d; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <!-- Hero -->
+  <div class="pos-hero">
+    <div style="position:relative;z-index:1;" class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <div style="width:50px;height:50px;border-radius:14px;background:rgba(255,255,255,.18);
+                    display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:#fff;">
+          <i class="bi bi-person-badge"></i>
+        </div>
+        <div>
+          <div style="font-size:0.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:rgba(255,255,255,.6);">Jestaun Pozisaun</div>
+          <h4 class="fw-bold text-white mb-0">{{ teacher.get_full_name }}</h4>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.7);margin-top:2px;">
+            Pozisaun atual:
+            {% if current %}
+              <strong>{{ current.get_position_display }}</strong> (husi {{ current.assigned_date|date:"d M Y" }})
+            {% else %}
+              <em>La iha pozisaun</em>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'core:user_list' %}" class="btn rounded-pill px-4 fw-semibold"
+         style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);font-size:0.82rem;">
+        <i class="bi bi-arrow-left me-1"></i>Fila
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Assignment form -->
+    <div class="col-lg-5">
+      <div class="card pos-card">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-1" style="color:#1e293b;">Atribui Pozisaun Foun</h6>
+          <p class="text-muted mb-4" style="font-size:0.8rem;">
+            Pozisaun uluk sei taka automaticamente no iha históriku.
+          </p>
+
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- Manorin option -->
+            <label class="d-block mb-3" style="cursor:pointer;">
+              <div class="d-flex align-items-center gap-3 pos-option {% if current.position == 'manorin' %}border-primary bg-primary bg-opacity-10{% endif %}">
+                <input type="radio" name="position" value="manorin"
+                       {% if current.position == 'manorin' or not current %}checked{% endif %}
+                       class="form-check-input mt-0 flex-shrink-0">
+                <div>
+                  <div class="pos-option-label"><i class="bi bi-person-fill text-primary me-1"></i>Manorin</div>
+                  <div class="pos-option-sub">Formadór ne'ebé hanorin iha sala</div>
+                </div>
+              </div>
+            </label>
+
+            <!-- Koordenador option -->
+            <label class="d-block mb-4" style="cursor:pointer;">
+              <div class="d-flex align-items-center gap-3 pos-option {% if current.position == 'koordenador' %}border-warning{% endif %}">
+                <input type="radio" name="position" value="koordenador"
+                       {% if current.position == 'koordenador' %}checked{% endif %}
+                       class="form-check-input mt-0 flex-shrink-0">
+                <div>
+                  <div class="pos-option-label"><i class="bi bi-person-fill-gear text-warning me-1"></i>Koordenador</div>
+                  <div class="pos-option-sub">Responsável ba koordinasaun programa</div>
+                </div>
+              </div>
+            </label>
+
+            <!-- Notes -->
+            <div class="mb-4">
+              <label class="form-label fw-semibold" style="font-size:0.83rem;">Nota <span class="text-muted fw-normal">(Opsional)</span></label>
+              <textarea name="notes" class="form-control" rows="2"
+                        placeholder="Razaun ba mudansa pozisaun..."
+                        style="border-radius:10px;font-size:0.83rem;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold w-100">
+              <i class="bi bi-check-circle me-1"></i>Salva Pozisaun
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="col-lg-7">
+      <div class="card pos-card">
+        <div class="card-header bg-white border-0 py-3 px-4">
+          <h6 class="fw-bold mb-0" style="color:#1e293b;">
+            <i class="bi bi-clock-history me-2" style="color:#2563eb;"></i>Históriku Pozisaun
+          </h6>
+        </div>
+        <div class="table-responsive">
+          <table class="table mb-0" style="font-size:0.83rem;">
+            <thead style="background:#f8fafc;">
+              <tr>
+                <th style="padding:.65rem 1rem;font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Pozisaun</th>
+                <th style="padding:.65rem 1rem;font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Data Hahú</th>
+                <th style="padding:.65rem 1rem;font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Data Remata</th>
+                <th style="padding:.65rem 1rem;font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Atribui Husi</th>
+                <th style="padding:.65rem 1rem;font-size:10.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pos in position_history %}
+              <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="padding:.7rem 1rem;vertical-align:middle;">
+                  <span class="badge-pos {% if pos.position == 'koordenador' %}badge-pos-koordenador{% else %}badge-pos-manorin{% endif %}">
+                    {% if pos.position == 'koordenador' %}<i class="bi bi-person-fill-gear"></i>{% else %}<i class="bi bi-person-fill"></i>{% endif %}
+                    {{ pos.get_position_display }}
+                  </span>
+                  {% if pos.is_current %}
+                  <span class="badge-current ms-1">Atual</span>
+                  {% endif %}
+                </td>
+                <td style="padding:.7rem 1rem;vertical-align:middle;color:#334155;">
+                  {{ pos.assigned_date|date:"d M Y" }}
+                </td>
+                <td style="padding:.7rem 1rem;vertical-align:middle;">
+                  {% if pos.end_date %}
+                    <span style="color:#64748b;">{{ pos.end_date|date:"d M Y" }}</span>
+                  {% else %}
+                    <span style="color:#15803d;font-weight:600;">—</span>
+                  {% endif %}
+                </td>
+                <td style="padding:.7rem 1rem;vertical-align:middle;color:#475569;">
+                  {% if pos.assigned_by %}{{ pos.assigned_by.get_full_name }}{% else %}<span style="color:#cbd5e1;">Auto-rejistu</span>{% endif %}
+                </td>
+                <td style="padding:.7rem 1rem;vertical-align:middle;color:#94a3b8;font-style:italic;">
+                  {{ pos.notes|default:"—" }}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4" style="font-size:0.83rem;">
+                  Seidauk iha rekord pozisaun.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -10,11 +10,12 @@ from django.contrib.auth import get_user_model
 import requests
 from fonte_api import send_whatsapp_message
 
-from core.forms import ForgotPasswordForm, ResetPasswordForm, UserForm, UserRegistrationForm, UserEditForm
+from core.forms import ForgotPasswordForm, ResetPasswordForm, UserForm, UserRegistrationForm, UserEditForm, TeacherQuickRegisterForm, SetPhoneForm
 from core.audit import log_action
 # Make sure this is at the top of your views file
 from django.core.cache import cache as django_cache
-from core.models import Child
+from core.models import Child, TeacherPosition
+import datetime
 from haap_platform import settings
 
 User = get_user_model()
@@ -436,3 +437,220 @@ def send_whatsapp_otp(phone, otp):
     response = requests.post(url, headers=headers, data=data)
     print(response.status_code, response.text)
     return response.json()
+
+@login_required
+def register_teacher_quick(request):
+    """Register a teacher by name/gender/position only — no phone required yet."""
+    if request.user.role != 'moe_admin':
+        messages.error(request, "Aksesu negadu.")
+        return redirect('core:user_list')
+
+    if request.method == 'POST':
+        form = TeacherQuickRegisterForm(request.POST)
+        if form.is_valid():
+            import uuid
+            teacher = form.save(commit=False)
+            teacher.role = 'teacher'
+            placeholder = f'TEMP{uuid.uuid4().hex[:11].upper()}'
+            teacher.username = placeholder
+            teacher.whatsapp_number = placeholder
+            teacher.is_active = True
+            teacher.is_verified = True
+            teacher.set_unusable_password()
+            teacher.save()
+
+            TeacherPosition.objects.create(
+                teacher=teacher,
+                position=form.cleaned_data['position'],
+                assigned_date=datetime.date.today(),
+                assigned_by=request.user,
+            )
+
+            log_action(
+                request=request,
+                action='create', module='Users',
+                description=f"Rejistu lalais formadór: {teacher.get_full_name()} ({form.cleaned_data['position']})",
+                record_id=str(teacher.id),
+                record_name=teacher.get_full_name(),
+                new_value={'position': form.cleaned_data['position'], 'gender': teacher.gender},
+            )
+            messages.success(request, f"Formadór {teacher.get_full_name()} rejistadu. Tau numeru telefone depois.")
+            return redirect('core:user_list')
+    else:
+        form = TeacherQuickRegisterForm()
+
+    return render(request, 'users/teacher_quick_register.html', {'form': form})
+
+
+@login_required
+def set_teacher_phone(request, user_id):
+    """Admin sets the real WhatsApp number for a teacher registered without a phone."""
+    if request.user.role != 'moe_admin':
+        messages.error(request, "Aksesu negadu.")
+        return redirect('core:user_list')
+
+    teacher = get_object_or_404(User, id=user_id, role='teacher')
+
+    if request.method == 'POST':
+        form = SetPhoneForm(request.POST, instance=teacher)
+        if form.is_valid():
+            # Check uniqueness manually (the model enforces it but gives a poor error)
+            phone = form.cleaned_data['whatsapp_number']
+            if User.objects.filter(whatsapp_number=phone).exclude(pk=teacher.pk).exists():
+                form.add_error('whatsapp_number', 'Numeru ne\'e uza ona.')
+            else:
+                old_phone = teacher.whatsapp_number
+                teacher = form.save()
+                # Give teacher a usable password placeholder they can reset later
+                if not teacher.has_usable_password():
+                    teacher.set_password('Haap2024!')
+                    teacher.save(update_fields=['password'])
+                log_action(
+                    request=request,
+                    action='update', module='Users',
+                    description=f"Tau numeru telefone ba {teacher.get_full_name()}: {phone}",
+                    record_id=str(teacher.id),
+                    record_name=teacher.get_full_name(),
+                    previous_value={'whatsapp_number': old_phone},
+                    new_value={'whatsapp_number': phone},
+                )
+                messages.success(request, f"Numeru telefone {teacher.get_full_name()} tau ona: {phone}")
+                return redirect('core:user_list')
+    else:
+        form = SetPhoneForm(instance=teacher)
+
+    return render(request, 'users/set_teacher_phone.html', {'form': form, 'teacher': teacher})
+
+
+@login_required
+def assign_position(request, user_id):
+    if request.user.role != 'moe_admin':
+        messages.error(request, "Aksesu negadu.")
+        return redirect('core:user_list')
+
+    teacher = get_object_or_404(User, id=user_id, role='teacher')
+    position_history = teacher.position_history.all()
+    current = position_history.filter(end_date__isnull=True).first()
+
+    if request.method == 'POST':
+        new_position = request.POST.get('position')
+        notes = request.POST.get('notes', '').strip()
+
+        if new_position not in ('manorin', 'koordenador'):
+            messages.error(request, "Pozisaun la válidu.")
+            return redirect('core:assign_position', user_id=user_id)
+
+        # Close the current open assignment
+        if current:
+            current.end_date = datetime.date.today()
+            current.save(update_fields=['end_date'])
+
+        # Create new assignment
+        TeacherPosition.objects.create(
+            teacher=teacher,
+            position=new_position,
+            assigned_date=datetime.date.today(),
+            assigned_by=request.user,
+            notes=notes or None,
+        )
+
+        log_action(
+            request=request,
+            user=request.user,
+            action='update',
+            module='Users',
+            description=f"Muda pozisaun {teacher.get_full_name()}: '{current.get_position_display() if current else '—'}' → '{dict(TeacherPosition.POSITION_CHOICES)[new_position]}'.",
+            record_id=str(teacher.id),
+            record_name=teacher.get_full_name(),
+            previous_value={'position': current.position if current else None},
+            new_value={'position': new_position},
+        )
+        messages.success(request, f"Pozisaun {teacher.get_full_name()} atualiza ona.")
+        return redirect('core:user_list')
+
+    return render(request, 'users/assign_position.html', {
+        'teacher': teacher,
+        'current': current,
+        'position_history': position_history,
+    })
+
+
+@login_required
+def assign_teacher_schools(request, user_id):
+    if request.user.role != 'moe_admin':
+        messages.error(request, 'Aksesu negadu.')
+        return redirect('core:dashboard')
+
+    from preschools.models import Preschool, PreschoolTeacher
+
+    teacher = get_object_or_404(User, id=user_id, role='teacher')
+
+    # Current active assignments
+    assignments = PreschoolTeacher.objects.filter(
+        teacher=teacher, is_active=True
+    ).select_related('preschool').order_by('preschool__name')
+
+    assigned_ids = set(a.preschool_id for a in assignments)
+
+    # Schools not yet assigned
+    available = Preschool.objects.exclude(id__in=assigned_ids).order_by('name')
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'add':
+            preschool_id = request.POST.get('preschool_id')
+            is_primary = request.POST.get('is_primary') == '1'
+            preschool = get_object_or_404(Preschool, id=preschool_id)
+
+            if is_primary:
+                # Clear any existing primary flag for this teacher
+                PreschoolTeacher.objects.filter(teacher=teacher, is_active=True).update(is_primary=False)
+
+            rel, created = PreschoolTeacher.objects.get_or_create(
+                teacher=teacher,
+                preschool=preschool,
+                defaults={'is_active': True, 'is_approved': True, 'is_primary': is_primary},
+            )
+            if not created:
+                rel.is_active = True
+                rel.is_approved = True
+                if is_primary:
+                    rel.is_primary = True
+                rel.save()
+
+            log_action(
+                request=request, action='create', module='Users',
+                description=f"Atribui eskola '{preschool.name}' ba {teacher.get_full_name()}.",
+                record_id=str(teacher.id), record_name=teacher.get_full_name(),
+            )
+            messages.success(request, f"Eskola '{preschool.name}' atribuidu ba {teacher.get_full_name()}.")
+
+        elif action == 'set_primary':
+            assignment_id = request.POST.get('assignment_id')
+            PreschoolTeacher.objects.filter(teacher=teacher, is_active=True).update(is_primary=False)
+            rel = get_object_or_404(PreschoolTeacher, id=assignment_id, teacher=teacher, is_active=True)
+            rel.is_primary = True
+            rel.save()
+            messages.success(request, f"'{rel.preschool.name}' hili nudar eskola primáriu.")
+
+        elif action == 'remove':
+            assignment_id = request.POST.get('assignment_id')
+            rel = get_object_or_404(PreschoolTeacher, id=assignment_id, teacher=teacher, is_active=True)
+            school_name = rel.preschool.name
+            rel.is_active = False
+            rel.save()
+            log_action(
+                request=request, action='delete', module='Users',
+                description=f"Hasai eskola '{school_name}' husi {teacher.get_full_name()}.",
+                record_id=str(teacher.id), record_name=teacher.get_full_name(),
+            )
+            messages.success(request, f"Eskola '{school_name}' hasai husi {teacher.get_full_name()}.")
+
+        return redirect('core:assign_teacher_schools', user_id=user_id)
+
+    return render(request, 'users/assign_teacher_schools.html', {
+        'teacher': teacher,
+        'assignments': assignments,
+        'available': available,
+    })

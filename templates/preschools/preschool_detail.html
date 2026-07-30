@@ -124,6 +124,7 @@
 .klase-act:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
 .klase-act.view:hover  { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
 .klase-act.edit:hover  { background: #f0fdf4; border-color: #86efac; color: #16a34a; }
+.klase-act.del:hover   { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
 
 /* ══ Mini map ═══════════════════════════════════════════════════════════════ */
 #detailMap { height: 200px; width: 100%; border-radius: 0 0 12px 12px; }
@@ -177,6 +178,11 @@
               <span class="pd-type-badge">
                 {{ preschool.get_preschool_type_display }}
               </span>
+              {% if preschool.emis_code %}
+              <span style="background:rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:2px 8px;font-size:0.72rem;font-weight:700;letter-spacing:.04em;">
+                EMIS {{ preschool.emis_code }}
+              </span>
+              {% endif %}
             </div>
             <h3 class="fw-bold text-white mb-1" style="letter-spacing:-0.3px;">{{ preschool.name }}</h3>
             <div style="font-size:0.8rem;color:rgba(255,255,255,.7);">
@@ -394,6 +400,14 @@
                   <a href="{% url 'preschools:classroom_update' id=classroom.id %}" class="klase-act edit" title="Edita">
                     <i class="bi bi-pencil"></i>
                   </a>
+                  <form method="post" action="{% url 'preschools:classroom_delete' id=classroom.id %}" style="margin:0;" class="klase-del-form">
+                    {% csrf_token %}
+                    <button type="submit" class="klase-act del" title="Hasai"
+                            data-name="{{ classroom.name }}"
+                            style="cursor:pointer;border:1px solid #e2e8f0;background:#fff;">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </form>
                 </div>
               </div>
               <div class="klase-name">{{ classroom.name }}</div>
@@ -446,6 +460,79 @@
       </div>
       {% endif %}
 
+      <!-- ══ EQUIPMENT SECTION ══════════════════════════════════════════════ -->
+      <div class="mt-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <div class="section-title"><i class="bi bi-box-seam me-1" style="color:#2563eb;"></i>Ekipamentu Atribuidu</div>
+            <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">
+              {{ equipment_total }} item rejista ba eskola ne'e
+            </div>
+          </div>
+          {% if user.role == 'moe_admin' %}
+          <a href="{% url 'equipment:equipment_by_preschool' preschool.pk %}"
+             class="btn btn-sm rounded-pill px-3 fw-semibold"
+             style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;font-size:.78rem;">
+            <i class="bi bi-list-ul me-1"></i>Lista Kompletu
+          </a>
+          {% endif %}
+        </div>
+
+        {% if equipment_by_type %}
+        <div class="row g-3">
+          {% for eq in equipment_by_type %}
+          <div class="col-12 col-sm-6 col-md-4">
+            <div style="background:#fff;border:1px solid #f1f5f9;border-radius:14px;
+                        box-shadow:0 1px 4px rgba(0,0,0,.05);padding:1rem 1.1rem;">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div style="width:38px;height:38px;border-radius:10px;background:#eff6ff;
+                            display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i class="bi {{ eq.type.icon }}" style="color:#2563eb;font-size:1rem;"></i>
+                </div>
+                <div>
+                  <div style="font-weight:700;font-size:.88rem;color:#0f172a;line-height:1.2;">{{ eq.type.name }}</div>
+                  <div style="font-size:1.4rem;font-weight:800;color:#1d4ed8;letter-spacing:-.5px;line-height:1;">{{ eq.total }}</div>
+                </div>
+              </div>
+              <!-- Status breakdown -->
+              <div class="d-flex flex-wrap gap-1 pt-2" style="border-top:1px solid #f1f5f9;">
+                {% if eq.active %}
+                <span style="display:inline-flex;align-items:center;gap:3px;background:#f0fdf4;color:#15803d;
+                             border-radius:20px;padding:1px 7px;font-size:.7rem;font-weight:700;">
+                  <i class="bi bi-circle-fill" style="font-size:.35rem;"></i>{{ eq.active }} Ativu
+                </span>
+                {% endif %}
+                {% if eq.damaged %}
+                <span style="display:inline-flex;align-items:center;gap:3px;background:#fef2f2;color:#dc2626;
+                             border-radius:20px;padding:1px 7px;font-size:.7rem;font-weight:700;">
+                  {{ eq.damaged }} Estragu
+                </span>
+                {% endif %}
+                {% if eq.inactive %}
+                <span style="display:inline-flex;align-items:center;gap:3px;background:#f1f5f9;color:#475569;
+                             border-radius:20px;padding:1px 7px;font-size:.7rem;font-weight:700;">
+                  {{ eq.inactive }} Inativu
+                </span>
+                {% endif %}
+                {% if eq.retired %}
+                <span style="display:inline-flex;align-items:center;gap:3px;background:#fefce8;color:#854d0e;
+                             border-radius:20px;padding:1px 7px;font-size:.7rem;font-weight:700;">
+                  {{ eq.retired }} Retirado
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:2.5rem 1.5rem;border:2px dashed #e2e8f0;border-radius:14px;">
+          <i class="bi bi-box-seam d-block mb-2" style="font-size:2rem;color:#cbd5e1;"></i>
+          <div style="font-size:.83rem;color:#94a3b8;">Seidauk iha ekipamentu atribuidu ba eskola ne'e.</div>
+        </div>
+        {% endif %}
+      </div>
+
     </div>
   </div>
 
@@ -482,4 +569,14 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endif %}
 
+<script>
+document.querySelectorAll('.klase-del-form').forEach(function(form) {
+  form.addEventListener('submit', function(e) {
+    var name = form.querySelector('[data-name]').dataset.name;
+    if (!confirm('Hasai klase "' + name + '"? Aksaun ida ne\'e la bele desfaz.')) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
 {% endblock %}

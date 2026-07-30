@@ -18,6 +18,8 @@ from klase.models import ClassroomChild
 from core.models import Child
 from klase.forms import ChildCodeEnrollmentForm
 from fonte_api import send_whatsapp_message
+from core.audit import log_action
+from equipment.models import Equipment, EquipmentType
 
 
 @method_decorator(login_required, name='dispatch')
@@ -86,7 +88,16 @@ class PreschoolCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        obj = form.instance
+        log_action(
+            request=self.request, action='create', module='Pre-Eskolár',
+            description=f"Kria pre-eskolár: {obj.name}",
+            record_id=str(obj.pk), record_name=obj.name,
+            new_value={'name': obj.name, 'emis': obj.emis_code, 'type': obj.preschool_type,
+                       'municipality': str(obj.municipality)},
+        )
+        return response
 
 @method_decorator(login_required, name='dispatch')
 class PreschoolUpdateView(UpdateView):
@@ -101,6 +112,19 @@ class PreschoolUpdateView(UpdateView):
             return redirect('core:moe_admin_dashboard')
         return super().dispatch(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        old = {f: str(getattr(self.object, f, '') or '') for f in ('name', 'emis_code', 'preschool_type')}
+        response = super().form_valid(form)
+        obj = form.instance
+        log_action(
+            request=self.request, action='update', module='Pre-Eskolár',
+            description=f"Atualiza pre-eskolár: {obj.name}",
+            record_id=str(obj.pk), record_name=obj.name,
+            previous_value=old,
+            new_value={f: str(getattr(obj, f, '') or '') for f in ('name', 'emis_code', 'preschool_type')},
+        )
+        return response
+
 @method_decorator(login_required, name='dispatch')
 class PreschoolDeleteView(DeleteView):
     model = Preschool
@@ -112,6 +136,17 @@ class PreschoolDeleteView(DeleteView):
             messages.error(request, 'Aksesu negadu.')
             return redirect('core:moe_admin_dashboard')
         return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        obj = self.get_object()
+        record_id, record_name = str(obj.pk), obj.name
+        response = super().form_valid(form)
+        log_action(
+            request=self.request, action='delete', module='Pre-Eskolár',
+            description=f"Apaga pre-eskolár: {record_name}",
+            record_id=record_id, record_name=record_name,
+        )
+        return response
 
 @method_decorator(login_required, name='dispatch')
 class PreschoolDetailView(DetailView):
@@ -131,6 +166,30 @@ class PreschoolDetailView(DetailView):
         context['approved_teacher_count'] = self.object.teachers.filter(
             is_approved=True
         ).count()
+
+        # Equipment assigned to this preschool, grouped by type
+        eq_qs = (
+            Equipment.objects
+            .filter(preschool=self.object)
+            .select_related('equipment_type')
+        )
+        eq_by_type = {}
+        for eq in eq_qs:
+            t = eq.equipment_type
+            if t.id not in eq_by_type:
+                eq_by_type[t.id] = {
+                    'type': t,
+                    'total': 0,
+                    'active': 0,
+                    'damaged': 0,
+                    'retired': 0,
+                    'inactive': 0,
+                }
+            eq_by_type[t.id]['total'] += 1
+            eq_by_type[t.id][eq.status] = eq_by_type[t.id].get(eq.status, 0) + 1
+
+        context['equipment_by_type'] = sorted(eq_by_type.values(), key=lambda x: x['type'].name)
+        context['equipment_total'] = eq_qs.count()
         return context
 
 """Claim the preschool as a teacher. This allows the user to manage the preschool's classrooms and students."""
@@ -249,6 +308,11 @@ def join_view(request, preschool_id):
     else:
         messages.success(request, "Pedidu haruka ona. Hein aprovasaun admin nian.")
 
+    log_action(
+        request=request, action='other', module='Pre-Eskolár',
+        description=f"Profesór {request.user.get_full_name()} husu aksesu ba {preschool.name}",
+        record_id=str(preschool.pk), record_name=preschool.name,
+    )
     return redirect('preschools:teacher_preschool_list')
 
 @method_decorator(login_required, name='dispatch')
@@ -295,6 +359,12 @@ def approve_preschool_teacher_request(request, request_id):
     except Exception as exc:
         messages.warning(request, f'Profesór pre-eskolár nian aprova ona, maibé notifikasaun WhatsApp la konsege haruka. {exc}')
 
+    log_action(
+        request=request, action='activate', module='Pre-Eskolár',
+        description=f"Aprova profesór {preschool_teacher.teacher.get_full_name()} ba {preschool_teacher.preschool.name}",
+        record_id=str(preschool_teacher.pk),
+        record_name=preschool_teacher.teacher.get_full_name(),
+    )
     return redirect('preschools:teacher_request_list')
 
 class UnclaimPreschoolView(LoginRequiredMixin, View):
@@ -379,15 +449,14 @@ class ClassroomCreateView(LoginRequiredMixin, CreateView):
             classroom.save()
 
             # SUCCESS MESSAGE
-            messages.success(
-                self.request,
-                "Sala aula kria ho susesu."
+            messages.success(self.request, "Sala aula kria ho susesu.")
+            log_action(
+                request=self.request, action='create', module='Sala Aula',
+                description=f"Kria sala aula: {classroom.name} iha {self.preschool.name}",
+                record_id=str(classroom.pk), record_name=classroom.name,
+                new_value={'name': classroom.name, 'preschool': self.preschool.name},
             )
-
-            return redirect(
-                "preschools:preschool_detail",
-                id=self.preschool.id
-            )
+            return redirect("preschools:preschool_detail", pk=self.preschool.id)
 
         except IntegrityError:
             # FIELD ERROR
@@ -480,6 +549,12 @@ def enroll_child(request, id):
 
         from django.contrib import messages
         messages.success(request, 'Child enrolled successfully.')
+        log_action(
+            request=request, action='create', module='Sala Aula',
+            description=f"Rejista labarik '{child.first_name}' iha sala '{classroom.name}'",
+            record_id=str(classroom.pk), record_name=classroom.name,
+            new_value={'child': str(child), 'classroom': classroom.name},
+        )
 
     return redirect('preschools:classroom_detail', id=classroom.id)
 
@@ -496,8 +571,18 @@ class ClassroomUpdateView(LoginRequiredMixin, UpdateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        old_name = self.object.name
+        response = super().form_valid(form)
+        obj = form.instance
         messages.success(self.request, "Klass update ho susesu.")
-        return super().form_valid(form)
+        log_action(
+            request=self.request, action='update', module='Sala Aula',
+            description=f"Atualiza sala aula: {obj.name}",
+            record_id=str(obj.pk), record_name=obj.name,
+            previous_value={'name': old_name},
+            new_value={'name': obj.name},
+        )
+        return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -509,3 +594,23 @@ class ClassroomUpdateView(LoginRequiredMixin, UpdateView):
             "preschools:preschool_detail",
             kwargs={"pk": self.object.preschool.id}
         )
+
+
+class ClassroomDeleteView(LoginRequiredMixin, View):
+    def post(self, request, id):
+        if request.user.role != 'moe_admin':
+            messages.error(request, 'Aksesu negadu.')
+            return redirect('core:moe_admin_dashboard')
+
+        classroom = get_object_or_404(Classroom, id=id)
+        preschool_id = classroom.preschool_id
+        classroom_name = classroom.name
+
+        log_action(
+            request=request, action='delete', module='Sala Aula',
+            description=f"Hasai klase: {classroom_name} husi {classroom.preschool.name}",
+            record_id=str(classroom.id), record_name=classroom_name,
+        )
+        classroom.delete()
+        messages.success(request, f"Klase '{classroom_name}' hasai ho susesu.")
+        return redirect('preschools:preschool_detail', pk=preschool_id)

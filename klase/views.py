@@ -27,6 +27,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from preschools.models import PreschoolTeacher
 from preschools.models import Preschool
 from .models import Classroom
+from core.audit import log_action
 
 
 @method_decorator(login_required, name='dispatch')
@@ -353,6 +354,15 @@ class ClassroomDetailView(View):
                 is_active=True
             )
 
+        log_action(
+            request=request,
+            user=request.user,
+            action='create',
+            module='klase',
+            description=f"Enroll labarik '{child.first_name}' (kódigu: {child_code}) ba klase '{classroom.name}' iha {classroom.preschool.name}.",
+            record_id=str(child.id),
+            record_name=child.first_name,
+        )
         messages.success(
             request,
             f"{child.first_name} adisiona ona ba klase '{classroom.name}' ho susesu."
@@ -378,9 +388,19 @@ class RemoveStudentFromClassroomView(View):
         )
 
         child_name = enrollment.child.first_name
+        child_id = str(enrollment.child.id)
         enrollment.is_active = False
         enrollment.save(update_fields=['is_active'])
 
+        log_action(
+            request=request,
+            user=request.user,
+            action='delete',
+            module='klase',
+            description=f"Hasai labarik '{child_name}' hosi klase '{classroom.name}' iha {classroom.preschool.name}.",
+            record_id=child_id,
+            record_name=child_name,
+        )
         messages.success(request, f"{child_name} remove ona hosi klase {classroom.name}.")
         return redirect('klase:classroom_detail', classroom_id=classroom.id)
 
@@ -615,6 +635,15 @@ class AjaxRegisterChild(View):
             added_by=request.user
         )
 
+        log_action(
+            request=request,
+            user=request.user,
+            action='create',
+            module='klase',
+            description=f"Rejista labarik '{first_name}' (via AJAX) ba klase '{classroom.name}'.",
+            record_id=str(child.id),
+            record_name=first_name,
+        )
         return JsonResponse({"success": True})
 
 class ClassroomListView(ListView):
@@ -678,6 +707,15 @@ class AddChildToClassroomView(View):
             added_by=request.user
         )
 
+        log_action(
+            request=request,
+            user=request.user,
+            action='create',
+            module='klase',
+            description=f"Adisiona labarik '{child.first_name}' ba klase '{classroom.name}' iha {classroom.preschool.name}.",
+            record_id=str(child.id),
+            record_name=child.first_name,
+        )
         messages.success(request, "Child added successfully.")
 
         return redirect("klase:classroom_detail", classroom_id=classroom.id)
