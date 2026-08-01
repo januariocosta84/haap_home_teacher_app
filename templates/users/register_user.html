@@ -308,6 +308,41 @@
           </div>
         </div>
 
+        <!-- ── CARD 4b: Informasaun Professor (only shown when role = teacher) ── -->
+        <div class="card border-0 shadow-sm mb-4 d-none" id="teacherFieldsCard" style="border-radius:16px;">
+          <div class="card-body p-4">
+            <div class="section-divider">
+              <i class="bi bi-person-workspace me-1"></i>Informasaun Professor
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">
+                  Sexu <span class="text-danger">*</span>
+                </label>
+                <div class="field-wrap">
+                  <i class="bi bi-person-badge field-icon"></i>
+                  {{ form.gender }}
+                </div>
+                {% for e in form.gender.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold small">
+                  Pozisaun <span class="text-danger">*</span>
+                </label>
+                <div class="field-wrap">
+                  <i class="bi bi-briefcase field-icon"></i>
+                  {{ form.position }}
+                </div>
+                {% for e in form.position.errors %}
+                <div class="text-danger small mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- ── CARD 5: Password ── -->
         <div class="card border-0 shadow-sm mb-4" style="border-radius:16px;">
           <div class="card-body p-4">
@@ -367,6 +402,7 @@ function selectRole(value, card) {
 
 function applyRoleFieldRules(role) {
   const isAuditing    = role === 'moe_auditing';
+  const isTeacher     = role === 'teacher';
   const whatsappRow   = document.getElementById('whatsappRow');
   const emailRequired = document.getElementById('emailRequired');
   const pwRequired    = document.getElementById('pwRequired');
@@ -375,6 +411,15 @@ function applyRoleFieldRules(role) {
   const whatsappInput = document.getElementById('id_whatsapp_number');
   const emailInput    = document.getElementById('id_email');
   const pwInput       = document.getElementById('id_password');
+
+  const teacherFieldsCard = document.getElementById('teacherFieldsCard');
+  const genderInput       = document.getElementById('id_gender');
+  const positionInput     = document.getElementById('id_position');
+  if (teacherFieldsCard) {
+    teacherFieldsCard.classList.toggle('d-none', !isTeacher);
+    if (genderInput)   genderInput.required   = isTeacher;
+    if (positionInput) positionInput.required = isTeacher;
+  }
 
   if (isAuditing) {
     whatsappRow.classList.add('d-none');

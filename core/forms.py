@@ -11,7 +11,7 @@ from django.utils.encoding import force_bytes
 from django.conf import settings
 from django import forms
 from django.core.validators import RegexValidator
-from .models import User, Municipality, AdministrativePost, Suco, Aldeia
+from .models import User, Municipality, AdministrativePost, Suco, Aldeia, TeacherPosition
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
 from .utils import normalize_whatsapp_number
@@ -650,12 +650,20 @@ class UserRegistrationForm(forms.ModelForm):
         widget=forms.Select(attrs={"class": "form-select"})
     )
 
+    # Teacher-only fields (shown/required only when role == 'teacher')
+    position = forms.ChoiceField(
+        choices=[("", "Hili Pozisaun")] + TeacherPosition.POSITION_CHOICES,
+        required=False,
+        label="Pozisaun",
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+
     class Meta:
         model = User
         fields = [
             "first_name", "last_name", "whatsapp_number", "email", "address",
             "municipality", "administrative_post", "suco", "aldeia",
-            "role", "password"
+            "role", "gender", "password"
         ]
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "form-control"}),
@@ -672,6 +680,7 @@ class UserRegistrationForm(forms.ModelForm):
             "administrative_post": forms.Select(attrs={"class": "form-select"}),
             "suco": forms.Select(attrs={"class": "form-select"}),
             "aldeia": forms.Select(attrs={"class": "form-select"}),
+            "gender": forms.Select(attrs={"class": "form-select"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -730,6 +739,9 @@ class UserRegistrationForm(forms.ModelForm):
                     Aldeia.objects.filter(suco=self.instance.suco)
                 )
 
+    def clean_whatsapp_number(self):
+        return normalize_whatsapp_number(self.cleaned_data.get('whatsapp_number', ''))
+
     def clean(self):
         cleaned = super().clean()
         role = cleaned.get('role')
@@ -742,6 +754,12 @@ class UserRegistrationForm(forms.ModelForm):
             # For all other roles, whatsapp_number is mandatory
             if not cleaned.get('whatsapp_number'):
                 self.add_error('whatsapp_number', 'Numeru WhatsApp obrigatóriu.')
+
+        if role == 'teacher':
+            if not cleaned.get('gender'):
+                self.add_error('gender', 'Sexu obrigatóriu ba Professor.')
+            if not cleaned.get('position'):
+                self.add_error('position', 'Pozisaun obrigatóriu ba Professor (Manorin ka Koordenador).')
         return cleaned
 
     def save(self, commit=True):

@@ -52,6 +52,15 @@ def register_user(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+
+            if user.role == 'teacher' and form.cleaned_data.get('position'):
+                TeacherPosition.objects.create(
+                    teacher=user,
+                    position=form.cleaned_data['position'],
+                    assigned_date=datetime.date.today(),
+                    assigned_by=request.user,
+                )
+
             log_action(
                 request=request,
                 action='create', module='Users',
