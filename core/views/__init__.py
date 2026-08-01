@@ -12,7 +12,7 @@ from .reports import ChildrenReportView, ClassAssociationReportView
 from .ajax_loads import get_children_by_parent, get_parents_by_municipality, load_administrative_posts, load_sucos, load_aldeias
 from .user_management import UserManagementView, register_user, view_user, approve_teacher, edit_user, delete_user
 # core/views/__init__.py
-from .errors import custom_404
+from .errors import custom_404, csrf_failure
 
 
 __all__ = [
@@ -26,7 +26,6 @@ __all__ = [
     'home', 'parent_home', 'admin_parent_child_list',
     'ChildrenReportView', 'ClassAssociationReportView', 'UserManagementView', 'register_user', 'view_user', 'approve_teacher', 'edit_user', 'delete_user',
     'get_children_by_parent', 'get_parents_by_municipality', 'load_administrative_posts', 'load_sucos', 'load_aldeias',
-    'custom_404',
-
+    'custom_404', 'csrf_failure',
 
 ]

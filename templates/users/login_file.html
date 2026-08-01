@@ -36,6 +36,15 @@
         <div class="login-card-sub">Tama ho ita nia numeru no password</div>
       </div>
 
+      <!-- In-app-browser warning (WhatsApp/Facebook/Instagram/Messenger webviews
+           sometimes strip the Referer header, which breaks CSRF/login) -->
+      <div id="inapp-browser-warning" class="alert alert-warning d-none mb-3"
+           style="border-radius:8px;padding:10px 14px;font-size:.82rem;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Ita hakerek liu husi app hanesan WhatsApp ka Facebook, ne'ebe bele halo login la funsiona di'ak.
+        Favor hili menu <strong>"Loke iha Browser"</strong> (Open in Browser) antes hakerek password.
+      </div>
+
       <!-- Alerts -->
       {% if messages %}
         <div class="mb-3">
@@ -180,6 +189,15 @@
 </style>
 
 <script>
+(function () {
+  var ua = navigator.userAgent || '';
+  var isInApp = /FBAN|FBAV|Instagram|WhatsApp|Line\/|MicroMessenger/i.test(ua);
+  if (isInApp) {
+    var el = document.getElementById('inapp-browser-warning');
+    if (el) el.classList.remove('d-none');
+  }
+})();
+
 function toggleLoginPassword() {
   const f = document.querySelector('[name=password]');
   const i = document.getElementById('loginEyeIcon');

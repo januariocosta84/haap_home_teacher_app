@@ -16,6 +16,14 @@ DEBUG = os.getenv('DEBUG', 'True') == 'False'
 _allowed = os.getenv('ALLOWED_HOSTS')
 ALLOWED_HOSTS = _allowed.split(',') if _allowed else ['192.168.1.23', 'localhost', '127.0.0.1', '154.26.155.43']
 
+# Required for HTTPS: Django's CSRF check validates the Referer header's origin
+# against this list. Without it, a Referer from e.g. www vs bare domain would
+# be rejected even though both serve the same app.
+CSRF_TRUSTED_ORIGINS = [
+    'https://timor.rev-school.com',
+    'https://www.timor.rev-school.com',
+]
+
 
 # Application definition
 
@@ -119,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -147,6 +155,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py
 AUTH_USER_MODEL = 'core.User'
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
@@ -163,7 +172,7 @@ MESSAGE_TAGS = {
 
 
 
-SITE_URL = "http://127.0.0.1:8000"  # or your production domain
+SITE_URL = "https://timor.rev-school.com"  # or your production domain
 DEFAULT_FROM_EMAIL = "no-reply@yourdomain.com"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 

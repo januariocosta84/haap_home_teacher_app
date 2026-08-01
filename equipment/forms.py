@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from core.models import User
 from equipment.models import Equipment, EquipmentAssignmentHistory, EquipmentType
 from klase.models import Classroom
@@ -94,7 +95,7 @@ class EquipmentForm(forms.ModelForm):
         self.fields['teacher'].empty_label = 'Hili Professor'
 
         # Dynamic classroom filter
-        if 'preschool' in self.data:
+        if self.data.get('preschool'):
             try:
                 preschool_id = self.data.get('preschool')
 
@@ -104,7 +105,7 @@ class EquipmentForm(forms.ModelForm):
                     )
                 )
 
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, ValidationError):
                 pass
 
         elif self.instance.pk and self.instance.preschool:
@@ -202,13 +203,13 @@ class EquipmentAssignmentForm(forms.Form):
         self.fields['action'].initial = 'reassign'
         self.fields['classroom'].queryset = Classroom.objects.none()
 
-        if 'preschool' in self.data:
+        if self.data.get('preschool'):
             try:
                 preschool_id = self.data.get('preschool')
                 self.fields['classroom'].queryset = Classroom.objects.filter(
                     preschool_id=preschool_id
                 )
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, ValidationError):
                 pass
 
     def clean(self):

@@ -1,0 +1,50 @@
+{% extends "core/base.html" %}
+
+{% block title %}403 — Verifikasaun Seguransa Falha{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+
+      <div class="card border-0 shadow-sm text-center" style="border-radius:20px;overflow:hidden;">
+        <div class="card-body p-5">
+
+          <!-- Icon -->
+          <div class="mb-3">
+            <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle"
+                 style="width:90px;height:90px;background:#fef2f2;">
+              <i class="bi bi-shield-exclamation text-danger" style="font-size:2.5rem;"></i>
+            </div>
+          </div>
+
+          <!-- Message -->
+          <h5 class="fw-semibold mb-2">Sesaun Expira ka Seguransa Falha</h5>
+          <p class="text-muted mb-3" style="font-size:.9rem;">
+            Pajina ne'ebe ita hakerek liu bar barak, ka browser ne'ebe ita uza (hanesan WhatsApp/Facebook
+            nia browser interna) la fó informasaun seguransa ne'ebe presiza. Favor tenta fila fali.
+          </p>
+
+          <div class="mb-4 px-3 py-2 rounded-3 text-start mx-auto" style="background:#f8fafc;border:1px solid #e2e8f0;max-width:420px;">
+            <div class="text-muted" style="font-size:.8rem;">
+              <i class="bi bi-lightbulb-fill me-1 text-warning"></i>
+              <strong>Dika:</strong> se ita loke link ne'e husi WhatsApp ka Facebook, favor hili
+              "Loke iha Browser" (Open in Browser) antes ita hakerek ita nia password.
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'core:login' %}"
+               class="btn btn-primary rounded-pill px-4 fw-semibold">
+              <i class="bi bi-arrow-clockwise me-1"></i>Tenta Fila Fali
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -14,6 +14,7 @@ from django.core.validators import RegexValidator
 from .models import User, Municipality, AdministrativePost, Suco, Aldeia
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
+from .utils import normalize_whatsapp_number
 
 #Registration form
 class ParentRegistrationForm(forms.ModelForm):
@@ -306,6 +307,9 @@ class LoginForm(AuthenticationForm):
         "inactive": "Kontu ida ne’e la ativa ona.",
     }
 
+    def clean_username(self):
+        return normalize_whatsapp_number(self.cleaned_data.get('username', ''))
+
 class ChildRegistrationForm(forms.ModelForm):
     class Meta:
         model = Child
@@ -525,6 +529,8 @@ class ParentRegisterForm(forms.ModelForm):
             except (ValueError, TypeError):
                 pass
 
+    def clean_whatsapp_number(self):
+        return normalize_whatsapp_number(self.cleaned_data.get('whatsapp_number', ''))
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -971,7 +977,7 @@ class ForgotPasswordForm(forms.Form):
     )
 
     def clean_whatsapp_number(self):
-        number = self.cleaned_data['whatsapp_number']
+        number = normalize_whatsapp_number(self.cleaned_data['whatsapp_number'])
         if not User.objects.filter(whatsapp_number=number).exists():
             raise forms.ValidationError("Númeru WhatsApp ne'e la iha sistema.")
         return number

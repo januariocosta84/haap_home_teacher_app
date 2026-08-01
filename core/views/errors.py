@@ -2,6 +2,10 @@ from django.shortcuts import render
 from django.urls import reverse
 
 
+def csrf_failure(request, reason=""):
+    return render(request, '403_csrf.html', status=403)
+
+
 def custom_404(request, exception):
     user = request.user
     if user.is_authenticated:
