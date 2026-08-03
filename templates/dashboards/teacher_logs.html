@@ -4,6 +4,8 @@
 {% block title %}Atividade Profesór{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 <style>
 /* ══ Hero ══════════════════════════════════════════════════════════════════ */
 .tl-hero {
@@ -309,7 +311,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
         {% if teachers %}
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="tl-filter-label">Profesór</label>
-          <select name="teacher" class="form-select form-select-sm">
+          <select name="teacher" id="teacherFilter" class="form-select form-select-sm">
             <option value="">Hotu profesór</option>
             {% for teacher in teachers %}
             <option value="{{ teacher.id }}" {% if filter_teacher == teacher.id|stringformat:"s" %}selected{% endif %}>
@@ -323,7 +325,7 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
         {% if preschools %}
         <div class="col-12 col-sm-6 col-lg-3">
           <label class="tl-filter-label">Pre-Eskolár</label>
-          <select name="preschool" class="form-select form-select-sm">
+          <select name="preschool" id="preschoolFilter" class="form-select form-select-sm">
             <option value="">Hotu eskola</option>
             {% for preschool in preschools %}
             <option value="{{ preschool.id }}" {% if filter_preschool == preschool.id|stringformat:"s" %}selected{% endif %}>
@@ -399,8 +401,32 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-link:hover {
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+  if (typeof $ !== 'undefined' && $.fn.select2) {
+    $('#teacherFilter').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Hotu profesór',
+      allowClear: true,
+      language: {
+        noResults: function () { return 'Laiha profesór hetan'; },
+        searching: function () { return 'Buka...'; },
+      },
+    });
+    $('#preschoolFilter').select2({
+      theme: 'bootstrap-5',
+      width: '100%',
+      placeholder: 'Hotu eskola',
+      allowClear: true,
+      language: {
+        noResults: function () { return 'Laiha eskola hetan'; },
+        searching: function () { return 'Buka...'; },
+      },
+    });
+  }
 
   var dtTable;
 
